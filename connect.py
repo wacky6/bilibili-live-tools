@@ -3,6 +3,7 @@ import utils
 from bilibiliCilent import bilibiliClient
 from printer import Printer
 from bilibili import bilibili
+from configloader import ConfigLoader
 
 
 class connect():
@@ -44,7 +45,7 @@ class connect():
         self.tag_reconnect = True
         if self.danmuji is not None:
             self.danmuji.close_connection()
-        bilibili().dic_bilibili['roomid'] = roomid
+        ConfigLoader().dic_user['other_control']['default_monitor_roomid'] = roomid
         print('已经切换roomid')
         self.tag_reconnect = False
         

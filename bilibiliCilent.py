@@ -2,6 +2,7 @@ from bilibili import bilibili
 from statistics import Statistics
 from printer import Printer
 from rafflehandler import Rafflehandler
+from configloader import ConfigLoader
 import utils
 import asyncio
 import random
@@ -182,7 +183,7 @@ class bilibiliClient():
             return
         self._reader = reader
         self._writer = writer
-        if (await self.SendJoinChannel(self.bilibili.dic_bilibili['roomid']) == True):
+        if (await self.SendJoinChannel(ConfigLoader().dic_user['other_control']['default_monitor_roomid']) == True):
             self.connected = True
             Printer().printlist_append(['join_lottery', '', 'user', '连接弹幕服务器成功'], True)
             await self.ReceiveMessageLoop()
