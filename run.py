@@ -11,6 +11,7 @@ from bilibili import bilibili
 from configloader import ConfigLoader
 import threading
 import os
+from login import Login
 import biliconsole
 
 
@@ -24,6 +25,8 @@ ConfigLoader(colorfile=file_color, userfile=file_user, bilibilifile=file_bilibil
 # print('Hello world.')
 printer = Printer()
 bilibili()
+login0 = Login()
+login0.login()
 Statistics()
 
 rafflehandler = Rafflehandler()
@@ -59,15 +62,10 @@ try:
     loop.run_until_complete(asyncio.wait(tasks))
 except KeyboardInterrupt:
     # print(sys.exc_info()[0], sys.exc_info()[1])
-    if bilibili().dic_bilibili['saved-session']['keep-login'] == 'True':
+    if ConfigLoader().dic_user['other_control']['keep-login']:
         pass
     else:
-        response = bilibili().logout()
-        
-        if response.text.find('成功退出登录') == -1:
-            print('登出失败', response)
-        else:
-            print('成功退出登陆')
+        response = login0.logout()
     
 console_thread.join()
 

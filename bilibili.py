@@ -1,15 +1,12 @@
 import sys
 from imp import reload
 from configloader import ConfigLoader
-import os
 import hashlib
 import random
 import datetime
 import time
 import requests
-import rsa
 import base64
-from urllib import parse
 import aiohttp
 import asyncio
 
@@ -28,12 +25,7 @@ def cnn_captcha(img):
     print("此次登录出现验证码,识别结果为%s"%(captcha))
     return captcha
 
-def calc_name_passw(key, Hash, username, password):
-    pubkey = rsa.PublicKey.load_pkcs1_openssl_pem(key.encode())
-    password = base64.b64encode(rsa.encrypt((Hash + password).encode('utf-8'), pubkey))
-    password = parse.quote_plus(password)
-    username = parse.quote_plus(username)
-    return username, password
+
 
 async def replay_request(response):
     json_response = await response.json(content_type=None)
@@ -60,12 +52,6 @@ class bilibili():
             cls.instance = super(bilibili, cls).__new__(cls, *args, **kw)
             cls.instance.dic_bilibili = ConfigLoader().dic_bilibili
             cls.instance.bili_session = None
-            print('正在登陆中...')
-            tag, msg = cls.instance.login()
-            if tag:
-                print("[{}] {}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), msg))
-            else:
-                print("[{}] 登录失败,错误信息为:{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), msg))
         return cls.instance
     
     @property
@@ -82,6 +68,14 @@ class bilibili():
         hash.update(str.encode('utf-8'))
         sign = hash.hexdigest()
         return sign
+        
+    def load_session(self, dic):
+        # print(dic)
+        for i in dic.keys():
+            self.dic_bilibili[i] = dic[i]
+            if i == 'cookie':
+                self.dic_bilibili['pcheaders']['cookie'] = dic[i]
+                self.dic_bilibili['appheaders']['cookie'] = dic[i]
     
     async def bili_section_post(self, url, headers=None, data=None):
         while True:
@@ -109,7 +103,8 @@ class bilibili():
                 #print('当前网络不好，正在重试，请反馈开发者!!!!')
                 #print(sys.exc_info()[0], sys.exc_info()[1])
                 continue
-    def logout(self):
+                
+    def request_logout(self):
         url = 'https://passport.bilibili.com/login?act=exit'
         pcheaders = self.dic_bilibili['pcheaders'].copy()
         pcheaders['Host'] = "passport.bilibili.com"
@@ -291,8 +286,6 @@ class bilibili():
         response = requests.post(url, data=params)
         return response
         
-        
-        
     def normal_login(self, username, password):
         # url = 'https://passport.bilibili.com/api/oauth2/login'   //旧接口
         url = "https://passport.bilibili.com/api/v2/oauth2/login"
@@ -330,54 +323,7 @@ class bilibili():
         return response
         
     
-    def login(self):
-        username = str(self.dic_bilibili['account']['username'])
-        password = str(self.dic_bilibili['account']['password'])
-
-        if not self.dic_bilibili['saved-session']['cookie']:
-            response = self.request_getkey()
-            value = response.json()['data']
-            key = value['key']
-            Hash = str(value['hash'])
-            username, password = calc_name_passw(key, Hash, username, password)
-            
-            response = self.normal_login(username, password)
-            while response.json()['code'] == -105:
-                
-                response = self.login_with_captcha(username, password)
-            try:
-                access_key = response.json()['data']['token_info']['access_token']
-                cookie = (response.json()['data']['cookie_info']['cookies'])
-                cookie_format = ""
-                for i in range(0, len(cookie)):
-                    cookie_format = cookie_format + cookie[i]['name'] + "=" + cookie[i]['value'] + ";"
-                self.dic_bilibili['csrf'] = cookie[0]['value']
-                self.dic_bilibili['access_key'] = access_key
-                self.dic_bilibili['cookie'] = cookie_format
-                self.dic_bilibili['uid'] = cookie[1]['value']
-                self.dic_bilibili['pcheaders']['cookie'] = cookie_format
-                self.dic_bilibili['appheaders']['cookie'] = cookie_format
-                dic_saved_session = {
-                    'csrf':self.dic_bilibili['csrf'],
-                    'access_key': self.dic_bilibili['access_key'],
-                    'cookie': self.dic_bilibili['cookie'],
-                    'uid': self.dic_bilibili['uid']
-                    }
-                if self.dic_bilibili['saved-session']['keep-login'] == 'True':
-                    ConfigLoader().write2bilibili(dic_saved_session)
-                return True, '密码登陆成功'          
-                
-            except:
-                return False, response.json()['message']
-        else:
-            self.dic_bilibili['csrf'] = self.dic_bilibili['saved-session']['csrf']
-            self.dic_bilibili['access_key'] = self.dic_bilibili['saved-session']['access_key']
-            self.dic_bilibili['cookie'] = self.dic_bilibili['saved-session']['cookie']
-            self.dic_bilibili['uid'] = self.dic_bilibili['saved-session']['uid']
-            self.dic_bilibili['pcheaders']['cookie'] = self.dic_bilibili['saved-session']['cookie']
-            self.dic_bilibili['appheaders']['cookie'] = self.dic_bilibili['saved-session']['cookie']
-            return True, '重用上次cookie登陆' 
-        
+    
 
 
     async def get_giftlist_of_storm(self, dic):
