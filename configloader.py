@@ -18,13 +18,14 @@ def rgb_to_percent(rgb_str):
 
     
 def load_bilibili(file):
-    cf_bilibili = configparser.ConfigParser()
+    cf_bilibili = configparser.ConfigParser(interpolation=None)
     cf_bilibili.optionxform = str
     
     cf_bilibili.read_file(codecs.open(file, "r", "utf8"))
     dic_bilibili = cf_bilibili._sections
     
     dic_nomalised_bilibili = dic_bilibili['normal'].copy()
+    dic_nomalised_bilibili['saved-session'] = dic_bilibili['saved-session'].copy()
     
     dic_nomalised_bilibili['account'] = dic_bilibili['account'].copy()
     if dic_nomalised_bilibili['account']['username']:
@@ -48,12 +49,16 @@ def load_bilibili(file):
         # print(i)
         if i[0:3] == 'dic':
             dic_nomalised_bilibili[i[4:]] = dic_bilibili[i]
+    # print(dic_nomalised_bilibili)
             
     return dic_nomalised_bilibili
+    
+    
+    
 
                 
 def load_color(file):
-    cf_color = configparser.ConfigParser()
+    cf_color = configparser.ConfigParser(interpolation=None)
     
     cf_color.read_file(codecs.open(file, "r", "utf8"))
 
@@ -69,7 +74,7 @@ def load_color(file):
  
                
 def load_user(file):
-    cf_user = configparser.ConfigParser()
+    cf_user = configparser.ConfigParser(interpolation=None)
     cf_user.read_file(codecs.open(file, "r", "utf8"))
     dic_user = cf_user._sections
     dictionary = {
@@ -86,7 +91,10 @@ def load_user(file):
     
     for i in dic_user['task_control'].keys():
         dic_user['task_control'][i] = dictionary.get(dic_user['task_control'][i], dic_user['task_control'][i])
-    print(dic_user)
+        
+    for i in dic_user['other_control'].keys():
+        dic_user['other_control'][i] = dictionary.get(dic_user['other_control'][i], dic_user['other_control'][i])
+    # print(dic_user)
             
     return dic_user
     
@@ -98,16 +106,36 @@ class ConfigLoader():
     def __new__(cls, colorfile=None, userfile=None, bilibilifile=None):
         if not cls.instance:
             cls.instance = super(ConfigLoader, cls).__new__(cls)
+            cls.instance.colorfile = colorfile
             cls.instance.dic_color = load_color(colorfile)
             # print(self.dic_color)
-        
+            
+            cls.instance.userfile = userfile
             cls.instance.dic_user = load_user(userfile)
             # print(self.dic_user)
-        
+            
+            cls.instance.bilibilifile = bilibilifile
             cls.instance.dic_bilibili = load_bilibili(bilibilifile)
             # print(self.dic_bilibili)
             print("# 初始化完成")
         return cls.instance
+    
+    def write2bilibili(self, dic):
+        # print(dic)
+        cf_bilibili = configparser.ConfigParser(interpolation=None)
+        cf_bilibili.optionxform = str
+        
+        cf_bilibili.read_file(codecs.open(self.bilibilifile, "r", "utf8"))
+        
+        for i in dic.keys():
+            # print('%r'%(dic[i]))
+            cf_bilibili.set('saved-session', i, dic[i])
+        
+        cf_bilibili.write(codecs.open(self.bilibilifile, "w+", "utf8"))
+
+    
+    
+        
         
             
        

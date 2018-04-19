@@ -63,7 +63,7 @@ class bilibili():
             print('正在登陆中...')
             tag, msg = cls.instance.login()
             if tag:
-                print("[{}] 登陆成功".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))))
+                print("[{}] {}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), msg))
             else:
                 print("[{}] 登录失败,错误信息为:{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), msg))
         return cls.instance
@@ -334,7 +334,7 @@ class bilibili():
         username = str(self.dic_bilibili['account']['username'])
         password = str(self.dic_bilibili['account']['password'])
 
-        if username != "":
+        if not self.dic_bilibili['saved-session']['cookie']:
             response = self.request_getkey()
             value = response.json()['data']
             key = value['key']
@@ -356,11 +356,28 @@ class bilibili():
                 self.dic_bilibili['cookie'] = cookie_format
                 self.dic_bilibili['uid'] = cookie[1]['value']
                 self.dic_bilibili['pcheaders']['cookie'] = cookie_format
-                self.dic_bilibili['appheaders']['cookie'] = cookie_format     
-                return True, None           
+                self.dic_bilibili['appheaders']['cookie'] = cookie_format
+                dic_saved_session = {
+                    'csrf':self.dic_bilibili['csrf'],
+                    'access_key': self.dic_bilibili['access_key'],
+                    'cookie': self.dic_bilibili['cookie'],
+                    'uid': self.dic_bilibili['uid']
+                    }
+                if self.dic_bilibili['saved-session']['keep-login'] == 'True':
+                    ConfigLoader().write2bilibili(dic_saved_session)
+                return True, '密码登陆成功'          
                 
             except:
                 return False, response.json()['message']
+        else:
+            self.dic_bilibili['csrf'] = self.dic_bilibili['saved-session']['csrf']
+            self.dic_bilibili['access_key'] = self.dic_bilibili['saved-session']['access_key']
+            self.dic_bilibili['cookie'] = self.dic_bilibili['saved-session']['cookie']
+            self.dic_bilibili['uid'] = self.dic_bilibili['saved-session']['uid']
+            self.dic_bilibili['pcheaders']['cookie'] = self.dic_bilibili['saved-session']['cookie']
+            self.dic_bilibili['appheaders']['cookie'] = self.dic_bilibili['saved-session']['cookie']
+            return True, '重用上次cookie登陆' 
+        
 
 
     async def get_giftlist_of_storm(self, dic):
