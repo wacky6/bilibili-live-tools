@@ -59,12 +59,15 @@ try:
     loop.run_until_complete(asyncio.wait(tasks))
 except KeyboardInterrupt:
     # print(sys.exc_info()[0], sys.exc_info()[1])
-    response = bilibili().logout()
-    
-    if response.text.find('成功退出登录') == -1:
-        print('登出失败', response)
+    if bilibili().dic_bilibili['saved-session']['keep-login'] == 'True':
+        pass
     else:
-        print('成功退出登陆')
+        response = bilibili().logout()
+        
+        if response.text.find('成功退出登录') == -1:
+            print('登出失败', response)
+        else:
+            print('成功退出登陆')
     
 console_thread.join()
 
