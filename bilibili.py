@@ -36,10 +36,6 @@ async def replay_request(response):
     else:
         return False
 
-async def request_search_user(name):
-    search_url = "https://search.bilibili.com/api/search?search_type=live&keyword=" + name
-    response = await aiohttp.request('get', search_url)
-    return response
     
 
 
@@ -103,6 +99,11 @@ class bilibili():
                 #print('当前网络不好，正在重试，请反馈开发者!!!!')
                 #print(sys.exc_info()[0], sys.exc_info()[1])
                 continue
+                
+    async def request_search_user(self, name):
+        search_url = "https://search.bilibili.com/api/search?search_type=live&keyword=" + name
+        response = await aiohttp.request('get', search_url)
+        return response
                 
     def request_logout(self):
         url = 'https://passport.bilibili.com/login?act=exit'
