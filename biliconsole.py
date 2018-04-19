@@ -17,6 +17,12 @@ def guide_of_console():
     print('|7 模拟安卓客户端发送弹幕     |')
     print('|8 模拟电脑网页端发送弹幕     |')
     print('|9 直播间的长短号码的转化     |')
+    print('|10 手动送礼物到指定直播间    |')
+    print('|11 切换监听的直播间         |')
+    print('|12 T或F控制弹幕的开关       |')
+    print('|13 房间号码查看主播         |')
+    print('|14 当前拥有的扭蛋币         |')
+    print('|15 开扭蛋币(只能1，10，100) |')
     print('￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣')
     
 
@@ -57,7 +63,7 @@ def preprocess_fetch_liveuser_info():
     Biliconsole().append2list_console([[real_roomid], utils.fetch_liveuser_info])
     
 def preprocess_open_capsule():
-    count = input('请输入要开的扭蛋数目')
+    count = input('请输入要开的扭蛋数目(1或10或100)')
     Biliconsole().append2list_console([[count], utils.open_capsule])
 
 options ={
@@ -80,7 +86,7 @@ options ={
 }
 
 def return_error():
-    print('命令无法识别，请重新输入')
+    print('命令无法识别，请重新输入(提示输入help查看详细)')
 
 def controler():
     while True:

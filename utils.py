@@ -260,7 +260,7 @@ async def send_gift_web(roomid, giftid, giftnum, bagid):
         
 async def fetch_liveuser_info(real_roomid):
     response = await bilibili().request_fetch_liveuser_info(real_roomid)
-    json_response = await response.json()
+    json_response = await response.json(content_type=None)
     if json_response['code'] == 0:
         data = json_response['data']
         print('# 主播姓名 {}'.format(data['info']['uname']))
