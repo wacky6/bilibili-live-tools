@@ -104,6 +104,21 @@ class bilibili():
         search_url = "https://search.bilibili.com/api/search?search_type=live&keyword=" + name
         response = await aiohttp.request('get', search_url)
         return response
+    
+    async def request_fetch_capsule(self):
+        url = "https://api.live.bilibili.com/api/ajaxCapsule"
+        response = await self.bili_section_get(url, headers=self.dic_bilibili['pcheaders'])
+        return response
+        
+    async def request_open_capsule(self, count):
+        url = "https://api.live.bilibili.com/api/ajaxCapsuleOpen"
+        data = {
+            'type': 'normal',
+            "count": count,
+            "csrf_token": self.dic_bilibili['csrf']
+        }
+        response = await self.bili_section_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
+        return response
                 
     def request_logout(self):
         url = 'https://passport.bilibili.com/login?act=exit'

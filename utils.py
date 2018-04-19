@@ -68,6 +68,33 @@ async def send_danmu_msg_andriod(msg, roomId):
 async def send_danmu_msg_web(msg, roomId):
     response = await bilibili().request_send_danmu_msg_web(msg, roomId)
     print(await response.json())
+    
+async def fetch_capsule_info():
+    response = await bilibili().request_fetch_capsule()
+    json_response = await response.json()
+    # print(json_response)
+    if (json_response['code'] == 0):
+        data = json_response['data']
+        if data['colorful']['status']:
+            print('梦幻扭蛋币: {}个'.format(data['colorful']['coin']))
+        else:
+            print('梦幻扭蛋币暂不可用')
+            
+        data = json_response['data']
+        if data['normal']['status']:
+            print('普通扭蛋币: {}个'.format(data['normal']['coin']))
+        else:
+            print('普通扭蛋币暂不可用')
+            
+async def open_capsule(count):
+    response = await bilibili().request_open_capsule(count)
+    json_response = await response.json()
+    # print(json_response)
+    if (json_response['code'] == 0):
+        #print(json_response['data']['text'])
+        for i in json_response['data']['text']:
+            print(i)
+    
 
 async def fetch_user_info():
     response = await bilibili().request_fetch_user_info()

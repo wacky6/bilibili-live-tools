@@ -56,6 +56,9 @@ def preprocess_fetch_liveuser_info():
     real_roomid = input('请输入roomid')
     Biliconsole().append2list_console([[real_roomid], utils.fetch_liveuser_info])
     
+def preprocess_open_capsule():
+    count = input('请输入要开的扭蛋数目')
+    Biliconsole().append2list_console([[count], utils.open_capsule])
 
 options ={
     '1': Statistics().getlist,
@@ -71,6 +74,8 @@ options ={
     '11': preprocess_change_danmuji_roomid,
     '12': change_printer_dic_user,
     '13': preprocess_fetch_liveuser_info,
+    '14': utils.fetch_capsule_info,#async
+    '15': preprocess_open_capsule,
     'help': guide_of_console
 }
 
@@ -81,13 +86,13 @@ def controler():
     while True:
         x = input('')
         # input and async
-        if x == ['7', '8', '9', '10', '13']:
+        if x == ['7', '8', '9', '10', '13', '15']:
             # func = options.get(x, return_error)
             args, func = options.get(x, return_error)()
             #print(args)
             #Biliconsole().append2list_console(answer)
         # async
-        elif x in ['3', '4', '5', '6']:
+        elif x in ['3', '4', '5', '6', '14']:
             answer = options.get(x, return_error)
             Biliconsole().append2list_console(answer)
         # normal
