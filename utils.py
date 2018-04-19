@@ -2,7 +2,6 @@ from bilibili import bilibili
 from printer import Printer
 import time
 import datetime
-import math
 from PIL import Image
 from io import BytesIO
 
@@ -154,6 +153,7 @@ async def fetch_bag_list(verbose=False, bagid=None,printer=True):
     temp = []
     gift_list = []
     json_response = await response.json()
+    # print(json_response)
     if printer == True:
         print('[{}] 查询可用礼物'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))))
     for i in range(len(json_response['data']['list'])):
@@ -162,17 +162,20 @@ async def fetch_bag_list(verbose=False, bagid=None,printer=True):
         gift_num = str((json_response['data']['list'][i]['gift_num'])).center(4)
         gift_name = json_response['data']['list'][i]['gift_name']
         expireat = (json_response['data']['list'][i]['expire_at'])
-        left_time = (expireat - int(CurrentTime()))
-        left_days = (expireat - int(CurrentTime())) / 86400
+        left_time = (expireat - json_response['data']['time'])
+        if expireat == 0:
+            left_days = '+∞'.center(6)
+        else:
+            left_days = str(round(left_time / 86400, 1)).center(6)
         gift_list.append([gift_id, gift_num, bag_id])
         if bagid is not None:
             if bag_id == int(bagid):
                 return gift_id
         else:
             if verbose:
-                print("# 编号为" + str(bag_id) + '的'+ gift_name + 'X' + gift_num, '(在' + str(math.ceil(left_days)) + '天后过期)')
+                print("# 编号为" + str(bag_id) + '的'+ gift_name.center(3) + 'X' + gift_num, '(在' + left_days + '天后过期)')
             elif printer == True:
-                print("# " + gift_name + 'X' + gift_num, '(在' + str(math.ceil(left_days)) + '天后过期)')
+                print("# " + gift_name.center(3) + 'X' + gift_num, '(在' + left_days + '天后过期)')
 
         if 0 < int(left_time) < 43200:   # 剩余时间少于半天时自动送礼
             temp.append([gift_id, gift_num, bag_id])
