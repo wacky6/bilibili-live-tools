@@ -5,6 +5,7 @@ import datetime
 from PIL import Image
 from io import BytesIO
 import webbrowser
+import re
 
 def adjust_for_chinese(str):
     SPACE = '\N{IDEOGRAPHIC SPACE}'
@@ -69,6 +70,26 @@ async def send_danmu_msg_web(msg, roomId):
     response = await bilibili().request_send_danmu_msg_web(msg, roomId)
     print(await response.json())
     
+        
+def find_live_user_roomid(wanted_name):
+    print('期望名字', wanted_name)
+    for i in range(len(wanted_name), 0, -1):
+        response = bilibili().request_search_user(wanted_name[:i])
+        results = response.json()['result']
+        if results == None:
+            print('屏蔽全名')
+            continue
+        for i in results:
+            real_name = re.sub(r'<[^>]*>', '', i['uname'])
+            #print('去除干扰', real_name)
+            if real_name == wanted_name:
+                print('找到结果', i['room_id'])
+                return i['room_id']
+        print('结束一次')
+
+    
+        
+                
 async def fetch_capsule_info():
     response = await bilibili().request_fetch_capsule()
     json_response = await response.json()

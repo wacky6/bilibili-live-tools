@@ -9,7 +9,6 @@ import random
 import struct
 import json
 import re
-import requests
 import sys
 
 async def handle_1_TV_raffle(num, real_roomid, raffleid):
@@ -372,11 +371,7 @@ class bilibiliClient():
             res = re.search(a, dic['msg'])
             if res is not None:
                 print(str(res.group()))
-                response = bilibili().request_search_user(str(res.group()))
-                json_response = response.json()
-                print('...')
-                roomid = json_response['result']['live_user'][0]['roomid']
-                
+                roomid = utils.find_live_user_roomid(str(res.group()))
                 Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}开通总督".format(roomid)], True)
                 Rafflehandler().append2list_captain(roomid)
                 Statistics().append2pushed_captainlist()

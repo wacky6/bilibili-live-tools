@@ -108,8 +108,7 @@ class bilibili():
         return response
                 
     def request_search_user(self, name):
-        print(name)
-        search_url = "https://search.bilibili.com/api/search?search_type=live&keyword=" + name
+        search_url = "https://search.bilibili.com/api/search?search_type=bili_user&keyword=" + name
         response = requests.get(search_url)
         return response
     
