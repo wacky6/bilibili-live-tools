@@ -100,9 +100,10 @@ class bilibili():
                 #print(sys.exc_info()[0], sys.exc_info()[1])
                 continue
                 
-    async def request_search_user(self, name):
+    def request_search_user(self, name):
+        print(name)
         search_url = "https://search.bilibili.com/api/search?search_type=live&keyword=" + name
-        response = await aiohttp.request('get', search_url)
+        response = request.get(search_url)
         return response
     
     async def request_fetch_capsule(self):

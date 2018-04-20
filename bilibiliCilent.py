@@ -371,9 +371,9 @@ class bilibiliClient():
             a = re.compile(r"(?<=在主播 )\S+(?= 的直播间开通了总督)")
             res = re.search(a, dic['msg'])
             if res is not None:
-                print('ok')
-                response = await bilibili().request_search_user(str(res.group()))
-                json_response = await response.json()
+                print(str(res.group()))
+                response = bilibili().request_search_user(str(res.group()))
+                json_response = response.json()
                 print('...')
                 roomid = json_response['result']['live_user'][0]['roomid']
                 
