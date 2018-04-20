@@ -237,7 +237,7 @@ async def check_room(roomid):
     response = await bilibili().request_check_room(roomid)
     json_response = await response.json(content_type=None)
     if json_response['code'] == 0:
-        print(json_response)
+        # print(json_response)
         print('查询结果:')
         data = json_response['data']
         
@@ -268,7 +268,20 @@ async def fetch_liveuser_info(real_roomid):
     json_response = await response.json(content_type=None)
     if json_response['code'] == 0:
         data = json_response['data']
+        # print(data)
         print('# 主播姓名 {}'.format(data['info']['uname']))
+        
+        uid = data['level']['uid'] #str
+        response_fan = await bilibili().request_fetch_fan(real_roomid, uid)
+        json_response_fan = await response_fan.json(content_type=None)
+        # print(json_response_fan)
+        data_fan = json_response_fan['data']
+        if json_response_fan['code'] == 0 and data_fan['medal']['status'] == 2:
+            print('# 勋章名字: {}'.format(data_fan['list'][0]['medal_name']))
+        else:
+            print('# 该主播暂时没有开通勋章')
+            # print(json_response_fan)
+
         size = 100, 100
         response_face = bilibili().request_load_img(data['info']['face'])
         img = Image.open(BytesIO(response_face.content))

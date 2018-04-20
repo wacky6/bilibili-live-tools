@@ -103,7 +103,7 @@ class bilibili():
     def request_search_user(self, name):
         print(name)
         search_url = "https://search.bilibili.com/api/search?search_type=live&keyword=" + name
-        response = request.get(search_url)
+        response = requests.get(search_url)
         return response
     
     async def request_fetch_capsule(self):
@@ -163,6 +163,11 @@ class bilibili():
         app_url = "https://api.live.bilibili.com/AppExchange/silver2coin?" + temp_params + "&sign=" + sign
         response1 = await self.bili_section_post(app_url, headers=self.dic_bilibili['appheaders'])
         return response1
+        
+    async def request_fetch_fan(self, real_roomid, uid):
+        url = 'https://api.live.bilibili.com/rankdb/v1/RoomRank/webMedalRank?roomid={}&ruid={}'.format(real_roomid, uid)
+        response = await self.bili_section_get(url)
+        return response
         
     async def request_check_room(self, roomid):
         url = "https://api.live.bilibili.com/room/v1/Room/room_init?id=" + str(roomid)
