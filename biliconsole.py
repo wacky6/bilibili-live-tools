@@ -82,11 +82,12 @@ options ={
     '13': preprocess_fetch_liveuser_info,
     '14': utils.fetch_capsule_info,#async
     '15': preprocess_open_capsule,
-    'help': guide_of_console
+    'help': guide_of_console,
+    'h': guide_of_console
 }
 
 def return_error():
-    print('命令无法识别，请重新输入(提示输入help查看详细)')
+    print('命令无法识别，请重新输入(提示输入h/help查看详细)')
 
 def controler():
     while True:
@@ -129,7 +130,7 @@ class Biliconsole():
                     # 对10号单独简陋处理
                     for j in range(len(i[0])):
                         if isinstance(i[0][j], list):
-                            print('检测')
+                            # print('检测')
                             i[0][j] = await i[0][j][1](*(i[0][j][0]))
                     if i[1] == 'normal':
                         i[2](*i[0])
