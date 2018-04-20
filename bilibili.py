@@ -100,6 +100,13 @@ class bilibili():
                 #print(sys.exc_info()[0], sys.exc_info()[1])
                 continue
                 
+    async def request_playurl(self, cid):
+        # cid real_roomid
+        # url = 'http://api.live.bilibili.com/room/v1/Room/playUrl?'
+        url = 'https://api.live.bilibili.com/api/playurl?device=phone&platform=ios&scale=3&build=10000&cid={}&otype=json&platform=h5'.format(cid)
+        response = await self.bili_section_get(url)
+        return response
+                
     def request_search_user(self, name):
         print(name)
         search_url = "https://search.bilibili.com/api/search?search_type=live&keyword=" + name

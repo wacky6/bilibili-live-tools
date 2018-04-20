@@ -349,7 +349,7 @@ class bilibiliClient():
                 Printer().printlist_append(['join_lottery', '普通送礼提示', 'user', ['普通送礼提示', dic['msg_text']]])
             return
         if cmd == 'SYS_MSG':
-            if set(self.dic_bulletin) == set(dic):
+            if dic.get('real_roomid', None) == None:
                 Printer().printlist_append(['join_lottery', '系统公告', 'user', dic['msg']])
             else:
                 try:

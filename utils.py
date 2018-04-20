@@ -4,6 +4,7 @@ import time
 import datetime
 from PIL import Image
 from io import BytesIO
+import webbrowser
 
 def adjust_for_chinese(str):
     SPACE = '\N{IDEOGRAPHIC SPACE}'
@@ -93,7 +94,20 @@ async def open_capsule(count):
         #print(json_response['data']['text'])
         for i in json_response['data']['text']:
             print(i)
-    
+            
+async def watch_living_video(cid):
+    import sound
+    sound.set_honors_silent_switch(False)
+    sound.set_volume(1)
+    sound.play_effect('piano:D3')
+    response = await bilibili().request_playurl(cid)
+    json_response = await response.json(content_type=None)
+    print(json_response)
+    if (json_response['code'] == 0):
+        data = json_response['data']
+        print(data)
+        webbrowser.open(data)
+        
 
 async def fetch_user_info():
     response = await bilibili().request_fetch_user_info()
