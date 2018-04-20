@@ -62,7 +62,7 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
         print(json_pc_response)
         
 async def handle_1_room_TV(real_roomid):   
-    await asyncio.sleep(random.uniform(0.5, 1.5)
+    await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.check_room_true(real_roomid)
     if True in result:
         Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', "WARNING:检测到房间{:^9}的钓鱼操作".format(real_roomid)], True)
