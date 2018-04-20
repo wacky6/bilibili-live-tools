@@ -338,7 +338,33 @@ class bilibili():
         response = s.post(url,data=payload,headers=headers)
         return response
         
-    
+    def request_check_token(self):
+        list_url = ["access_key=" + self.dic_bilibili['access_key'], "appkey=" + self.dic_bilibili['appkey'], "access_token=" + self.dic_bilibili['access_key'], 'actionKey=' + self.dic_bilibili[
+            'actionKey'], 'build=' + self.dic_bilibili[
+                          'build'], 'device=' + self.dic_bilibili['device'], 'mobi_app=' + self.dic_bilibili[
+                          'mobi_app'], 'platform=' + self.dic_bilibili['platform'], 'ts=' + CurrentTime()]
+        list_cookie = self.dic_bilibili['cookie'].split(';')[:-1]
+        params = ('&'.join(sorted(list_url + list_cookie)))
+        sign = self.calc_sign(params)
+        appheaders = self.dic_bilibili['appheaders'].copy()
+        appheaders['Host'] = "passport.bilibili.com"
+        true_url = 'https://passport.bilibili.com/api/v2/oauth2/info?' + params + '&sign=' + sign
+        response1 = requests.get(true_url, headers=appheaders)
+        return response1
+        
+    def request_refresh_token(self):
+        data = {
+            "access_token": self.dic_bilibili['access_key'],
+            "appkey": self.dic_bilibili['appkey'],
+            "refresh_token": self.dic_bilibili['refresh_token']
+            }
+        str_data = '&'.join('{}={}'.format(key,val) for (key, val) in data.items())
+        data['sign'] = self.calc_sign(str_data)
+        url = 'https://passport.bilibili.com/api/oauth2/refreshToken'
+        appheaders = self.dic_bilibili['appheaders'].copy()
+        appheaders['Host'] = "passport.bilibili.com"
+        response1 = requests.post(url, headers=appheaders, params=data)
+        return response1
     
 
 

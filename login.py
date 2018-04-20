@@ -33,6 +33,7 @@ class Login:
                 # print(response.json())
                 data = response.json()['data']
                 access_key = data['token_info']['access_token']
+                refresh_token = data['token_info']['refresh_token']
                 cookie = data['cookie_info']['cookies']
                 cookie_format = ""
                 for i in range(0, len(cookie)):
@@ -40,6 +41,7 @@ class Login:
                 dic_saved_session = {
                     'csrf': cookie[0]['value'],
                     'access_key': access_key,
+                    'refresh_token': refresh_token,
                     'cookie': cookie_format,
                     'uid': cookie[1]['value']
                     }
@@ -65,6 +67,40 @@ class Login:
             print('登出失败', response)
         else:
             print('成功退出登陆')
+            
+    def check_token(self):
+        response = bilibili().request_check_token()
+        json_response = response.json()
+        if json_response['code'] == 0 and json_response['data'].get('mid', ''):
+            print('token有效期检查: 仍有效')
+            # print(json_response)
+            return True
+        print('联系作者(token可能过期)', json_response)
+        return False
+        
+    def refresh_token(self):
+        # return 
+        response = bilibili().request_refresh_token()
+        json_response = response.json()
+        # print(json_response)
+        if json_response['code'] == 0 and json_response['data'].get('mid', ''):
+            print('token刷新成功')
+            dic_saved_session = {
+                    'access_key': json_response['data']['access_token'],
+                    'refresh_token': json_response['data']['refresh_token']
+                    }
+            bilibili().load_session(dic_saved_session)
+            if ConfigLoader().dic_user['other_control']['keep-login']:
+                ConfigLoader().write2bilibili(dic_saved_session)
+            # 更新token信息
+            return True
+        print('联系作者(token刷新失败，cookie过期)', json_response)
+        return False
+            
+    
+            
+
+        
         
 
     

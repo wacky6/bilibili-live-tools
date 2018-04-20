@@ -1,10 +1,9 @@
 from bilibili import bilibili
-import requests
-import hashlib
 import time
 import datetime
 import asyncio
 from printer import Printer
+from login import Login
 
 def CurrentTime():
     currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
@@ -53,6 +52,10 @@ class OnlineHeart():
     async def run(self):
         while 1:
             Printer().printlist_append(['join_lottery', '', 'user', "心跳"], True)
+            if Login().check_token():
+                pass
+            else:
+                Login().refresh_token()
             await self.apppost_heartbeat()
             await self.pcpost_heartbeat()
             await self.heart_gift()           
