@@ -14,7 +14,7 @@ import sys
 
 async def handle_1_TV_raffle(num, real_roomid, raffleid):
     #print('参与')
-    await asyncio.sleep(random.uniform(1, min(30, num * 1.5)))
+    await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
     response2 = await bilibili().get_gift_of_TV(real_roomid, raffleid)
     Printer().printlist_append(['join_lottery', '小电视', 'user', "参与了房间{:^9}的小电视抽奖".format(real_roomid)], True)
     json_response2 = await response2.json()
@@ -27,7 +27,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid):
         print(json_response2)
         
 async def handle_1_captain_raffle(num, roomid, raffleid):
-    await asyncio.sleep(random.uniform(1, min(30, num * 1.5)))
+    await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
     response2 = await bilibili().get_gift_of_captain(roomid, raffleid)
     json_response2 = await response2.json()
     if json_response2['code'] == 0:
@@ -38,7 +38,7 @@ async def handle_1_captain_raffle(num, roomid, raffleid):
                     
 async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
     #print('参与')
-    await asyncio.sleep(random.uniform(1, min(30, num * 1.5)))
+    await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
     response1 = await bilibili().get_gift_of_events_app(text1, text2, raffleid)
     pc_response = await bilibili().get_gift_of_events_web(text1, text2, raffleid)
     
@@ -62,7 +62,7 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
         print(json_pc_response)
         
 async def handle_1_room_TV(real_roomid):   
-    await asyncio.sleep(random.uniform(2, 3))
+    await asyncio.sleep(random.uniform(0.5, 1.5)
     result = await utils.check_room_true(real_roomid)
     if True in result:
         Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', "WARNING:检测到房间{:^9}的钓鱼操作".format(real_roomid)], True)
@@ -89,7 +89,7 @@ async def handle_1_room_TV(real_roomid):
             await asyncio.wait(tasklist, return_when=asyncio.ALL_COMPLETED)
 
 async def handle_1_room_activity(giftId, text1, text2):
-    await asyncio.sleep(random.uniform(2, 3))
+    await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.check_room_true(text1)
     if True in result:
         Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', "WARNING:检测到房间{:^9}的钓鱼操作".format(text1)], True)
@@ -118,7 +118,7 @@ async def handle_1_room_activity(giftId, text1, text2):
 
    
 async def handle_1_room_captain(roomid):
-    await asyncio.sleep(random.uniform(2, 3))
+    await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.check_room_true(roomid)
     if True in result:
         Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', "WARNING:检测到房间{:^9}的钓鱼操作".format(roomid)], True)
