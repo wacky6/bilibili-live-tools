@@ -240,11 +240,13 @@ async def check_room(roomid):
         print(json_response)
         print('查询结果:')
         data = json_response['data']
-        print('# 真实房间号为:{}'.format(data['room_id']))
+        
         if data['short_id'] == 0:
             print('# 此房间无短房号')
         else:
             print('# 短号为:{}'.format(data['short_id']))
+        print('# 真实房间号为:{}'.format(data['room_id']))
+        return data['room_id']
             
             
 async def send_gift_web(roomid, giftid, giftnum, bagid):

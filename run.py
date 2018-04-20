@@ -11,7 +11,7 @@ from bilibili import bilibili
 from configloader import ConfigLoader
 import threading
 import os
-from login import Login
+import login 
 import biliconsole
 
 
@@ -25,8 +25,7 @@ ConfigLoader(colorfile=file_color, userfile=file_user, bilibilifile=file_bilibil
 # print('Hello world.')
 printer = Printer()
 bilibili()
-login0 = Login()
-login0.login()
+login.login()
 Statistics()
 
 rafflehandler = Rafflehandler()
@@ -65,7 +64,7 @@ except KeyboardInterrupt:
     if ConfigLoader().dic_user['other_control']['keep-login']:
         pass
     else:
-        response = login0.logout()
+        response = login.logout()
     
 console_thread.join()
 

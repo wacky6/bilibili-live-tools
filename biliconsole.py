@@ -50,7 +50,7 @@ def process_send_gift_web():
     
 def preprocess_change_danmuji_roomid():
     roomid = input('请输入roomid')
-    connect().reconnect(roomid)
+    Biliconsole().append2list_console([[[[roomid], utils.check_room]], 'normal', connect().reconnect])
 
 def change_printer_dic_user():
     new_words = input('弹幕控制')
@@ -77,7 +77,7 @@ options ={
     '8': preprocess_send_danmu_msg_web,#input async
     '9': preprocess_check_room,#input async
     '10': process_send_gift_web,#input async !!!
-    '11': preprocess_change_danmuji_roomid,
+    '11': preprocess_change_danmuji_roomid,# input async
     '12': change_printer_dic_user,
     '13': preprocess_fetch_liveuser_info,
     '14': utils.fetch_capsule_info,#async
@@ -92,7 +92,7 @@ def controler():
     while True:
         x = input('')
         # input and async
-        if x == ['7', '8', '9', '10', '13', '15']:
+        if x == ['7', '8', '9', '10','11', '13', '15']:
             # func = options.get(x, return_error)
             args, func = options.get(x, return_error)()
             #print(args)
@@ -129,8 +129,12 @@ class Biliconsole():
                     # 对10号单独简陋处理
                     for j in range(len(i[0])):
                         if isinstance(i[0][j], list):
+                            print('检测')
                             i[0][j] = await i[0][j][1](*(i[0][j][0]))
-                    task = asyncio.ensure_future(i[1](*i[0]))
+                    if i[1] == 'normal':
+                        i[2](*i[0])
+                    else:
+                        task = asyncio.ensure_future(i[1](*i[0]))
                 else:
                     task = asyncio.ensure_future(i())
                 tasklist.append(task)
