@@ -18,6 +18,16 @@ class Login:
     def login(self):
         username = ConfigLoader().dic_bilibili['account']['username']
         password = ConfigLoader().dic_bilibili['account']['password']
+        need_relogin = False
+        
+        if ConfigLoader().dic_bilibili['saved-session']['cookie']:
+            bilibili().load_session(ConfigLoader().dic_bilibili['saved-session'])
+            if self.check_token():
+                pass
+            else:
+                self.refresh_token()
+            print("[{}] {}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '重用保存会话信息登陆'))
+            return True
 
         if not ConfigLoader().dic_bilibili['saved-session']['cookie']:
             response = bilibili().request_getkey()
@@ -56,10 +66,6 @@ class Login:
                 print("[{}] 登录失败,错误信息为:{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), response.json()['message']))
                 return False
                 
-        else:
-            bilibili().load_session(ConfigLoader().dic_bilibili['saved-session'])
-            print("[{}] {}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '重用上次cookie登陆'))
-            return True
     
     def logout(self):
         response = bilibili().request_logout()
