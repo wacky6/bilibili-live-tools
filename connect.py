@@ -16,7 +16,7 @@ class connect():
             cls.instance.tag_reconnect = False
         return cls.instance
         
-    async def connect(self):
+    async def run(self):
         while True:
             print('# 正在启动弹幕姬')
             time_start = int(utils.CurrentTime())

@@ -1,7 +1,7 @@
-from OnlineHeart import OnlineHeart
-from Silver import Silver
-from LotteryResult import LotteryResult
-from Tasks import Tasks
+import OnlineHeart
+import Silver
+import LotteryResult
+import Tasks
 from connect import connect
 from rafflehandler import Rafflehandler
 import asyncio
@@ -31,11 +31,7 @@ Statistics()
 rafflehandler = Rafflehandler()
 biliconsole.Biliconsole()
 
-task = OnlineHeart()
-task1 = Silver()
-task2 = Tasks()
-task3 = LotteryResult()
-task4 = connect()
+danmu_connection = connect()
 
 
 console_thread = threading.Thread(target=biliconsole.controler)
@@ -48,11 +44,11 @@ tasks = [
     # utils.fetch_bag_list(),
     # utils.fetch_medal(),
 
-    task.run(),
-    task1.run(),
-    task2.run(),
-    task4.connect(),
-    task3.query(),
+    OnlineHeart.run(),
+    Silver.run(),
+    Tasks.run(),
+    danmu_connection.run(),
+    LotteryResult.run(),
     rafflehandler.run(),
     biliconsole.Biliconsole().run()
     
