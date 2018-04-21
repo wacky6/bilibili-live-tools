@@ -99,6 +99,7 @@ async def handle_1_room_TV(real_roomid):
             raffle_results = await asyncio.gather(*tasklist)
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
+                Rafflehandler().append2list_TV(real_roomid)
 
 async def handle_1_room_activity(giftId, text1, text2):
     await asyncio.sleep(random.uniform(0.5, 1.5))
@@ -128,6 +129,7 @@ async def handle_1_room_activity(giftId, text1, text2):
             raffle_results = await asyncio.gather(*tasklist)
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
+                Rafflehandler().append2list_activity(giftId, text1, text2)
             
 
 async def handle_1_room_captain(roomid):
@@ -165,6 +167,7 @@ async def handle_1_room_captain(roomid):
             raffle_results = await asyncio.gather(*tasklist)
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
+                Rafflehandler().append2list_captain(roomid)
                                                           
 
 class bilibiliClient():
