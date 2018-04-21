@@ -609,7 +609,7 @@ class bilibili():
         response = requests.get(url, headers=pcheaders)
         return response
 
-    def assign_group(self, i1, i2):
+    async def assign_group(self, session, i1, i2):
         temp_params = "_device=" + self.dic_bilibili[
             'device'] + "&_hwid=SX1NL0wuHCsaKRt4BHhIfRguTXxOfj5WN1BkBTdLfhstTn9NfUouFiUV&access_key=" + \
                       self.dic_bilibili['access_key'] + "&appkey=" + self.dic_bilibili['appkey'] + "&build=" + \
@@ -620,7 +620,7 @@ class bilibili():
         url = "https://api.vc.bilibili.com/link_setting/v1/link_setting/sign_in?" + temp_params + "&sign=" + sign
         appheaders = self.dic_bilibili['appheaders'].copy()
         appheaders['Host'] = "api.vc.bilibili.com"
-        response = requests.get(url, headers=appheaders)
+        response = await session.get(url, headers=appheaders)
         return response
 
     async def gift_list(self):

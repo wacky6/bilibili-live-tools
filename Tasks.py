@@ -5,6 +5,7 @@ import asyncio
 from configloader import ConfigLoader
 import utils
 from printer import Printer
+import aiohttp
 
     
 # 获取每日包裹奖励
@@ -32,8 +33,19 @@ async def Daily_Task():
     Printer().printlist_append(['join_lottery', '', 'user', "# 双端观看直播:", json_response2["msg"]])
 
 
+async def Sign1Group(session, i1, i2):
+    response = await bilibili().assign_group(session, i1, i2)
+    json_response = await response.json()
+    if json_response['code'] == 0:
+        if (json_response['data']['status']) == 1:
+            Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 已应援过" % (i1)])
+        if (json_response['data']['status']) == 0:
+            Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 应援成功,获得 %s 点亲密度" % (i1, json_response['data']['add_num'])])
+    else:
+        Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 应援失败" % (i1)])
+
 # 应援团签到
-def link_sign():
+async def link_sign():
     response = bilibili().get_grouplist()
     check = len(response.json()['data']['list'])
     group_id_list = []
@@ -43,15 +55,14 @@ def link_sign():
         owner_uid = response.json()['data']['list'][i]['owner_uid']
         group_id_list.append(group_id)
         owner_uid_list.append(owner_uid)
-    for (i1, i2) in zip(group_id_list, owner_uid_list):
-        response = bilibili().assign_group(i1, i2)
-        if response.json()['code'] == 0:
-            if (response.json()['data']['status']) == 1:
-                Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 已应援过" % (i1)])
-            if (response.json()['data']['status']) == 0:
-                Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 应援成功,获得 %s 点亲密度" % (i1, response.json()['data']['add_num'])])
-        else:
-            Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 应援失败" % (i1)])
+    tasklist = []
+    if group_id_list:
+        async with aiohttp.ClientSession() as session:
+            for (i1, i2) in zip(group_id_list, owner_uid_list):
+                task = asyncio.ensure_future(Sign1Group(session, i1, i2))
+                tasklist.append(task)
+            results = await asyncio.gather(*tasklist)
+        
 
 async def send_gift():
     if ConfigLoader().dic_user['task_control']['clean-expiring-gift']:
@@ -128,7 +139,7 @@ async def run():
         await DoSign()
         await Daily_bag()
         await Daily_Task()
-        link_sign()
+        await link_sign()
         await send_gift()
         await auto_send_gift()
         await asyncio.sleep(21600)
