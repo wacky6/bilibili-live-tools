@@ -37,6 +37,20 @@ def seconds_until_tomorrow():
     return tomorrow_start_time - current_time
 
 
+async def WearingMedalInfo():
+    response = await bilibili().ReqWearingMedal()
+    json_response = await response.json()
+    print(json_response)
+    if json_response['code'] == 0:
+        data = json_response['data']
+        if data:
+            # print(data['roominfo']['room_id'], data['today_feed'], data['day_limit'])
+            return data['roominfo']['room_id'], data['today_feed'], data['day_limit']
+        else:
+            # print('暂无佩戴任何勋章')
+            return 
+
+
 async def fetch_medal(printer=True):
     printlist = []
     if printer:
@@ -47,15 +61,8 @@ async def fetch_medal(printer=True):
     response = await bilibili().request_fetchmedal()
     # print(response.json())
     json_response = await response.json()
-    roomid = 0
-    today_feed = 0
-    day_limit = 0
     if json_response['code'] == 0:
         for i in json_response['data']['fansMedalList']:
-            if i['status'] == 1:
-                roomid = i['roomid']
-                today_feed = i['today_feed']
-                day_limit = i['day_limit']
             if printer:
                 printlist.append('{} {} {:^14} {:^14} {} {:^6} '.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])),
                                                            adjust_for_chinese(i['anchorInfo']['uname']),
@@ -65,7 +72,7 @@ async def fetch_medal(printer=True):
                                                            dic_worn[str(i['status'])]))
         if printer:
             Printer().printlist_append(['join_lottery', '', 'user', printlist], True)
-        return roomid, today_feed, day_limit
+        return
         
         
 async def send_danmu_msg_andriod(msg, roomId):

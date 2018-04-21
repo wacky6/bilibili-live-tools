@@ -67,7 +67,10 @@ async def send_gift():
 
 async def auto_send_gift():
     if ConfigLoader().dic_user['task_control']['send2wearing-medal']:
-        a = await utils.fetch_medal(printer=False)
+        a = await utils.WearingMedalInfo()
+        if a is None:
+            print('暂未佩戴任何勋章')
+            return 
         res = await bilibili().gift_list()
         json_res = await res.json()
         temp_dic = {}

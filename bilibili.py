@@ -298,6 +298,15 @@ class bilibili():
         response = await self.bili_section_post(url, headers=self.dic_bilibili['pcheaders'])
         return response
         
+    async def ReqWearingMedal(self):
+        url = f'{base_url}/live_user/v1/UserInfo/get_weared_medal'
+        data = {
+            'uid': self.dic_bilibili['uid'],
+            'csrf_token': self.dic_bilibili['csrf']
+        }
+        response = await self.bili_section_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
+        return response
+        
     def request_getkey(self):
         url = 'https://passport.bilibili.com/api/oauth2/getKey'
         temp_params = 'appkey=' + self.dic_bilibili['appkey']
