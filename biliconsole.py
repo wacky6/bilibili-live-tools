@@ -53,7 +53,7 @@ def preprocess_send_danmu_msg_web():
 def preprocess_check_room():
     roomid = input('请输入要转化的房间号:')
     if not roomid:
-        roomid = ConfigLoader().dic_user['other_control']
+        roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
     Biliconsole().append2list_console([[roomid], utils.check_room])
 
 
