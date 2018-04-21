@@ -40,7 +40,7 @@ def seconds_until_tomorrow():
 async def WearingMedalInfo():
     response = await bilibili().ReqWearingMedal()
     json_response = await response.json()
-    print(json_response)
+    # print(json_response)
     if json_response['code'] == 0:
         data = json_response['data']
         if data:
