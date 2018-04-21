@@ -279,7 +279,7 @@ class bilibili():
         return response
 
     async def request_send_danmu_msg_web(self, msg, roomId):
-        url = '/msg/send'.format(base_url)
+        url = '{}/msg/send'.format(base_url)
         data = {
             'color': '16777215',
             'fontsize': '25',
@@ -528,7 +528,7 @@ class bilibili():
                           'build'] + '&device=' + self.dic_bilibili['device'] + '&mobi_app=' + self.dic_bilibili[
                           'mobi_app'] + '&platform=' + self.dic_bilibili['platform'] + '&ts=' + time
         sign = self.calc_sign(temp_params)
-        url = '{}/mobile/userOnlineHeart?{}&sign={}'(base_url, temp_params, sign)
+        url = '{}/mobile/userOnlineHeart?{}&sign={}'.format(base_url, temp_params, sign)
         payload = {'roomid': 23058, 'scale': 'xhdpi'}
         response = await self.bili_section_post(url, data=payload, headers=self.dic_bilibili['appheaders'])
         return response
