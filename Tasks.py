@@ -128,5 +128,4 @@ async def run():
         link_sign()
         await send_gift()
         await auto_send_gift()
-        print('1')
         await asyncio.sleep(21600)

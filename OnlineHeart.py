@@ -61,7 +61,6 @@ async def run():
         await pcpost_heartbeat()
         await heart_gift()
         await draw_lottery()
-        print('2')
         await asyncio.sleep(300)
 
 

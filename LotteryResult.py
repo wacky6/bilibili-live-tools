@@ -10,7 +10,6 @@ async def run():
         
         # print('自动延迟参数', sleeptime1, sleeptime2)
         await asyncio.sleep(30)
-        print(3)
         '''
         if sleeptime1 != None and sleeptime2 != None:
             # print(sleeptime1, sleeptime2)
