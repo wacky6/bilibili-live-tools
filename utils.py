@@ -51,6 +51,21 @@ async def WearingMedalInfo():
             return 
 
 
+# web api返回值信息少
+async def TitleInfo():
+    response = await bilibili().ReqTitleInfo()
+    json_response = await response.json(content_type=None)
+    # print(json_response)
+    if json_response['code'] == 0:
+        data = json_response['data']
+        for i in data['list']:
+            if i['level']:
+                max = i['level'][1]
+            else:
+                max = '-'
+            print(i['activity'], i['score'], max)
+    
+
 async def fetch_medal(printer=True):
     printlist = []
     if printer:

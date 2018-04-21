@@ -117,6 +117,7 @@ options = {
     '14': utils.fetch_capsule_info,  # async
     '15': preprocess_open_capsule,
     '16': process_watch_living_video,  # input async
+    '17': utils.TitleInfo,
     'help': guide_of_console,
     'h': guide_of_console
 }
@@ -129,7 +130,7 @@ def return_error():
 def controler():
     while True:
         x = input('')
-        if x in ['3', '4', '5', '6', '14']:
+        if x in ['3', '4', '5', '6', '14', '17']:
             answer = options.get(x, return_error)
             Biliconsole().append2list_console(answer)
         else:

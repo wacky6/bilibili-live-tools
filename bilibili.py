@@ -307,6 +307,11 @@ class bilibili():
         response = await self.bili_section_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
         return response
         
+    async def ReqTitleInfo(self):
+        url = f'{base_url}/appUser/myTitleList?access_key={self.dic_bilibili["access_key"]}'
+        response = await self.bili_section_get(url, headers=self.dic_bilibili['appheaders'])
+        return response
+        
     def request_getkey(self):
         url = 'https://passport.bilibili.com/api/oauth2/getKey'
         temp_params = 'appkey=' + self.dic_bilibili['appkey']
