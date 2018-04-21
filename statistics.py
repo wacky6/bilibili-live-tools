@@ -1,5 +1,7 @@
 import datetime
 from bilibili import bilibili
+
+
 # 13:30  --->  13.5
 def decimal_time():
     now = datetime.datetime.now()
@@ -83,7 +85,7 @@ class Statistics:
                     else:
                         print('未知情况')
                         print(json_response)
-                except :
+                except:
                     print(json_response)
 
         else:
@@ -110,7 +112,7 @@ class Statistics:
                         self.add_to_result(data['gift_name'], int(data['gift_num']))
     
                         self.delete_0st_TVlist()
-                except :
+                except:
                     print(json_response)
             # else:
             # print(int(CurrentTime()))

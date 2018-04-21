@@ -17,14 +17,14 @@ def CurrentTime():
     currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
     return str(currenttime)
 
+
 def cnn_captcha(img):
     url = "http://101.236.6.31:8080/code"
     data = {"image": img}
     ressponse = requests.post(url, data=data)
     captcha = ressponse.text
-    print("此次登录出现验证码,识别结果为%s"%(captcha))
+    print("此次登录出现验证码,识别结果为%s" % (captcha))
     return captcha
-
 
 
 async def replay_request(response):
@@ -37,9 +37,6 @@ async def replay_request(response):
         return False
 
     
-
-
-
 class bilibili():
     instance = None
 
@@ -56,7 +53,6 @@ class bilibili():
             self.bili_session = aiohttp.ClientSession()
             # print(0)
         return self.bili_session
-        
         
     def calc_sign(self, str):
         str = str + self.dic_bilibili['app_secret']
@@ -81,9 +77,9 @@ class bilibili():
                 if tag:
                     continue
                 return response
-            except :
-                #print('当前网络不好，正在重试，请反馈开发者!!!!')
-                #print(sys.exc_info()[0], sys.exc_info()[1])
+            except:
+                # print('当前网络不好，正在重试，请反馈开发者!!!!')
+                # print(sys.exc_info()[0], sys.exc_info()[1])
                 continue
         
         
@@ -95,9 +91,9 @@ class bilibili():
                 if tag:
                     continue
                 return response
-            except :
-                #print('当前网络不好，正在重试，请反馈开发者!!!!')
-                #print(sys.exc_info()[0], sys.exc_info()[1])
+            except:
+                # print('当前网络不好，正在重试，请反馈开发者!!!!')
+                # print(sys.exc_info()[0], sys.exc_info()[1])
                 continue
                 
     async def request_playurl(self, cid):
@@ -134,17 +130,14 @@ class bilibili():
         response = requests.get(url, headers=pcheaders)
         return response
         
-                
     #1:900兑换
     async def request_doublegain_coin2silver(self):
-        #url: "/exchange/coin2silver",
+        # url: "/exchange/coin2silver",
         data = {'coin': 10}
         url = "https://api.live.bilibili.com/exchange/coin2silver"
         response = await self.bili_section_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
         return response
         
-    
-
     async def post_watching_history(self, room_id):
         data = {
             "room_id": room_id,
@@ -154,7 +147,6 @@ class bilibili():
         response = await self.bili_section_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
         return response
 
-    
     async def silver2coin_web(self):
         url = "https://api.live.bilibili.com/exchange/silver2coin"
         response = await self.bili_section_post(url, headers=self.dic_bilibili['pcheaders'])
@@ -330,24 +322,24 @@ class bilibili():
             'Accept': 'application/json, text/plain, */*',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
             'Host': 'passport.bilibili.com',
-            'cookie':"sid=hxt5szbb"
+            'cookie': "sid=hxt5szbb"
         }
         s = requests.session()
         url = "https://passport.bilibili.com/captcha"
-        res = s.get(url,headers=headers)
+        res = s.get(url, headers=headers)
         tmp1 = base64.b64encode(res.content)
         
         captcha = cnn_captcha(tmp1)
         temp_params = 'actionKey=' + self.dic_bilibili[
             'actionKey'] + '&appkey=' + self.dic_bilibili['appkey'] + '&build=' + self.dic_bilibili[
-                          'build'] + '&captcha='+captcha+'&device=' + self.dic_bilibili['device'] + '&mobi_app=' + self.dic_bilibili['mobi_app'] + '&password='+ password +'&platform=' + self.dic_bilibili[
-                          'platform'] +'&username='+username
+                          'build'] + '&captcha=' + captcha + '&device=' + self.dic_bilibili['device'] + '&mobi_app=' + self.dic_bilibili['mobi_app'] + '&password=' + password + '&platform=' + self.dic_bilibili[
+                          'platform'] + '&username='+username
         sign = self.calc_sign(temp_params)
         payload = temp_params + '&sign=' + sign
         headers['Content-type'] = "application/x-www-form-urlencoded"
         headers['cookie'] = "sid=hxt5szbb"
         url = "https://passport.bilibili.com/api/v2/oauth2/login"
-        response = s.post(url,data=payload,headers=headers)
+        response = s.post(url, data=payload, headers=headers)
         return response
         
     def request_check_token(self):
@@ -378,8 +370,6 @@ class bilibili():
         response1 = requests.post(url, headers=appheaders, params=data)
         return response1
     
-
-
     async def get_giftlist_of_storm(self, dic):
         roomid = dic['roomid']
         get_url = "https://api.live.bilibili.com/lottery/v1/Storm/check?roomid=" + str(roomid)
@@ -480,21 +470,19 @@ class bilibili():
     async def get_giftlist_of_captain(self, roomid):
         true_url = 'https://api.live.bilibili.com/lottery/v1/lottery/check?roomid=' + str(roomid)
         headers = {
-        "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q = 0.8",
-        "Accept-Encoding":"gzip,async deflate,br",
-        "Accept-Language":"zh-CN",
-        "DNT": "1",
-        "Cookie":"LIVE_BUVID=AUTO7715232653604550",
-        "Connection":"keep-alive",
-        "Cache-Control":"max-age =0",
-        "Host":"api.live.bilibili.com",
-        "Upgrade-Insecure-Requests": "1",
-        "User-Agent":'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:59.0) Gecko/20100101 Firefox/59.0'
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q = 0.8",
+            "Accept-Encoding": "gzip,async deflate,br",
+            "Accept-Language": "zh-CN",
+            "DNT": "1",
+            "Cookie": "LIVE_BUVID=AUTO7715232653604550",
+            "Connection": "keep-alive",
+            "Cache-Control": "max-age =0",
+            "Host": "api.live.bilibili.com",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:59.0) Gecko/20100101 Firefox/59.0'
         }
-        response1 = await self.bili_section_get(true_url,headers=headers)
+        response1 = await self.bili_section_get(true_url, headers=headers)
         return response1
-
-
 
     def get_giftids_raffle(self, str):
         return self.dic_bilibili['giftids_raffle'][str]

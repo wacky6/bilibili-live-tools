@@ -13,6 +13,7 @@ def calc_name_passw(key, Hash, username, password):
     username = parse.quote_plus(username)
     return username, password
 
+
 def login():
     username = ConfigLoader().dic_bilibili['account']['username']
     password = ConfigLoader().dic_bilibili['account']['password']
@@ -71,7 +72,8 @@ def logout():
         print('登出失败', response)
     else:
         print('成功退出登陆')
-        
+
+                
 def check_token():
     response = bilibili().request_check_token()
     json_response = response.json()
@@ -81,9 +83,10 @@ def check_token():
         return True
     print('联系作者(token可能过期)', json_response)
     return False
-    
+
+        
 def refresh_token():
-    # return 
+    # return
     response = bilibili().request_refresh_token()
     json_response = response.json()
     # print(json_response)

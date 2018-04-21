@@ -43,7 +43,7 @@ class Silver():
             timeend = await self.time_end()
             timestart = await self.time_start()
             response = await bilibili().get_silver(timestart, timeend)
-            #print(response.json())
+            # print(response.json())
             json_response = await response.json()
             return json_response['code']
         except:
@@ -53,7 +53,7 @@ class Silver():
         while 1:
             Printer().printlist_append(['join_lottery', '', 'user', "检查宝箱状态"], True)
             temp = await self.GetAward()
-            if temp == None or temp == -10017:
+            if temp is None or temp == -10017:
                 await asyncio.sleep(utils.seconds_until_tomorrow() + 300)
             elif temp == 0:
                 Printer().printlist_append(['join_lottery', '', 'user', "# 打开了宝箱"])

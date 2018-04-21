@@ -54,9 +54,6 @@ def load_bilibili(file):
     return dic_nomalised_bilibili
     
     
-    
-
-                
 def load_color(file):
     cf_color = configparser.ConfigParser(interpolation=None)
     

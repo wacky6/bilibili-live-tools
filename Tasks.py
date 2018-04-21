@@ -7,6 +7,7 @@ from configloader import ConfigLoader
 import utils
 from printer import Printer
 
+
 class Tasks():
 
     def __init__(self):
@@ -16,9 +17,8 @@ class Tasks():
     async def Daily_bag(self):
         response = await bilibili().get_dailybag()
         json_response = await response.json()
-        for i in range(0,len(json_response['data']['bag_list'])):
+        for i in range(0, len(json_response['data']['bag_list'])):
             Printer().printlist_append(['join_lottery', '', 'user', "# 获得-" + json_response['data']['bag_list'][i]['bag_name'] + "-成功"])
-
 
     def CurrentTime(self):
         currenttime = str(int(time.mktime(datetime.datetime.now().timetuple())))
@@ -42,30 +42,30 @@ class Tasks():
         check = len(response.json()['data']['list'])
         group_id_list = []
         owner_uid_list = []
-        for i in range(0,check):
+        for i in range(0, check):
             group_id = response.json()['data']['list'][i]['group_id']
             owner_uid = response.json()['data']['list'][i]['owner_uid']
             group_id_list.append(group_id)
             owner_uid_list.append(owner_uid)
-        for (i1,i2) in zip(group_id_list,owner_uid_list):
+        for (i1, i2) in zip(group_id_list, owner_uid_list):
             response = bilibili().assign_group(i1, i2)
             if response.json()['code'] == 0:
                 if (response.json()['data']['status']) == 1:
-                    Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 已应援过"  %(i1) ])
+                    Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 已应援过" % (i1)])
                 if (response.json()['data']['status']) == 0:
-                    Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 应援成功,获得 %s 点亲密度"  %(i1, response.json()['data']['add_num'])])
+                    Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 应援成功,获得 %s 点亲密度" % (i1, response.json()['data']['add_num'])])
             else:
-                Printer().printlist_append(['join_lottery', '', 'user',"# 应援团 %s 应援失败" %(i1)])
+                Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 应援失败" % (i1)])
 
     async def send_gift(self):
         if self.dic_user['task_control']['clean-expiring-gift']:
-            argvs,x = await utils.fetch_bag_list(printer=False)
-            for i in range(0,len(argvs)):
+            argvs, x = await utils.fetch_bag_list(printer=False)
+            for i in range(0, len(argvs)):
                 giftID = argvs[i][0]
                 giftNum = argvs[i][1]
                 bagID = argvs[i][2]
                 roomID = self.dic_user['task_control']['clean-expiring-gift2room']
-                await utils.send_gift_web(roomID,giftID,giftNum,bagID)
+                await utils.send_gift_web(roomID, giftID, giftNum, bagID)
             if not argvs:
                 Printer().printlist_append(['join_lottery', '', 'user', "# 没有将要过期的礼物~"])
 
@@ -85,7 +85,7 @@ class Tasks():
             day_limit = a[2]
             left_num = int(day_limit) - int(today_feed)
             calculate = 0
-            for i in range(0,len(temp)):
+            for i in range(0, len(temp)):
                 gift_id = int(temp[i][0])
                 gift_num = int(temp[i][1])
                 bag_id = int(temp[i][2])

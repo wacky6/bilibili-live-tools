@@ -11,7 +11,7 @@ from bilibili import bilibili
 from configloader import ConfigLoader
 import threading
 import os
-import login 
+import login
 import biliconsole
 
 

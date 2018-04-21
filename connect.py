@@ -8,6 +8,7 @@ from configloader import ConfigLoader
 
 class connect():
     instance = None
+    
     def __new__(cls, *args, **kw):
         if not cls.instance:
             cls.instance = super(connect, cls).__new__(cls, *args, **kw)
@@ -26,7 +27,7 @@ class connect():
             print('# 弹幕姬异常或主动断开，处理完剩余信息后重连')
             self.danmuji.connected = False
             time_end = int(utils.CurrentTime())
-            if task_heartbeat.done() == False:
+            if not task_heartbeat.done():
                 task_heartbeat.cancel()
                 print('# 弹幕主程序退出，立即取消心跳模块')
             else:
@@ -40,7 +41,6 @@ class connect():
                 print('# 当前网络不稳定，为避免频繁不必要尝试，将自动在5秒后重试')
                 await asyncio.sleep(5)
             
-        
     def reconnect(self, roomid):
         self.tag_reconnect = True
         if self.danmuji is not None:
