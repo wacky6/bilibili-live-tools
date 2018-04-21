@@ -28,16 +28,26 @@ def guide_of_console():
     print('￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣')
     
 
+def fetch_real_roomid(roomid):
+    if roomid:
+        real_roomid = [[roomid], utils.check_room]
+    else:
+        real_roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
+    return real_roomid
+
+
 def preprocess_send_danmu_msg_andriod():
     msg = input('请输入要发送的信息:')
     roomid = input('请输入要发送的房间号:')
-    Biliconsole().append2list_console([[msg, int(roomid)], utils.send_danmu_msg_andriod])
+    real_roomid = fetch_real_roomid(roomid)
+    Biliconsole().append2list_console([[msg, real_roomid], utils.send_danmu_msg_andriod])
   
       
 def preprocess_send_danmu_msg_web():
     msg = input('请输入要发送的信息:')
     roomid = input('请输入要发送的房间号:')
-    Biliconsole().append2list_console([[msg, int(roomid)], utils.send_danmu_msg_web])
+    real_roomid = fetch_real_roomid(roomid)
+    Biliconsole().append2list_console([[msg, real_roomid], utils.send_danmu_msg_web])
 
 
 def preprocess_check_room():
@@ -51,12 +61,14 @@ def process_send_gift_web():
     # print('是谁', giftid)
     giftnum = input('请输入要发送的礼物数目:')
     roomid = input('请输入要发送的房间号:')
-    Biliconsole().append2list_console([[roomid, [[False, bagid], utils.fetch_bag_list], giftnum, bagid], utils.send_gift_web])
+    real_roomid = fetch_real_roomid(roomid)
+    Biliconsole().append2list_console([[real_roomid, [[False, bagid], utils.fetch_bag_list], giftnum, bagid], utils.send_gift_web])
     
     
 def preprocess_change_danmuji_roomid():
     roomid = input('请输入roomid')
-    Biliconsole().append2list_console([[[[roomid], utils.check_room]], 'normal', connect().reconnect])
+    real_roomid = fetch_real_roomid(roomid)
+    Biliconsole().append2list_console([[real_roomid], 'normal', connect().reconnect])
 
 
 def change_printer_dic_user():
@@ -68,7 +80,8 @@ def change_printer_dic_user():
         
         
 def preprocess_fetch_liveuser_info():
-    real_roomid = input('请输入roomid')
+    roomid = input('请输入roomid')
+    real_roomid = fetch_real_roomid(roomid)
     Biliconsole().append2list_console([[real_roomid], utils.fetch_liveuser_info])
 
         
@@ -79,7 +92,8 @@ def preprocess_open_capsule():
 
 def process_watch_living_video():
     if ConfigLoader().dic_user['platform']['platform'] == 'ios_pythonista':
-        real_roomid = input('请输入roomid')
+        roomid = input('请输入roomid')
+        real_roomid = fetch_real_roomid(roomid)
         Biliconsole().append2list_console([[real_roomid], utils.watch_living_video])
         return
     print('仅支持ios')

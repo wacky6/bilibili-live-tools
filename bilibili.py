@@ -239,7 +239,7 @@ class bilibili():
             'appkey': self.dic_bilibili['appkey'],
             'build': self.dic_bilibili['build'],
             # 房间号
-            'cid': roomId,
+            'cid': int(roomId),
             # 颜色
             'color': '16777215',
             'device': self.dic_bilibili['device'],
@@ -286,7 +286,7 @@ class bilibili():
             'mode': '1',
             'msg': msg,
             'rnd': '0',
-            'roomid': roomId,
+            'roomid': int(roomId),
             'csrf_token': self.dic_bilibili['csrf']
         }
 
