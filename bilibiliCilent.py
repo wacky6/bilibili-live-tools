@@ -196,18 +196,16 @@ class bilibiliClient():
             reader, writer = await asyncio.open_connection(self.bilibili.dic_bilibili['_ChatHost'], self.bilibili.dic_bilibili['_ChatPort'])
         except:
             print("# 连接无法建立，请检查本地网络状况")
-            return
+            return False
         self._reader = reader
         self._writer = writer
         if (await self.SendJoinChannel(ConfigLoader().dic_user['other_control']['default_monitor_roomid'])):
             self.connected = True
             Printer().printlist_append(['join_lottery', '', 'user', '连接弹幕服务器成功'], True)
-            await self.ReceiveMessageLoop()
+            # await self.ReceiveMessageLoop()
+            return True
 
     async def HeartbeatLoop(self):
-        while not self.connected:
-            await asyncio.sleep(0.5)
-
         Printer().printlist_append(['join_lottery', '', 'user', '弹幕模块开始心跳（由于弹幕心跳间隔为30s，所以后续正常心跳不再提示）'], True)
 
         while self.connected:
