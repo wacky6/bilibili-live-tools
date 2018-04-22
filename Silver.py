@@ -3,6 +3,7 @@ import datetime
 import asyncio
 import utils
 from printer import Printer
+from bilitimer import BiliTimer
 
 
 # 将time_end时间转换成正常时间
@@ -44,15 +45,23 @@ async def GetAward():
     except:
         pass
 
-async def run():
+
+async def GetAllSilver():
     while 1:
         Printer().printlist_append(['join_lottery', '', 'user', "检查宝箱状态"], True)
         temp = await GetAward()
         if temp is None or temp == -10017:
-            await asyncio.sleep(utils.seconds_until_tomorrow() + 300)
+            sleeptime = (utils.seconds_until_tomorrow() + 300)
+            BiliTimer().append2list_jobs([GetAllSilver, [], int(utils.CurrentTime()), sleeptime])
+            return 
         elif temp == 0:
             Printer().printlist_append(['join_lottery', '', 'user', "# 打开了宝箱"])
             await GetAward()
         else:
             Printer().printlist_append(['join_lottery', '', 'user',"# 继续等待宝箱冷却..."])
-            await asyncio.sleep(181)
+            # await asyncio.sleep(181)
+            BiliTimer().append2list_jobs([GetAllSilver, [], int(utils.CurrentTime()), 181])
+            return  
+                       
+def init():
+    BiliTimer().append2list_jobs([GetAllSilver, [], 0, 0])

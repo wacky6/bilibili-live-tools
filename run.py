@@ -13,6 +13,7 @@ import threading
 import os
 import login
 import biliconsole
+from bilitimer import BiliTimer
 
 
 loop = asyncio.get_event_loop()
@@ -34,6 +35,12 @@ biliconsole.Biliconsole()
 danmu_connection = connect()
 
 
+bili_timer = BiliTimer()
+OnlineHeart.init()
+Tasks.init()
+Silver.init()
+
+
 console_thread = threading.Thread(target=biliconsole.controler)
 
 console_thread.start()
@@ -43,14 +50,15 @@ tasks = [
     # utils.fetch_user_info(),
     # utils.fetch_bag_list(),
     # utils.fetch_medal(),
-
-    OnlineHeart.run(),
-    Silver.run(),
-    Tasks.run(),
+    
+    # OnlineHeart.run(),
+    # Silver.run(),
+    # Tasks.run(),
     danmu_connection.run(),
     LotteryResult.run(),
     rafflehandler.run(),
-    biliconsole.Biliconsole().run()
+    biliconsole.Biliconsole().run(),
+    bili_timer.run()
     
 ]
 try:

@@ -5,6 +5,7 @@ import asyncio
 from configloader import ConfigLoader
 import utils
 from printer import Printer
+from bilitimer import BiliTimer
 import aiohttp
 
     
@@ -12,8 +13,10 @@ import aiohttp
 async def Daily_bag():
     response = await bilibili().get_dailybag()
     json_response = await response.json()
+    # print(json_response)
     for i in range(0, len(json_response['data']['bag_list'])):
         Printer().printlist_append(['join_lottery', '', 'user', "# 获得-" + json_response['data']['bag_list'][i]['bag_name'] + "-成功"])
+    BiliTimer().append2list_jobs([Daily_bag, [], int(CurrentTime()), 21600])
 
 
 def CurrentTime():
@@ -24,13 +27,17 @@ def CurrentTime():
 async def DoSign():
     response = await bilibili().get_dosign()
     temp = await response.json(content_type=None)
+    # print(temp)
     Printer().printlist_append(['join_lottery', '', 'user', "# 签到状态:",temp['msg']])
+    BiliTimer().append2list_jobs([DoSign, [], int(CurrentTime()), 21600])
 
 # 领取每日任务奖励
 async def Daily_Task():
     response2 = await bilibili().get_dailytask()
     json_response2 = await response2.json()
     Printer().printlist_append(['join_lottery', '', 'user', "# 双端观看直播:", json_response2["msg"]])
+    # print(json_response2)
+    BiliTimer().append2list_jobs([Daily_Task, [], int(CurrentTime()), 21600])
 
 
 async def Sign1Group(session, i1, i2):
@@ -62,6 +69,7 @@ async def link_sign():
                 task = asyncio.ensure_future(Sign1Group(session, i1, i2))
                 tasklist.append(task)
             results = await asyncio.gather(*tasklist)
+    BiliTimer().append2list_jobs([link_sign, [], int(CurrentTime()), 21600])
         
 
 async def send_gift():
@@ -75,6 +83,7 @@ async def send_gift():
             await utils.send_gift_web(roomID, giftID, giftNum, bagID)
         if not argvs:
             Printer().printlist_append(['join_lottery', '', 'user', "# 没有将要过期的礼物~"])
+    BiliTimer().append2list_jobs([send_gift, [], int(CurrentTime()), 21600])
 
 async def auto_send_gift():
     if ConfigLoader().dic_user['task_control']['send2wearing-medal']:
@@ -113,6 +122,7 @@ async def auto_send_gift():
                     await utils.send_gift_web(roomid, gift_id, tmp, bag_id)
                     left_num = left_num - tmp1
         Printer().printlist_append(['join_lottery', '', 'user', "# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
+    BiliTimer().append2list_jobs([auto_send_gift, [], int(CurrentTime()), 21600])
         
 async def doublegain_coin2silver():
     if ConfigLoader().dic_user['task_control']['doublegain_coin2silver']:
@@ -121,6 +131,7 @@ async def doublegain_coin2silver():
         response1 = await bilibili().request_doublegain_coin2silver()
         json_response1 = await response1.json()
         print(json_response0['msg'], json_response1['msg'])
+    BiliTimer().append2list_jobs([doublegain_coin2silver, [], int(CurrentTime()), 21600])
 
 async def sliver2coin():
     if ConfigLoader().dic_user['task_control']['silver2coin']:
@@ -130,16 +141,15 @@ async def sliver2coin():
         json_response1 = await response1.json()
         Printer().printlist_append(['join_lottery', '', 'user',"# ", json_response['msg']])
         Printer().printlist_append(['join_lottery', '', 'user', "# ", json_response1['msg']])
+    BiliTimer().append2list_jobs([sliver2coin, [], int(CurrentTime()), 21600])
 
-async def run():
-    while 1:
-        Printer().printlist_append(['join_lottery', '', 'user', "每日任务"], True)
-        await sliver2coin()
-        await doublegain_coin2silver()
-        await DoSign()
-        await Daily_bag()
-        await Daily_Task()
-        await link_sign()
-        await send_gift()
-        await auto_send_gift()
-        await asyncio.sleep(21600)
+
+def init():
+    BiliTimer().append2list_jobs([sliver2coin, [], 0, 0])
+    BiliTimer().append2list_jobs([doublegain_coin2silver, [], 0, 0])
+    BiliTimer().append2list_jobs([DoSign, [], 0, 0])
+    BiliTimer().append2list_jobs([Daily_bag, [], 0, 0])
+    BiliTimer().append2list_jobs([Daily_Task, [], 0, 0])
+    BiliTimer().append2list_jobs([link_sign, [], 0, 0])
+    BiliTimer().append2list_jobs([send_gift, [], 0, 0])
+    BiliTimer().append2list_jobs([auto_send_gift, [], 0, 0])

@@ -3,6 +3,7 @@ import time
 import datetime
 import asyncio
 from printer import Printer
+from bilitimer import BiliTimer
 import login
 
 
@@ -12,15 +13,23 @@ def CurrentTime():
 
 
 async def apppost_heartbeat():
+    if login.check_token():
+        pass
+    else:
+        login.refresh_token()
     await bilibili().apppost_heartbeat()
+    Printer().printlist_append(['join_lottery', '', 'user', "心跳"], True)
+    BiliTimer().append2list_jobs([apppost_heartbeat, [], int(CurrentTime()), 300])
 
 
 async def pcpost_heartbeat():
     await bilibili().pcpost_heartbeat()
+    BiliTimer().append2list_jobs([pcpost_heartbeat, [], int(CurrentTime()), 300])
 
 
 async def heart_gift():
     await bilibili().heart_gift()
+    BiliTimer().append2list_jobs([heart_gift, [], int(CurrentTime()), 300])
 
 
 # 因为休眠时间差不多,所以放到这里,此为实验性功能
@@ -48,19 +57,13 @@ async def draw_lottery():
                         pass
         else:
             break
+    BiliTimer().append2list_jobs([heart_gift, [], int(CurrentTime()), 300])
 
-
-async def run():
-    while 1:
-        Printer().printlist_append(['join_lottery', '', 'user', "心跳"], True)
-        if login.check_token():
-            pass
-        else:
-            login.refresh_token()
-        await apppost_heartbeat()
-        await pcpost_heartbeat()
-        await heart_gift()
-        await draw_lottery()
-        await asyncio.sleep(300)
+        
+def init():
+    BiliTimer().append2list_jobs([apppost_heartbeat, [], 0, 0])
+    BiliTimer().append2list_jobs([pcpost_heartbeat, [], 0, 0])
+    BiliTimer().append2list_jobs([heart_gift, [], 0, 0])
+    BiliTimer().append2list_jobs([draw_lottery, [], 0, 0])
 
 
