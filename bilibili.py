@@ -32,9 +32,9 @@ async def replay_request(response):
     if json_response['code'] == 1024:
         print('b站炸了，暂停所有请求5s后重试，请耐心等待')
         await asyncio.sleep(5)
-        return True
+        return True, None
     else:
-        return False
+        return False, json_response
 
 base_url = 'https://api.live.bilibili.com'
 
@@ -75,10 +75,10 @@ class bilibili():
         while True:
             try:
                 response = await self.bili_section.post(url, headers=headers, data=data)
-                tag = await replay_request(response)
+                tag, json_response = await replay_request(response)
                 if tag:
                     continue
-                return response
+                return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -89,10 +89,10 @@ class bilibili():
         while True:
             try:
                 response = await self.bili_section.get(url, headers=headers, data=data, params=params)
-                tag = await replay_request(response)
+                tag, json_response = await replay_request(response)
                 if tag:
                     continue
-                return response
+                return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -621,7 +621,8 @@ class bilibili():
         appheaders = self.dic_bilibili['appheaders'].copy()
         appheaders['Host'] = "api.vc.bilibili.com"
         response = await session.get(url, headers=appheaders)
-        return response
+        json_response = await response.json(content_type=None)
+        return json_response
 
     async def gift_list(self):
         url = f"{base_url}/gift/v2/live/room_gift_list?roomid=2721650&area_v2_id=86"

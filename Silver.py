@@ -14,8 +14,7 @@ def DataTime():
 # 领瓜子时判断领取周期的参数
 async def time_start():
 
-    response = await bilibili().get_time_about_silver()
-    temp = await response.json()
+    temp = await bilibili().get_time_about_silver()
     # print (temp['code'])    #宝箱领完返回的code为-10017
     if temp['code'] == -10017:
         Printer().printlist_append(['join_lottery', '', 'user', "# 今日宝箱领取完毕"])
@@ -26,8 +25,7 @@ async def time_start():
 # 领瓜子时判断领取周期的参数
 async def time_end():
     try:
-        response = await bilibili().get_time_about_silver()
-        temp = await response.json()
+        temp = await bilibili().get_time_about_silver()
         time_end = temp['data']['time_end']
         return str(time_end)
     except:
@@ -38,9 +36,8 @@ async def GetAward():
     try:
         timeend = await time_end()
         timestart = await time_start()
-        response = await bilibili().get_silver(timestart, timeend)
-        # print(response.json())
-        json_response = await response.json()
+        json_response = await bilibili().get_silver(timestart, timeend)
+        # print(json_response)
         return json_response['code']
     except:
         pass
