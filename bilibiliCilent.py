@@ -166,10 +166,8 @@ async def handle_1_room_captain(roomid):
 class bilibiliClient():
 
     def __init__(self):
-        self.bilibili = bilibili()
         self._reader = None
         self._writer = None
-        self._uid = None
         self.connected = False
         self._UserCount = 0
 
@@ -186,7 +184,7 @@ class bilibiliClient():
         
     async def connectServer(self):
         try:
-            reader, writer = await asyncio.open_connection(self.bilibili.dic_bilibili['_ChatHost'], self.bilibili.dic_bilibili['_ChatPort'])
+            reader, writer = await asyncio.open_connection(ConfigLoader().dic_bilibili['_ChatHost'], ConfigLoader().dic_bilibili['_ChatPort'])
         except:
             print("# 连接无法建立，请检查本地网络状况")
             return False
@@ -202,13 +200,13 @@ class bilibiliClient():
         Printer().printlist_append(['join_lottery', '', 'user', '弹幕模块开始心跳（由于弹幕心跳间隔为30s，所以后续正常心跳不再提示）'], True)
 
         while self.connected:
-            await self.SendSocketData(0, 16, self.bilibili.dic_bilibili['_protocolversion'], 2, 1, "")
+            await self.SendSocketData(0, 16, ConfigLoader().dic_bilibili['_protocolversion'], 2, 1, "")
             await asyncio.sleep(30)
 
     async def SendJoinChannel(self, channelId):
-        self._uid = (int)(100000000000000.0 + 200000000000000.0 * random.random())
-        body = '{"roomid":%s,"uid":%s}' % (channelId, self._uid)
-        await self.SendSocketData(0, 16, self.bilibili.dic_bilibili['_protocolversion'], 7, 1, body)
+        uid = (int)(100000000000000.0 + 200000000000000.0 * random.random())
+        body = '{"roomid":%s,"uid":%s}' % (channelId, uid)
+        await self.SendSocketData(0, 16, ConfigLoader().dic_bilibili['_protocolversion'], 7, 1, body)
         return True
 
     async def SendSocketData(self, packetlength, magic, ver, action, param, body):
