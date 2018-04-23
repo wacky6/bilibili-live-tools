@@ -287,6 +287,7 @@ async def check_taskinfo():
             
 async def check_room(roomid):
     json_response = await bilibili().request_check_room(roomid)
+    # print(json_response)
     if json_response['code'] == 0:
         # print(json_response)
         print('查询结果:')
@@ -298,6 +299,9 @@ async def check_room(roomid):
             print('# 短号为:{}'.format(data['short_id']))
         print('# 真实房间号为:{}'.format(data['room_id']))
         return data['room_id']
+    # 房间不存在
+    elif json_response['code'] == 60004:
+        print(json_response['msg'])
             
             
 async def send_gift_web(roomid, giftid, giftnum, bagid):
