@@ -33,7 +33,10 @@ async def replay_request(response):
         print('b站炸了，暂停所有请求5s后重试，请耐心等待')
         await asyncio.sleep(5)
         return True, None
+    if json_response['code'] ==0:
+        return False, json_response
     else:
+        # print(json_response)
         return False, json_response
 
 base_url = 'https://api.live.bilibili.com'

@@ -308,6 +308,7 @@ async def send_gift_web(roomid, giftid, giftnum, bagid):
     json_response = await bilibili().request_check_room(roomid)
     ruid = json_response['data']['uid']
     biz_id = json_response['data']['room_id']
+    # 200027 不足数目
     json_response1 = await bilibili().request_send_gift_web(giftid, giftnum, bagid, ruid, biz_id)
     if json_response1['code'] == 0:
         # print(json_response1['data'])

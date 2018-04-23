@@ -25,17 +25,17 @@ def CurrentTime():
 
 # 签到功能
 async def DoSign():
-    temp = await bilibili().get_dosign()
     # -500 done
+    temp = await bilibili().get_dosign()
     # print('DoSign', temp)
     Printer().printlist_append(['join_lottery', '', 'user', "# 签到状态:",temp['msg']])
     BiliTimer().append2list_jobs([DoSign, [], int(CurrentTime()), 21600])
 
 # 领取每日任务奖励
 async def Daily_Task():
+    #-400 done
     json_response2 = await bilibili().get_dailytask()
     Printer().printlist_append(['join_lottery', '', 'user', "# 双端观看直播:", json_response2["msg"]])
-    #-400 done
     # print('Daily_Task', json_response2)
     BiliTimer().append2list_jobs([Daily_Task, [], int(CurrentTime()), 21600])
 
@@ -131,7 +131,9 @@ async def doublegain_coin2silver():
 
 async def sliver2coin():
     if ConfigLoader().dic_user['task_control']['silver2coin']:
+        # -403 done
         json_response = await bilibili().silver2coin_web()
+        # 403 done
         json_response1 = await bilibili().silver2coin_app()
         Printer().printlist_append(['join_lottery', '', 'user',"# ", json_response['msg']])
         Printer().printlist_append(['join_lottery', '', 'user', "# ", json_response1['msg']])

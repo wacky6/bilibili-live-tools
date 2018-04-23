@@ -39,6 +39,7 @@ async def heart_gift():
 async def draw_lottery():
     for i in range(68, 90):
         json_response = await bilibili().get_lotterylist(i)
+        # -400 不存在
         if json_response['code'] == 0:
             temp = json_response['data']['title']
             if "测试" in temp:
