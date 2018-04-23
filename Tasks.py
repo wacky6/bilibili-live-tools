@@ -97,6 +97,7 @@ async def auto_send_gift():
         a = await utils.WearingMedalInfo()
         if a is None:
             print('暂未佩戴任何勋章')
+            BiliTimer().append2list_jobs([auto_send_gift, [], int(CurrentTime()), 21600])
             return 
         json_res = await bilibili().gift_list()
         temp_dic = {}
