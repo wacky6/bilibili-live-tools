@@ -17,18 +17,21 @@ async def apppost_heartbeat():
         pass
     else:
         login.refresh_token()
-    await bilibili().apppost_heartbeat()
+    response = await bilibili().apppost_heartbeat()
+    # print('apppost_heartbeat', await response.json())
     Printer().printlist_append(['join_lottery', '', 'user', "心跳"], True)
     BiliTimer().append2list_jobs([apppost_heartbeat, [], int(CurrentTime()), 300])
 
 
 async def pcpost_heartbeat():
-    await bilibili().pcpost_heartbeat()
+    response = await bilibili().pcpost_heartbeat()
+    # print('pcpost_heartbeat', await response.json())
     BiliTimer().append2list_jobs([pcpost_heartbeat, [], int(CurrentTime()), 300])
 
 
 async def heart_gift():
-    await bilibili().heart_gift()
+    response =  await bilibili().heart_gift()
+    # print('heart_gift', await response.json())
     BiliTimer().append2list_jobs([heart_gift, [], int(CurrentTime()), 300])
 
 

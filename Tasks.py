@@ -13,7 +13,7 @@ import aiohttp
 async def Daily_bag():
     response = await bilibili().get_dailybag()
     json_response = await response.json()
-    # print(json_response)
+    # print('Daily_bag', json_response)
     for i in range(0, len(json_response['data']['bag_list'])):
         Printer().printlist_append(['join_lottery', '', 'user', "# 获得-" + json_response['data']['bag_list'][i]['bag_name'] + "-成功"])
     BiliTimer().append2list_jobs([Daily_bag, [], int(CurrentTime()), 21600])
@@ -27,7 +27,7 @@ def CurrentTime():
 async def DoSign():
     response = await bilibili().get_dosign()
     temp = await response.json(content_type=None)
-    # print(temp)
+    # print('DoSign', temp)
     Printer().printlist_append(['join_lottery', '', 'user', "# 签到状态:",temp['msg']])
     BiliTimer().append2list_jobs([DoSign, [], int(CurrentTime()), 21600])
 
@@ -36,7 +36,7 @@ async def Daily_Task():
     response2 = await bilibili().get_dailytask()
     json_response2 = await response2.json()
     Printer().printlist_append(['join_lottery', '', 'user', "# 双端观看直播:", json_response2["msg"]])
-    # print(json_response2)
+    # print('Daily_Task', json_response2)
     BiliTimer().append2list_jobs([Daily_Task, [], int(CurrentTime()), 21600])
 
 
