@@ -29,15 +29,23 @@ async def DoSign():
     temp = await bilibili().get_dosign()
     # print('DoSign', temp)
     Printer().printlist_append(['join_lottery', '', 'user', "# 签到状态:",temp['msg']])
-    BiliTimer().append2list_jobs([DoSign, [], int(CurrentTime()), 21600])
+    if temp['code'] == -500 and '已' in temp['msg']:
+        sleeptime = (utils.seconds_until_tomorrow() + 300)
+        BiliTimer().append2list_jobs([DoSign, [], int(CurrentTime()), sleeptime])
+    else:
+        BiliTimer().append2list_jobs([DoSign, [], int(CurrentTime()), 350])
 
 # 领取每日任务奖励
 async def Daily_Task():
-    #-400 done
+    #-400 done/not yet
     json_response2 = await bilibili().get_dailytask()
     Printer().printlist_append(['join_lottery', '', 'user', "# 双端观看直播:", json_response2["msg"]])
     # print('Daily_Task', json_response2)
-    BiliTimer().append2list_jobs([Daily_Task, [], int(CurrentTime()), 21600])
+    if json_response2['code'] == -400 and '已' in json_response2['msg']:
+        sleeptime = (utils.seconds_until_tomorrow() + 300)
+        BiliTimer().append2list_jobs([Daily_Task, [], int(CurrentTime()), sleeptime])
+    else:
+        BiliTimer().append2list_jobs([Daily_Task, [], int(CurrentTime()), 350])
 
 
 async def Sign1Group(session, i1, i2):
