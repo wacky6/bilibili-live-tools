@@ -18,17 +18,13 @@ async def time_start():
 
 # 领取银瓜子
 async def GetAward():
-    try:
-        silver_time = await time_start()
-        if silver_time is not None:
-            timestart, timeend = silver_time
-        else:
-            return
-        json_response = await bilibili().get_silver(timestart, timeend)
-        return json_response
-    except:
-        print(silver_time)
-
+    silver_time = await time_start()
+    if silver_time is not None:
+        timestart, timeend = silver_time
+    else:
+        return
+    json_response = await bilibili().get_silver(timestart, timeend)
+    return json_response
 
 async def GetAllSilver():
     while 1:
