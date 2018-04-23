@@ -146,6 +146,23 @@ async def sliver2coin():
         json_response1 = await bilibili().silver2coin_app()
         Printer().printlist_append(['join_lottery', '', 'user',"# ", json_response['msg']])
         Printer().printlist_append(['join_lottery', '', 'user', "# ", json_response1['msg']])
+        if json_response['code'] == -403 and '只' in json_response['msg']:
+            finish_web = True
+        else:
+            finish_web =False
+            
+        if json_response1['code'] == 403 and '最多' in json_response1['msg']:
+            finish_app = True
+        else:
+            finish_app =False
+        if finish_app and finish_web:
+            sleeptime = (utils.seconds_until_tomorrow() + 300)
+            BiliTimer().append2list_jobs([sliver2coin, [], int(CurrentTime()), sleeptime])
+            return 
+        else:
+            BiliTimer().append2list_jobs([sliver2coin, [], int(CurrentTime()), 350])
+            return 
+        
     BiliTimer().append2list_jobs([sliver2coin, [], int(CurrentTime()), 21600])
 
 
