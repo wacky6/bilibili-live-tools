@@ -58,7 +58,7 @@ async def draw_lottery():
                         pass
         else:
             break
-    BiliTimer().append2list_jobs([heart_gift, [], int(CurrentTime()), 300])
+    BiliTimer().append2list_jobs([draw_lottery, [], int(CurrentTime()), 300])
 
         
 def init():
