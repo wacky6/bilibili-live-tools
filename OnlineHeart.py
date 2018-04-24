@@ -42,7 +42,7 @@ async def draw_lottery():
         # -400 不存在
         if json_response['code'] == 0:
             temp = json_response['data']['title']
-            if "测试" in temp:
+            if "测试" in temp or 'test' in temp:
                 print("检测到疑似钓鱼类测试抽奖，默认不参与，请自行判断抽奖可参与性")
                 # print(url)
             else:
