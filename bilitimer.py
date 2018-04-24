@@ -53,4 +53,8 @@ class BiliTimer:
         # print('添加任务', job)
         return
         
+    def getresult(self):
+        print('目前timer任务队列状况', self.jobs)
+        print('数目', len(self.jobs))
+        
     

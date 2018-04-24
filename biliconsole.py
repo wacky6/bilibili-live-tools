@@ -5,6 +5,7 @@ from printer import Printer
 from configloader import ConfigLoader
 import threading
 import asyncio
+from bilitimer import BiliTimer
 
 
 def guide_of_console():
@@ -118,6 +119,7 @@ options = {
     '15': preprocess_open_capsule,
     '16': process_watch_living_video,  # input async
     '17': utils.TitleInfo,
+    '18': BiliTimer().getresult,
     'help': guide_of_console,
     'h': guide_of_console
 }
