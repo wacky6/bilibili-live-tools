@@ -158,10 +158,7 @@ class bilibili():
         return response
         
     async def silver2coin_app(self):
-        temp_params = 'access_key=' + self.dic_bilibili['access_key'] + '&actionKey=' + self.dic_bilibili[
-            'actionKey'] + '&appkey=' + self.dic_bilibili['appkey'] + '&build=' + self.dic_bilibili[
-                          'build'] + '&device=' + self.dic_bilibili['device'] + '&mobi_app=' + self.dic_bilibili[
-                          'mobi_app'] + '&platform=' + self.dic_bilibili['platform'] + '&ts=' + CurrentTime()
+        temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&ts={CurrentTime()}'
         sign = self.calc_sign(temp_params)
         app_url = f"{base_url}/AppExchange/silver2coin?{temp_params}&sign={sign}"
         response1 = await self.bili_section_post(app_url, headers=self.dic_bilibili['appheaders'])
@@ -317,7 +314,7 @@ class bilibili():
         
     def request_getkey(self):
         url = 'https://passport.bilibili.com/api/oauth2/getKey'
-        temp_params = 'appkey=' + self.dic_bilibili['appkey']
+        temp_params = f'appkey={self.dic_bilibili["appkey"]}'
         sign = self.calc_sign(temp_params)
         params = {'appkey': self.dic_bilibili['appkey'], 'sign': sign}
         response = requests.post(url, data=params)
@@ -326,11 +323,10 @@ class bilibili():
     def normal_login(self, username, password):
         # url = 'https://passport.bilibili.com/api/oauth2/login'   //旧接口
         url = "https://passport.bilibili.com/api/v2/oauth2/login"
-        temp_params = 'appkey=' + self.dic_bilibili['appkey'] + '&password=' + password + '&username=' + username
+        temp_params = f'appkey={self.dic_bilibili["appkey"]}&password={password}&username={username}'
         sign = self.calc_sign(temp_params)
         headers = {"Content-type": "application/x-www-form-urlencoded"}
-        payload = "appkey=" + self.dic_bilibili[
-            'appkey'] + "&password=" + password + "&username=" + username + "&sign=" + sign
+        payload = f'appkey={self.dic_bilibili["appkey"]}&password={password}&username={username}&sign={sign}'
         response = requests.post(url, data=payload, headers=headers)
         return response
         
@@ -347,12 +343,9 @@ class bilibili():
         tmp1 = base64.b64encode(res.content)
         
         captcha = cnn_captcha(tmp1)
-        temp_params = 'actionKey=' + self.dic_bilibili[
-            'actionKey'] + '&appkey=' + self.dic_bilibili['appkey'] + '&build=' + self.dic_bilibili[
-                          'build'] + '&captcha=' + captcha + '&device=' + self.dic_bilibili['device'] + '&mobi_app=' + self.dic_bilibili['mobi_app'] + '&password=' + password + '&platform=' + self.dic_bilibili[
-                          'platform'] + '&username='+username
+        temp_params = f'actionKey={self.dic_bilibili["actionKey"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&captcha={captcha}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&password={password}&platform={self.dic_bilibili["platform"]}&username={username}'
         sign = self.calc_sign(temp_params)
-        payload = temp_params + '&sign=' + sign
+        payload = f'{temp_params}&sign={sign}'
         headers['Content-type'] = "application/x-www-form-urlencoded"
         headers['cookie'] = "sid=hxt5szbb"
         url = "https://passport.bilibili.com/api/v2/oauth2/login"
@@ -369,7 +362,7 @@ class bilibili():
         sign = self.calc_sign(params)
         appheaders = self.dic_bilibili['appheaders'].copy()
         appheaders['Host'] = "passport.bilibili.com"
-        true_url = 'https://passport.bilibili.com/api/v2/oauth2/info?' + params + '&sign=' + sign
+        true_url = f'https://passport.bilibili.com/api/v2/oauth2/info?{params}&sign={sign}'
         response1 = requests.get(true_url, headers=appheaders)
         return response1
         
@@ -468,12 +461,7 @@ class bilibili():
         return response
 
     async def get_giftlist_of_TV(self, real_roomid):
-        temp_params = 'access_key=' + self.dic_bilibili['access_key'] + '&actionKey=' + self.dic_bilibili[
-            'actionKey'] + '&appkey=' + self.dic_bilibili['appkey'] + '&build=' + self.dic_bilibili[
-                          'build'] + '&device=' + self.dic_bilibili['device'] + \
-                      '&mobi_app=' + self.dic_bilibili['mobi_app'] + '&platform=' + self.dic_bilibili[
-                          'platform'] + '&roomid=' + str(
-            real_roomid) + '&ts=' + CurrentTime()
+        temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&roomid={real_roomid}&ts={CurrentTime()}'
         sign = self.calc_sign(temp_params)
         check_url = f'{base_url}/AppSmallTV/index?{temp_params}&sign={sign}'
         headers = {
@@ -540,10 +528,7 @@ class bilibili():
     # 发送app心跳包
     async def apppost_heartbeat(self):
         time = CurrentTime()
-        temp_params = 'access_key=' + self.dic_bilibili['access_key'] + '&actionKey=' + self.dic_bilibili[
-            'actionKey'] + '&appkey=' + self.dic_bilibili['appkey'] + '&build=' + self.dic_bilibili[
-                          'build'] + '&device=' + self.dic_bilibili['device'] + '&mobi_app=' + self.dic_bilibili[
-                          'mobi_app'] + '&platform=' + self.dic_bilibili['platform'] + '&ts=' + time
+        temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&ts={time}'
         sign = self.calc_sign(temp_params)
         url = f'{base_url}/mobile/userOnlineHeart?{temp_params}&sign={sign}'
         payload = {'roomid': 23058, 'scale': 'xhdpi'}
@@ -568,10 +553,7 @@ class bilibili():
 
     async def get_time_about_silver(self):
         time = CurrentTime()
-        temp_params = 'access_key=' + self.dic_bilibili['access_key'] + '&actionKey=' + self.dic_bilibili[
-            'actionKey'] + '&appkey=' + self.dic_bilibili['appkey'] + '&build=' + self.dic_bilibili[
-                          'build'] + '&device=' + self.dic_bilibili['device'] + '&mobi_app=' + self.dic_bilibili[
-                          'mobi_app'] + '&platform=' + self.dic_bilibili['platform'] + '&ts=' + time
+        temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&ts={time}'
         sign = self.calc_sign(temp_params)
         GetTask_url = f'{base_url}/mobile/freeSilverCurrentTask?{temp_params}&sign={sign}'
         response = await self.bili_section_get(GetTask_url, headers=self.dic_bilibili['appheaders'])
@@ -579,11 +561,7 @@ class bilibili():
 
     async def get_silver(self, timestart, timeend):
         time = CurrentTime()
-        temp_params = 'access_key=' + self.dic_bilibili['access_key'] + '&actionKey=' + self.dic_bilibili[
-            'actionKey'] + '&appkey=' + self.dic_bilibili['appkey'] + '&build=' + self.dic_bilibili[
-                          'build'] + '&device=' + self.dic_bilibili['device'] + '&mobi_app=' + self.dic_bilibili[
-                          'mobi_app'] + '&platform=' + self.dic_bilibili[
-                          'platform'] + '&time_end=' + timeend + '&time_start=' + timestart + '&ts=' + time
+        temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&time_end={timeend}&time_start={timestart}&ts={time}'
         sign = self.calc_sign(temp_params)
         url = f'{base_url}/mobile/freeSilverAward?{temp_params}&sign={sign}'
         response = await self.bili_section_get(url, headers=self.dic_bilibili['appheaders'])
@@ -620,7 +598,7 @@ class bilibili():
                           'mobi_app'] + "&owner_id=" + str(i2) + "&platform=" + self.dic_bilibili[
                           'platform'] + "&src=xiaomi&trace_id=20171224024300024&ts=" + CurrentTime() + "&version=5.20.1.520001"
         sign = self.calc_sign(temp_params)
-        url = "https://api.vc.bilibili.com/link_setting/v1/link_setting/sign_in?" + temp_params + "&sign=" + sign
+        url = f'https://api.vc.bilibili.com/link_setting/v1/link_setting/sign_in?{temp_params}&sign={sign}'
         appheaders = self.dic_bilibili['appheaders'].copy()
         appheaders['Host'] = "api.vc.bilibili.com"
         response = await session.get(url, headers=appheaders)
