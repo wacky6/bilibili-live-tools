@@ -220,7 +220,7 @@ async def fetch_bag_list(verbose=False, bagid=None, printer=True):
             left_days = '+∞'.center(6)
         else:
             left_days = str(round(left_time / 86400, 1)).center(6)
-        gift_list.append([gift_id, gift_num, bag_id])
+            gift_list.append([gift_id, gift_num, bag_id])
         if bagid is not None:
             if bag_id == int(bagid):
                 return gift_id
