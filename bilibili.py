@@ -352,12 +352,9 @@ class bilibili():
         return response
         
     def request_check_token(self):
-        list_url = ["access_key=" + self.dic_bilibili['access_key'], "appkey=" + self.dic_bilibili['appkey'], "access_token=" + self.dic_bilibili['access_key'], 'actionKey=' + self.dic_bilibili[
-            'actionKey'], 'build=' + self.dic_bilibili[
-                          'build'], 'device=' + self.dic_bilibili['device'], 'mobi_app=' + self.dic_bilibili[
-                          'mobi_app'], 'platform=' + self.dic_bilibili['platform'], 'ts=' + CurrentTime()]
+        list_url = f'access_key={self.dic_bilibili["access_key"]}&appkey={self.dic_bilibili["appkey"]}&access_token={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&ts={CurrentTime()}'
         list_cookie = self.dic_bilibili['cookie'].split(';')[:-1]
-        params = ('&'.join(sorted(list_url + list_cookie)))
+        params = ('&'.join(sorted(list_url.split('&') + list_cookie)))
         sign = self.calc_sign(params)
         appheaders = self.dic_bilibili['appheaders'].copy()
         appheaders['Host'] = "passport.bilibili.com"
