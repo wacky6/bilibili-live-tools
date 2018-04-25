@@ -77,12 +77,11 @@ async def handle_1_room_TV(real_roomid):
         await bilibili().post_watching_history(real_roomid)
         json_response = await bilibili().get_giftlist_of_TV(real_roomid)
         checklen = json_response['data']['unjoin']
-        num = len(checklen)
         list_available_raffleid = []
-        for j in range(0, num):
+        for j in checklen:
             # await asyncio.sleep(random.uniform(0.5, 1))
-            resttime = json_response['data']['unjoin'][j]['dtime']
-            raffleid = json_response['data']['unjoin'][j]['id']
+            resttime = j['dtime']
+            raffleid = j['id']
             if Statistics().check_TVlist(raffleid):
                 list_available_raffleid.append(raffleid)
         tasklist = []
@@ -106,12 +105,11 @@ async def handle_1_room_activity(giftId, text1, text2):
         await bilibili().post_watching_history(text1)
         json_response = await bilibili().get_giftlist_of_events(text1)
         checklen = json_response['data']
-        num = len(checklen)
         list_available_raffleid = []
-        for j in range(0, num):
+        for j in checklen:
             # await asyncio.sleep(random.uniform(0.5, 1))
-            resttime = checklen[j]['time']
-            raffleid = checklen[j]['raffleId']
+            resttime = j['time']
+            raffleid = j['raffleId']
             if Statistics().check_activitylist(raffleid):
                 list_available_raffleid.append(raffleid)
         tasklist = []
@@ -147,8 +145,8 @@ async def handle_1_room_captain(roomid):
         list_available_raffleid = []
         if num > 1:
             print(json_response1)
-        for j in range(0, num):
-            id = json_response1['data']['guard'][j]['id']
+        for j in json_response1['data']['guard']:
+            id = j['id']
             list_available_raffleid.append(id)
               
         tasklist = []

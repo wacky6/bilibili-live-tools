@@ -14,8 +14,8 @@ async def Daily_bag():
     json_response = await bilibili().get_dailybag()
     # no done code
     # print('Daily_bag', json_response)
-    for i in range(0, len(json_response['data']['bag_list'])):
-        Printer().printlist_append(['join_lottery', '', 'user', "# 获得-" + json_response['data']['bag_list'][i]['bag_name'] + "-成功"])
+    for i in json_response['data']['bag_list']:
+        Printer().printlist_append(['join_lottery', '', 'user', "# 获得-" + i['bag_name'] + "-成功"])
     BiliTimer().append2list_jobs([Daily_bag, [], int(CurrentTime()), 21600])
 
 
@@ -61,12 +61,12 @@ async def Sign1Group(session, i1, i2):
 # 应援团签到
 async def link_sign():
     response = bilibili().get_grouplist()
-    check = len(response.json()['data']['list'])
+    list_check = response.json()['data']['list']
     group_id_list = []
     owner_uid_list = []
-    for i in range(0, check):
-        group_id = response.json()['data']['list'][i]['group_id']
-        owner_uid = response.json()['data']['list'][i]['owner_uid']
+    for i in list_check:
+        group_id = i['group_id']
+        owner_uid = i['owner_uid']
         group_id_list.append(group_id)
         owner_uid_list.append(owner_uid)
     tasklist = []
@@ -83,13 +83,13 @@ async def send_gift():
     if ConfigLoader().dic_user['task_control']['clean-expiring-gift']:
         argvs = await utils.fetch_bag_list(printer=False)
         sent = False
-        for i in range(0, len(argvs)):
-            left_time = argvs[i][3] 
+        for i in argvs:
+            left_time = i[3] 
             if left_time is not None and 0 < int(left_time) < 43200:   # 剩余时间少于半天时自动送礼
                 sent = True
-                giftID = argvs[i][0]
-                giftNum = argvs[i][1]
-                bagID = argvs[i][2]
+                giftID = i[0]
+                giftNum = i[1]
+                bagID = i[2]
                 roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
                 await utils.send_gift_web(roomID, giftID, giftNum, bagID)
         if not sent:
@@ -105,9 +105,9 @@ async def auto_send_gift():
             return 
         json_res = await bilibili().gift_list()
         temp_dic = {}
-        for j in range(0, len(json_res['data'])):
-            price = json_res['data'][j]['price']
-            id = json_res['data'][j]['id']
+        for j in json_res['data']:
+            price = j['price']
+            id = j['id']
             temp_dic[id] = price
         temp = await utils.fetch_bag_list(printer=False)
         roomid = a[0]
@@ -115,11 +115,11 @@ async def auto_send_gift():
         day_limit = a[2]
         left_num = int(day_limit) - int(today_feed)
         calculate = 0
-        for i in range(0, len(temp)):
-            gift_id = int(temp[i][0])
-            gift_num = int(temp[i][1])
-            bag_id = int(temp[i][2])
-            left_time = temp[i][3]
+        for i in temp:
+            gift_id = int(i[0])
+            gift_num = int(i[1])
+            bag_id = int(i[2])
+            left_time = i[3]
             if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
                 if (gift_num * (temp_dic[gift_id] / 100) < left_num):
                     calculate = calculate + temp_dic[gift_id] / 100 * gift_num
