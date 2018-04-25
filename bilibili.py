@@ -224,14 +224,13 @@ class bilibili():
         return requests.get(url)
 
     async def request_send_danmu_msg_andriod(self, msg, roomId):
-        url = f'{base_url}/api/sendmsg?'
+        # url = f'{base_url}/api/sendmsg?'
         # page ??
         time = CurrentTime()
-        list_url = ["access_key=" + self.dic_bilibili['access_key'], "appkey=" + self.dic_bilibili['appkey'], 'aid=',
-                    'page=1', "build=" + self.dic_bilibili['build']]
-        sign = self.calc_sign('&'.join(sorted(list_url)))
+        list_url = f'access_key={self.dic_bilibili["access_key"]}&aid=&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&page=1'
+        sign = self.calc_sign(list_url)
 
-        url = url + '&'.join(list_url[:3] + ['sign=' + sign] + list_url[3:])
+        url = f'{base_url}/api/sendmsg?{list_url}&sign={sign}'
 
         data = {
             'access_key': self.dic_bilibili['access_key'],
@@ -417,12 +416,7 @@ class bilibili():
             'cookie': self.dic_bilibili['cookie'],
             'referer': text2
         }
-        temp_params = 'access_key=' + self.dic_bilibili['access_key'] + '&actionKey=' + self.dic_bilibili[
-            'actionKey'] + '&appkey=' + self.dic_bilibili['appkey'] + '&build=' + self.dic_bilibili[
-                          'build'] + '&device=' + self.dic_bilibili['device'] + '&event_type=flower_rain-' + str(
-            raffleid) + '&mobi_app=' + self.dic_bilibili['mobi_app'] + '&platform=' + self.dic_bilibili[
-                          'platform'] + '&room_id=' + str(
-            text1) + '&ts=' + CurrentTime()
+        temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&event_type=flower_rain-{raffleid}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&room_id={text1}&ts={CurrentTime()}'
         params = temp_params + self.dic_bilibili['app_secret']
         sign = self.calc_sign(temp_params)
         true_url = f'{base_url}/YunYing/roomEvent?{temp_params}&sign={sign}'
@@ -430,12 +424,7 @@ class bilibili():
         return response1
 
     async def get_gift_of_TV(self, real_roomid, raffleid):
-        temp_params = 'access_key=' + self.dic_bilibili['access_key'] + '&actionKey=' + self.dic_bilibili[
-            'actionKey'] + '&appkey=' + self.dic_bilibili['appkey'] + '&build=' + self.dic_bilibili[
-                          'build'] + '&device=' + self.dic_bilibili['device'] + '&id=' + str(
-            raffleid) + '&mobi_app=' + self.dic_bilibili['mobi_app'] + '&platform=' + self.dic_bilibili[
-                          'platform'] + '&roomid=' + str(
-            real_roomid) + '&ts=' + CurrentTime()
+        temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&id={raffleid}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&roomid={real_roomid}&ts={CurrentTime()}'
         sign = self.calc_sign(temp_params)
         true_url = f'{base_url}/AppSmallTV/join?{temp_params}&sign={sign}'
         response2 = await self.bili_section_get(true_url, headers=self.dic_bilibili['appheaders'])
@@ -591,12 +580,7 @@ class bilibili():
         return response
 
     async def assign_group(self, session, i1, i2):
-        temp_params = "_device=" + self.dic_bilibili[
-            'device'] + "&_hwid=SX1NL0wuHCsaKRt4BHhIfRguTXxOfj5WN1BkBTdLfhstTn9NfUouFiUV&access_key=" + \
-                      self.dic_bilibili['access_key'] + "&appkey=" + self.dic_bilibili['appkey'] + "&build=" + \
-                      self.dic_bilibili['build'] + "&group_id=" + str(i1) + "&mobi_app=" + self.dic_bilibili[
-                          'mobi_app'] + "&owner_id=" + str(i2) + "&platform=" + self.dic_bilibili[
-                          'platform'] + "&src=xiaomi&trace_id=20171224024300024&ts=" + CurrentTime() + "&version=5.20.1.520001"
+        temp_params = f'_device={self.dic_bilibili["device"]}&_hwid=SX1NL0wuHCsaKRt4BHhIfRguTXxOfj5WN1BkBTdLfhstTn9NfUouFiUV&access_key={self.dic_bilibili["access_key"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&group_id={i1}&mobi_app={self.dic_bilibili["mobi_app"]}&owner_id={i2}&platform={self.dic_bilibili["platform"]}&src=xiaomi&trace_id=20171224024300024&ts={CurrentTime()}&version=5.20.1.520001'
         sign = self.calc_sign(temp_params)
         url = f'https://api.vc.bilibili.com/link_setting/v1/link_setting/sign_in?{temp_params}&sign={sign}'
         appheaders = self.dic_bilibili['appheaders'].copy()
