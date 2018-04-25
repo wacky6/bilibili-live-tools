@@ -42,9 +42,8 @@ def login():
             access_key = data['token_info']['access_token']
             refresh_token = data['token_info']['refresh_token']
             cookie = data['cookie_info']['cookies']
-            cookie_format = ""
-            for i in range(0, len(cookie)):
-                cookie_format = cookie_format + cookie[i]['name'] + "=" + cookie[i]['value'] + ";"
+            generator_cookie = (f'{i["name"]}={i["value"]}' for i in cookie)
+            cookie_format = ';'.join(generator_cookie)
             dic_saved_session = {
                 'csrf': cookie[0]['value'],
                 'access_key': access_key,
