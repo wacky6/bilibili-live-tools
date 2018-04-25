@@ -366,17 +366,12 @@ class bilibili():
         return response1
         
     def request_refresh_token(self):
-        data = {
-            "access_token": self.dic_bilibili['access_key'],
-            "appkey": self.dic_bilibili['appkey'],
-            "refresh_token": self.dic_bilibili['refresh_token']
-            }
-        str_data = '&'.join('{}={}'.format(key,val) for (key, val) in data.items())
-        data['sign'] = self.calc_sign(str_data)
-        url = 'https://passport.bilibili.com/api/oauth2/refreshToken'
+        data = f'access_token={self.dic_bilibili["access_key"]}&appkey={self.dic_bilibili["appkey"]}&refresh_token={self.dic_bilibili["refresh_token"]}'
+        sign = self.calc_sign(data)
+        url = f'https://passport.bilibili.com/api/oauth2/refreshToken?{data}&sign={sign}'
         appheaders = self.dic_bilibili['appheaders'].copy()
         appheaders['Host'] = "passport.bilibili.com"
-        response1 = requests.post(url, headers=appheaders, params=data)
+        response1 = requests.post(url, headers=appheaders)
         return response1
     
     async def get_giftlist_of_storm(self, dic):

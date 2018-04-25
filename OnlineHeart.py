@@ -16,7 +16,7 @@ async def apppost_heartbeat():
     if login.check_token():
         pass
     else:
-        login.refresh_token()
+        login.RefreshToken()
     json_response = await bilibili().apppost_heartbeat()
     # print('apppost_heartbeat', json_response)
     Printer().printlist_append(['join_lottery', '', 'user', "心跳"], True)
