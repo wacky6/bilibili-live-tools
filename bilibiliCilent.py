@@ -15,7 +15,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid):
     # print('参与')
     await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
     json_response2 = await bilibili().get_gift_of_TV(real_roomid, raffleid)
-    Printer().printlist_append(['join_lottery', '小电视', 'user', "参与了房间{:^9}的小电视抽奖".format(real_roomid)], True)
+    Printer().printlist_append(['join_lottery', '小电视', 'user', f'参与了房间{real_roomid:^9}的小电视抽奖'], True)
     Printer().printlist_append(
         ['join_lottery', '小电视', 'user', "# 小电视道具抽奖状态: ", json_response2['msg']])
     # -400不存在
@@ -48,7 +48,7 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
     json_response1 = await bilibili().get_gift_of_events_app(text1, text2, raffleid)
     json_pc_response = await bilibili().get_gift_of_events_web(text1, text2, raffleid)
     
-    Printer().printlist_append(['join_lottery', '', 'user', "参与了房间{:^9}的{}活动抽奖".format(text1, bilibili().get_giftids_raffle(str(giftId)))], True)
+    Printer().printlist_append(['join_lottery', '', 'user', f'参与了房间{text1:^9}的{bilibili().get_giftids_raffle(str(giftId))}活动抽奖'], True)
 
     if json_response1['code'] == 0:
         Printer().printlist_append(['join_lottery', '', 'user', "# 移动端活动抽奖结果: ",
@@ -71,7 +71,7 @@ async def handle_1_room_TV(real_roomid):
     await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.check_room_true(real_roomid)
     if True in result:
-        Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', "WARNING:检测到房间{:^9}的钓鱼操作".format(real_roomid)], True)
+        Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', f'WARNING:检测到房间{real_roomid:^9}的钓鱼操作'], True)
     else:
         # print(True)
         await bilibili().post_watching_history(real_roomid)
@@ -100,7 +100,7 @@ async def handle_1_room_activity(giftId, text1, text2):
     await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.check_room_true(text1)
     if True in result:
-        Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', "WARNING:检测到房间{:^9}的钓鱼操作".format(text1)], True)
+        Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', f'WARNING:检测到房间{text1:^9}的钓鱼操作'], True)
     else:
         # print(True)
         await bilibili().post_watching_history(text1)
@@ -130,7 +130,7 @@ async def handle_1_room_captain(roomid):
     await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.check_room_true(roomid)
     if True in result:
-        Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', "WARNING:检测到房间{:^9}的钓鱼操作".format(roomid)], True)
+        Printer().printlist_append(['join_lottery', '钓鱼提醒', 'user', f'WARNING:检测到房间{roomid:^9}的钓鱼操作'], True)
     else:
         # print(True)
         await bilibili().post_watching_history(roomid)
@@ -355,7 +355,7 @@ class bilibiliClient():
                 try:
                     TV_url = dic['url']
                     real_roomid = dic['real_roomid']
-                    Printer().printlist_append(['join_lottery', '小电视', 'user', "检测到房间{:^9}的小电视抽奖".format(real_roomid)], True)
+                    Printer().printlist_append(['join_lottery', '小电视', 'user', f'检测到房间{real_roomid:^9}的小电视抽奖'], True)
                     # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
                     Rafflehandler().append2list_TV(real_roomid)
                     Statistics().append2pushed_TVlist()
@@ -369,6 +369,6 @@ class bilibiliClient():
             if res is not None:
                 print(str(res.group()))
                 roomid = utils.find_live_user_roomid(str(res.group()))
-                Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}开通总督".format(roomid)], True)
+                Printer().printlist_append(['join_lottery', '', 'user', f'检测到房间{roomid:^9}开通总督'], True)
                 Rafflehandler().append2list_captain(roomid)
                 Statistics().append2pushed_captainlist()
