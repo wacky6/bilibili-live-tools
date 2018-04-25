@@ -204,7 +204,6 @@ async def fetch_user_info():
 
 async def fetch_bag_list(verbose=False, bagid=None, printer=True):
     json_response = await bilibili().request_fetch_bag_list()
-    temp = []
     gift_list = []
     # print(json_response)
     if printer:
@@ -218,22 +217,21 @@ async def fetch_bag_list(verbose=False, bagid=None, printer=True):
         left_time = (expireat - json_response['data']['time'])
         if expireat == 0:
             left_days = '+∞'.center(6)
+            left_time = None
         else:
             left_days = str(round(left_time / 86400, 1)).center(6)
-            gift_list.append([gift_id, gift_num, bag_id])
         if bagid is not None:
             if bag_id == int(bagid):
                 return gift_id
         else:
             if verbose:
-                print("# 编号为" + str(bag_id) + '的'+ gift_name.center(3) + 'X' + gift_num, '(在' + left_days + '天后过期)')
+                print(f'# 编号为{bag_id}的{gift_name:^3}X{gift_num} (在{left_days}天后过期)')
             elif printer:
-                print("# " + gift_name.center(3) + 'X' + gift_num, '(在' + left_days + '天后过期)')
+                print(f'# {gift_name:^3}X{gift_num} (在{left_days}天后过期)')
 
-        if 0 < int(left_time) < 43200:   # 剩余时间少于半天时自动送礼
-            temp.append([gift_id, gift_num, bag_id])
-    # print(temp)
-    return temp, gift_list
+        gift_list.append([gift_id, gift_num, bag_id, left_time])
+    # print(gift_list)
+    return gift_list
     
 async def check_taskinfo():
     json_response = await bilibili().request_check_taskinfo()

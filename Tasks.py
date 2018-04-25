@@ -81,14 +81,18 @@ async def link_sign():
 
 async def send_gift():
     if ConfigLoader().dic_user['task_control']['clean-expiring-gift']:
-        argvs, x = await utils.fetch_bag_list(printer=False)
+        argvs = await utils.fetch_bag_list(printer=False)
+        sent = False
         for i in range(0, len(argvs)):
-            giftID = argvs[i][0]
-            giftNum = argvs[i][1]
-            bagID = argvs[i][2]
-            roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
-            await utils.send_gift_web(roomID, giftID, giftNum, bagID)
-        if not argvs:
+            left_time = argvs[i][3] 
+            if left_time is not None and 0 < int(left_time) < 43200:   # 剩余时间少于半天时自动送礼
+                sent = True
+                giftID = argvs[i][0]
+                giftNum = argvs[i][1]
+                bagID = argvs[i][2]
+                roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
+                await utils.send_gift_web(roomID, giftID, giftNum, bagID)
+        if not sent:
             Printer().printlist_append(['join_lottery', '', 'user', "# 没有将要过期的礼物~"])
     BiliTimer().append2list_jobs([send_gift, [], int(CurrentTime()), 21600])
 
@@ -105,7 +109,7 @@ async def auto_send_gift():
             price = json_res['data'][j]['price']
             id = json_res['data'][j]['id']
             temp_dic[id] = price
-        x, temp = await utils.fetch_bag_list(printer=False)
+        temp = await utils.fetch_bag_list(printer=False)
         roomid = a[0]
         today_feed = a[1]
         day_limit = a[2]
@@ -115,7 +119,8 @@ async def auto_send_gift():
             gift_id = int(temp[i][0])
             gift_num = int(temp[i][1])
             bag_id = int(temp[i][2])
-            if (gift_id not in [4, 3, 9, 10]):
+            left_time = temp[i][3]
+            if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
                 if (gift_num * (temp_dic[gift_id] / 100) < left_num):
                     calculate = calculate + temp_dic[gift_id] / 100 * gift_num
                     # tmp = calculate / (temp_dic[gift_id] / 100)
