@@ -62,19 +62,13 @@ async def Sign1Group(session, i1, i2):
 async def link_sign():
     response = bilibili().get_grouplist()
     list_check = response.json()['data']['list']
-    group_id_list = []
-    owner_uid_list = []
-    for i in list_check:
-        group_id = i['group_id']
-        owner_uid = i['owner_uid']
-        group_id_list.append(group_id)
-        owner_uid_list.append(owner_uid)
+    id_list = ((i['group_id'], i['owner_uid'])  for i in list_check)
     tasklist = []
-    if group_id_list:
-        async with aiohttp.ClientSession() as session:
-            for (i1, i2) in zip(group_id_list, owner_uid_list):
-                task = asyncio.ensure_future(Sign1Group(session, i1, i2))
-                tasklist.append(task)
+    async with aiohttp.ClientSession() as session:
+        for (i1, i2) in id_list:
+            task = asyncio.ensure_future(Sign1Group(session, i1, i2))
+            tasklist.append(task)
+        if tasklist:
             results = await asyncio.gather(*tasklist)
     BiliTimer().append2list_jobs([link_sign, [], int(CurrentTime()), 21600])
         
