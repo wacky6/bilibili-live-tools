@@ -27,17 +27,16 @@ def cnn_captcha(img):
     return captcha
 
 
-async def replay_request(response):
-    json_response = await response.json(content_type=None)
-    if json_response['code'] == 1024:
+async def replay_request(code):
+    if code == 1024:
         print('b站炸了，暂停所有请求5s后重试，请耐心等待')
         await asyncio.sleep(5)
-        return True, None
-    if json_response['code'] ==0:
-        return False, json_response
+        return True
+    if code == 0:
+        return False
     else:
         # print(json_response)
-        return False, json_response
+        return False
 
 base_url = 'https://api.live.bilibili.com'
 
@@ -60,7 +59,7 @@ class bilibili():
         return self.bili_session
         
     def calc_sign(self, str):
-        str = str + self.dic_bilibili['app_secret']
+        str = f'{str}{self.dic_bilibili["app_secret"]}'
         hash = hashlib.md5()
         hash.update(str.encode('utf-8'))
         sign = hash.hexdigest()
@@ -78,7 +77,8 @@ class bilibili():
         while True:
             try:
                 response = await self.bili_section.post(url, headers=headers, data=data)
-                tag, json_response = await replay_request(response)
+                json_response = await response.json(content_type=None)
+                tag = await replay_request(json_response['code'])
                 if tag:
                     continue
                 return json_response
@@ -88,11 +88,12 @@ class bilibili():
                 continue
         
         
-    async def bili_section_get(self, url, headers=None, data=None, params=None):
+    async def bili_section_get(self, url, headers=None, data=None):
         while True:
             try:
-                response = await self.bili_section.get(url, headers=headers, data=data, params=params)
-                tag, json_response = await replay_request(response)
+                response = await self.bili_section.get(url, headers=headers, data=data)
+                json_response = await response.json(content_type=None)
+                tag = await replay_request(json_response['code'])
                 if tag:
                     continue
                 return json_response
@@ -409,10 +410,11 @@ class bilibili():
             'referer': text2
         }
         temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&event_type=flower_rain-{raffleid}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&room_id={text1}&ts={CurrentTime()}'
-        params = temp_params + self.dic_bilibili['app_secret']
+        # params = temp_params + self.dic_bilibili['app_secret']
         sign = self.calc_sign(temp_params)
         true_url = f'{base_url}/YunYing/roomEvent?{temp_params}&sign={sign}'
-        response1 = await self.bili_section_get(true_url, params=params, headers=headers)
+        # response1 = await self.bili_section_get(true_url, params=params, headers=headers)
+        response1 = await self.bili_section_get(true_url, headers=headers)
         return response1
 
     async def get_gift_of_TV(self, real_roomid, raffleid):
@@ -564,12 +566,13 @@ class bilibili():
         response2 = await self.bili_section_post(url, data=payload2, headers=self.dic_bilibili['appheaders'])
         return response2
 
-    def get_grouplist(self):
+    async def get_grouplist(self, session):
         url = "https://api.vc.bilibili.com/link_group/v1/member/my_groups"
         pcheaders = self.dic_bilibili['pcheaders'].copy()
         pcheaders['Host'] = "api.vc.bilibili.com"
-        response = requests.get(url, headers=pcheaders)
-        return response
+        response = await session.get(url, headers=pcheaders)
+        json_response = await response.json(content_type=None)
+        return json_response
 
     async def assign_group(self, session, i1, i2):
         temp_params = f'_device={self.dic_bilibili["device"]}&_hwid=SX1NL0wuHCsaKRt4BHhIfRguTXxOfj5WN1BkBTdLfhstTn9NfUouFiUV&access_key={self.dic_bilibili["access_key"]}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&group_id={i1}&mobi_app={self.dic_bilibili["mobi_app"]}&owner_id={i2}&platform={self.dic_bilibili["platform"]}&src=xiaomi&trace_id=20171224024300024&ts={CurrentTime()}&version=5.20.1.520001'

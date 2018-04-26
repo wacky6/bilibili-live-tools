@@ -60,12 +60,12 @@ async def Sign1Group(session, i1, i2):
 
 # 应援团签到
 async def link_sign():
-    response = bilibili().get_grouplist()
-    list_check = response.json()['data']['list']
-    id_list = ((i['group_id'], i['owner_uid'])  for i in list_check)
-    if list_check:
-        tasklist = []
-        async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session:
+        json_rsp = await bilibili().get_grouplist(session)
+        list_check = json_rsp['data']['list']
+        id_list = ((i['group_id'], i['owner_uid'])  for i in list_check)
+        if list_check:
+            tasklist = []
             for (i1, i2) in id_list:
                 task = asyncio.ensure_future(Sign1Group(session, i1, i2))
                 tasklist.append(task)

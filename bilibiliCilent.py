@@ -238,6 +238,8 @@ async def parseDanMu(messages):
                                                           
 
 class bilibiliClient():
+    
+    __slots__ = ('_reader', '_writer', 'connected', '_UserCount')
 
     def __init__(self):
         self._reader = None
