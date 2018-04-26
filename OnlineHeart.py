@@ -46,10 +46,10 @@ async def draw_lottery():
                 print("检测到疑似钓鱼类测试抽奖，默认不参与，请自行判断抽奖可参与性")
                 # print(url)
             else:
-                check = len(json_response['data']['typeB'])
-                for g in range(0, check):
-                    join_end_time = json_response['data']['typeB'][g]['join_end_time']
-                    join_start_time = json_response['data']['typeB'][g]['join_start_time']
+                check = json_response['data']['typeB']
+                for g, value in enumerate(check):
+                    join_end_time = value['join_end_time']
+                    join_start_time = value['join_start_time']
                     ts = CurrentTime()
                     if int(join_end_time) > int(ts) > int(join_start_time):
                         json_response1 = await bilibili().get_gift_of_lottery(i, g)

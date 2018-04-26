@@ -208,12 +208,12 @@ async def fetch_bag_list(verbose=False, bagid=None, printer=True):
     # print(json_response)
     if printer:
         print('[{}] 查询可用礼物'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))))
-    for i in range(len(json_response['data']['list'])):
-        bag_id = (json_response['data']['list'][i]['bag_id'])
-        gift_id = (json_response['data']['list'][i]['gift_id'])
-        gift_num = str((json_response['data']['list'][i]['gift_num'])).center(4)
-        gift_name = json_response['data']['list'][i]['gift_name']
-        expireat = (json_response['data']['list'][i]['expire_at'])
+    for i in json_response['data']['list']:
+        bag_id = i['bag_id']
+        gift_id = i['gift_id']
+        gift_num = str(i['gift_num']).center(4)
+        gift_name = i['gift_name']
+        expireat = i['expire_at']
         left_time = (expireat - json_response['data']['time'])
         if expireat == 0:
             left_days = '+∞'.center(6)

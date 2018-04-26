@@ -63,12 +63,12 @@ async def link_sign():
     response = bilibili().get_grouplist()
     list_check = response.json()['data']['list']
     id_list = ((i['group_id'], i['owner_uid'])  for i in list_check)
-    tasklist = []
-    async with aiohttp.ClientSession() as session:
-        for (i1, i2) in id_list:
-            task = asyncio.ensure_future(Sign1Group(session, i1, i2))
-            tasklist.append(task)
-        if tasklist:
+    if list_check:
+        tasklist = []
+        async with aiohttp.ClientSession() as session:
+            for (i1, i2) in id_list:
+                task = asyncio.ensure_future(Sign1Group(session, i1, i2))
+                tasklist.append(task)
             results = await asyncio.gather(*tasklist)
     BiliTimer().append2list_jobs([link_sign, [], int(CurrentTime()), 21600])
         
@@ -98,11 +98,7 @@ async def auto_send_gift():
             BiliTimer().append2list_jobs([auto_send_gift, [], int(CurrentTime()), 21600])
             return 
         json_res = await bilibili().gift_list()
-        temp_dic = {}
-        for j in json_res['data']:
-            price = j['price']
-            id = j['id']
-            temp_dic[id] = price
+        temp_dic = {j['id']: j['price'] for j in json_res['data']}
         temp = await utils.fetch_bag_list(printer=False)
         roomid = a[0]
         today_feed = a[1]
@@ -115,18 +111,17 @@ async def auto_send_gift():
             bag_id = int(i[2])
             left_time = i[3]
             if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
-                if (gift_num * (temp_dic[gift_id] / 100) < left_num):
-                    calculate = calculate + temp_dic[gift_id] / 100 * gift_num
-                    # tmp = calculate / (temp_dic[gift_id] / 100)
-                    tmp2 = temp_dic[gift_id] / 100 * gift_num
+                if (gift_num * (temp_dic[gift_id] / 100) <= left_num):
+                    tmp1 = temp_dic[gift_id] / 100 * gift_num
                     await utils.send_gift_web(roomid, gift_id, gift_num, bag_id)
-                    left_num = left_num-tmp2
                 elif left_num - temp_dic[gift_id] / 100 >= 0:
                     tmp = (left_num) / (temp_dic[gift_id] / 100)
                     tmp1 = (temp_dic[gift_id] / 100) * int(tmp)
-                    calculate = calculate + tmp1
                     await utils.send_gift_web(roomid, gift_id, tmp, bag_id)
-                    left_num = left_num - tmp1
+                else:
+                    tmp1 = 0
+                calculate = calculate + tmp1
+                left_num = left_num - tmp1
         Printer().printlist_append(['join_lottery', '', 'user', "# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
     BiliTimer().append2list_jobs([auto_send_gift, [], int(CurrentTime()), 21600])
         
