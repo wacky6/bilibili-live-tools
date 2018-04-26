@@ -159,6 +159,82 @@ async def handle_1_room_captain(roomid):
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
                 Rafflehandler().append2list_captain(roomid)
+                
+
+async def parseDanMu(messages):
+    # await bilibili().request_send_danmu_msg_andriod('hbhnukunkunk', 6149819)
+
+    try:
+        dic = json.loads(messages)
+    except:
+        return
+    cmd = dic['cmd']
+
+    if cmd == 'DANMU_MSG':
+        # print(dic)
+        Printer().printlist_append(['danmu', '弹幕', 'user', dic])
+        return
+    if cmd == 'SYS_GIFT':
+        if 'giftId' in dic.keys():
+            if str(dic['giftId']) in bilibili().get_giftids_raffle_keys():
+                
+                text1 = dic['real_roomid']
+                text2 = dic['url']
+                giftId = dic['giftId']
+                Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili().get_giftids_raffle(str(giftId)))], True)
+                Rafflehandler().append2list_activity(giftId, text1, text2)
+                Statistics().append2pushed_activitylist()
+                        
+            elif dic['giftId'] == 39:
+                Printer().printlist_append(['join_lottery', '', 'user', "节奏风暴"])
+                temp = await bilibili().get_giftlist_of_storm(dic)
+                check = len(temp['data'])
+                if check != 0 and temp['data']['hasJoin'] != 1:
+                    id = temp['data']['id']
+                    json_response1 = await bilibili().get_gift_of_storm(id)
+                    print(json_response1)
+                else:
+                    Printer().printlist_append(['join_lottery','','debug', [dic, "请联系开发者"]])
+            else:
+                text1 = dic['real_roomid']
+                text2 = dic['url']
+                Printer().printlist_append(['join_lottery', '', 'debug', [dic, "请联系开发者"]])
+                try:
+                    giftId = dic['giftId']
+                    Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili().get_giftids_raffle(str(giftId)))], True)
+                    Rafflehandler().append2list_activity(giftId, text1, text2)
+                    Statistics().append2pushed_activitylist()
+                            
+                except:
+                    pass
+                
+        else:
+            Printer().printlist_append(['join_lottery', '普通送礼提示', 'user', ['普通送礼提示', dic['msg_text']]])
+        return
+    if cmd == 'SYS_MSG':
+        if dic.get('real_roomid', None) is None:
+            Printer().printlist_append(['join_lottery', '系统公告', 'user', dic['msg']])
+        else:
+            try:
+                TV_url = dic['url']
+                real_roomid = dic['real_roomid']
+                Printer().printlist_append(['join_lottery', '小电视', 'user', f'检测到房间{real_roomid:^9}的小电视抽奖'], True)
+                # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
+                Rafflehandler().append2list_TV(real_roomid)
+                Statistics().append2pushed_TVlist()
+                
+            except:
+                print('请联系开发者', dic)
+    if cmd == 'GUARD_MSG':
+        print(dic)
+        a = re.compile(r"(?<=在主播 )\S+(?= 的直播间开通了总督)")
+        res = re.search(a, dic['msg'])
+        if res is not None:
+            print(str(res.group()))
+            roomid = utils.find_live_user_roomid(str(res.group()))
+            Printer().printlist_append(['join_lottery', '', 'user', f'检测到房间{roomid:^9}开通总督'], True)
+            Rafflehandler().append2list_captain(roomid)
+            Statistics().append2pushed_captainlist()
                                                           
 
 class bilibiliClient():
@@ -169,12 +245,6 @@ class bilibiliClient():
         self.connected = False
         self._UserCount = 0
 
-        self.dic_bulletin = {
-            'cmd': 'str',
-            'msg': 'str',
-            'rep': 'int',
-            'url': 'str'
-        }
         
     def close_connection(self):
         self._writer.close()
@@ -286,7 +356,7 @@ class bilibiliClient():
                         messages = tmp.decode('utf-8')
                     except:
                         continue
-                    await self.parseDanMu(messages)
+                    await parseDanMu(messages)
                     continue
                 elif num == 5 or num == 6 or num == 7:
                     continue
@@ -296,77 +366,4 @@ class bilibiliClient():
                     else:
                         continue
                         
-    async def parseDanMu(self, messages):
-        # await bilibili().request_send_danmu_msg_andriod('hbhnukunkunk', 6149819)
-
-        try:
-            dic = json.loads(messages)
-        except:
-            return
-        cmd = dic['cmd']
-
-        if cmd == 'DANMU_MSG':
-            # print(dic)
-            Printer().printlist_append(['danmu', '弹幕', 'user', dic])
-            return
-        if cmd == 'SYS_GIFT':
-            if 'giftId' in dic.keys():
-                if str(dic['giftId']) in bilibili().get_giftids_raffle_keys():
-                    
-                    text1 = dic['real_roomid']
-                    text2 = dic['url']
-                    giftId = dic['giftId']
-                    Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili().get_giftids_raffle(str(giftId)))], True)
-                    Rafflehandler().append2list_activity(giftId, text1, text2)
-                    Statistics().append2pushed_activitylist()
-                            
-                elif dic['giftId'] == 39:
-                    Printer().printlist_append(['join_lottery', '', 'user', "节奏风暴"])
-                    temp = await bilibili().get_giftlist_of_storm(dic)
-                    check = len(temp['data'])
-                    if check != 0 and temp['data']['hasJoin'] != 1:
-                        id = temp['data']['id']
-                        json_response1 = await bilibili().get_gift_of_storm(id)
-                        print(json_response1)
-                    else:
-                        Printer().printlist_append(['join_lottery','','debug', [dic, "请联系开发者"]])
-                else:
-                    text1 = dic['real_roomid']
-                    text2 = dic['url']
-                    Printer().printlist_append(['join_lottery', '', 'debug', [dic, "请联系开发者"]])
-                    try:
-                        giftId = dic['giftId']
-                        Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili().get_giftids_raffle(str(giftId)))], True)
-                        Rafflehandler().append2list_activity(giftId, text1, text2)
-                        Statistics().append2pushed_activitylist()
-                                
-                    except:
-                        pass
-                    
-            else:
-                Printer().printlist_append(['join_lottery', '普通送礼提示', 'user', ['普通送礼提示', dic['msg_text']]])
-            return
-        if cmd == 'SYS_MSG':
-            if dic.get('real_roomid', None) is None:
-                Printer().printlist_append(['join_lottery', '系统公告', 'user', dic['msg']])
-            else:
-                try:
-                    TV_url = dic['url']
-                    real_roomid = dic['real_roomid']
-                    Printer().printlist_append(['join_lottery', '小电视', 'user', f'检测到房间{real_roomid:^9}的小电视抽奖'], True)
-                    # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
-                    Rafflehandler().append2list_TV(real_roomid)
-                    Statistics().append2pushed_TVlist()
-                    
-                except:
-                    print('请联系开发者', dic)
-        if cmd == 'GUARD_MSG':
-            print(dic)
-            a = re.compile(r"(?<=在主播 )\S+(?= 的直播间开通了总督)")
-            res = re.search(a, dic['msg'])
-            if res is not None:
-                print(str(res.group()))
-                roomid = utils.find_live_user_roomid(str(res.group()))
-                Printer().printlist_append(['join_lottery', '', 'user', f'检测到房间{roomid:^9}开通总督'], True)
-                Rafflehandler().append2list_captain(roomid)
-                Statistics().append2pushed_captainlist()
+    
