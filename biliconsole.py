@@ -171,9 +171,10 @@ class Biliconsole():
                         i[2](*i[0])
                     else:
                         task = asyncio.ensure_future(i[1](*i[0]))
+                        tasklist.append(task)
                 else:
                     task = asyncio.ensure_future(i())
-                tasklist.append(task)
+                    tasklist.append(task)
             if tasklist:
                 await asyncio.wait(tasklist, return_when=asyncio.ALL_COMPLETED)
                 # print('本批次结束')

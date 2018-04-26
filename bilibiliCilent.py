@@ -250,7 +250,7 @@ class bilibiliClient():
         
     def close_connection(self):
         self._writer.close()
-        self._connected = False
+        self.connected = False
         
     async def connectServer(self):
         try:

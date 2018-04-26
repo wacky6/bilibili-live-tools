@@ -20,7 +20,7 @@ def adjust_for_chinese(str):
     # build the translation table
     full = str.maketrans(west, east)
     str = str.translate(full).rstrip().split('\n')
-    md = '{:^10}'.format(str[0])
+    md = f'{str[0]:^10}'
     return md.translate(full)
 
 
@@ -120,13 +120,13 @@ async def fetch_capsule_info():
     if (json_response['code'] == 0):
         data = json_response['data']
         if data['colorful']['status']:
-            print('梦幻扭蛋币: {}个'.format(data['colorful']['coin']))
+            print(f'梦幻扭蛋币: {data["colorful"]["coin"]}个')
         else:
             print('梦幻扭蛋币暂不可用')
             
         data = json_response['data']
         if data['normal']['status']:
-            print('普通扭蛋币: {}个'.format(data['normal']['coin']))
+            print(f'普通扭蛋币: {data["normal"]["coin"]}个')
         else:
             print('普通扭蛋币暂不可用')
             
@@ -185,7 +185,7 @@ async def fetch_user_info():
             img.show()
         except:
             pass
-        print('# 手机认证状况 {} | 实名认证状况 {}'.format(mobile_verify, identification))
+        print(f'# 手机认证状况 {mobile_verify} | 实名认证状况 {identification}')
         print('# 银瓜子', silver)
         print('# 通用金瓜子', gold)
         print('# ios可用金瓜子', gold_ios)
@@ -211,7 +211,7 @@ async def fetch_bag_list(verbose=False, bagid=None, printer=True):
     for i in json_response['data']['list']:
         bag_id = i['bag_id']
         gift_id = i['gift_id']
-        gift_num = str(i['gift_num']).center(4)
+        gift_num = i['gift_num']
         gift_name = i['gift_name']
         expireat = i['expire_at']
         left_time = (expireat - json_response['data']['time'])
@@ -219,15 +219,15 @@ async def fetch_bag_list(verbose=False, bagid=None, printer=True):
             left_days = '+∞'.center(6)
             left_time = None
         else:
-            left_days = str(round(left_time / 86400, 1)).center(6)
+            left_days = round(left_time / 86400, 1)
         if bagid is not None:
             if bag_id == int(bagid):
                 return gift_id
         else:
             if verbose:
-                print(f'# 编号为{bag_id}的{gift_name:^3}X{gift_num} (在{left_days}天后过期)')
+                print(f'# 编号为{bag_id}的{gift_name:^3}X{gift_num:^4} (在{left_days:^6}天后过期)')
             elif printer:
-                print(f'# {gift_name:^3}X{gift_num} (在{left_days}天后过期)')
+                print(f'# {gift_name:^3}X{gift_num:^4} (在{left_days:^6}天后过期)')
 
         gift_list.append([gift_id, gift_num, bag_id, left_time])
     # print(gift_list)
@@ -264,7 +264,7 @@ async def check_taskinfo():
             print('# 该任务已完成')
         else:
             print('# 该任务未完成')
-            print('## 一共{}次重置次数，当前为第{}次第{}个礼包(每次3个礼包)'.format(box_info['max_times'], box_info['freeSilverTimes'], box_info['type']))
+            print(f'## 一共{box_info["max_times"]}次重置次数，当前为第{box_info["freeSilverTimes"]}次第{box_info["type"]}个礼包(每次3个礼包)')
             
         print('每日签到：')
         if sign_info['status'] == 1:
@@ -285,7 +285,6 @@ async def check_taskinfo():
             
 async def check_room(roomid):
     json_response = await bilibili().request_check_room(roomid)
-    # print(json_response)
     if json_response['code'] == 0:
         # print(json_response)
         print('查询结果:')
@@ -294,8 +293,8 @@ async def check_room(roomid):
         if data['short_id'] == 0:
             print('# 此房间无短房号')
         else:
-            print('# 短号为:{}'.format(data['short_id']))
-        print('# 真实房间号为:{}'.format(data['room_id']))
+            print(f'# 短号为:{data["short_id"]}')
+        print(f'# 真实房间号为:{data["room_id"]}')
         return data['room_id']
     # 房间不存在
     elif json_response['code'] == 60004:
@@ -310,7 +309,7 @@ async def send_gift_web(roomid, giftid, giftnum, bagid):
     json_response1 = await bilibili().request_send_gift_web(giftid, giftnum, bagid, ruid, biz_id)
     if json_response1['code'] == 0:
         # print(json_response1['data'])
-        print("# 送出礼物:", json_response1['data']['gift_name'] + "X" + str(json_response1['data']['gift_num']))
+        print(f'# 送出礼物: {json_response1["data"]["gift_name"]}X{json_response1["data"]["gift_num"]}')
     else:
         print("# 错误", json_response1['msg'])
  
@@ -320,14 +319,14 @@ async def fetch_liveuser_info(real_roomid):
     if json_response['code'] == 0:
         data = json_response['data']
         # print(data)
-        print('# 主播姓名 {}'.format(data['info']['uname']))
+        print(f'# 主播姓名 {data["info"]["uname"]}')
         
         uid = data['level']['uid']  # str
         json_response_fan = await bilibili().request_fetch_fan(real_roomid, uid)
         # print(json_response_fan)
         data_fan = json_response_fan['data']
         if json_response_fan['code'] == 0 and data_fan['medal']['status'] == 2:
-            print('# 勋章名字: {}'.format(data_fan['list'][0]['medal_name']))
+            print(f'# 勋章名字: {data_fan["list"][0]["medal_name"]}')
         else:
             print('# 该主播暂时没有开通勋章')
             # print(json_response_fan)
