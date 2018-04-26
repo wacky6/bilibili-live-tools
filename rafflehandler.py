@@ -70,4 +70,8 @@ class Rafflehandler:
         self.list_captain.append(roomid)
         print('appended captain')
         return
+        
+    def getlist(self):
+        print('目前TV任务队列状况', self.list_TV)
+        print('数目', len(self.list_TV))
          

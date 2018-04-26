@@ -3,6 +3,7 @@ from statistics import Statistics
 from connect import connect
 from printer import Printer
 from configloader import ConfigLoader
+from rafflehandler import Rafflehandler
 import threading
 import asyncio
 from bilitimer import BiliTimer
@@ -120,6 +121,7 @@ options = {
     '16': process_watch_living_video,  # input async
     '17': utils.TitleInfo,
     '18': BiliTimer().getresult,
+    '19': Rafflehandler().getlist,
     'help': guide_of_console,
     'h': guide_of_console
 }
