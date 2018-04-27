@@ -77,6 +77,7 @@ async def send_gift():
     if ConfigLoader().dic_user['task_control']['clean-expiring-gift']:
         argvs = await utils.fetch_bag_list(printer=False)
         sent = False
+        roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
         for i in argvs:
             left_time = i[3] 
             if left_time is not None and 0 < int(left_time) < 43200:   # 剩余时间少于半天时自动送礼
@@ -84,7 +85,6 @@ async def send_gift():
                 giftID = i[0]
                 giftNum = i[1]
                 bagID = i[2]
-                roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
                 await utils.send_gift_web(roomID, giftID, giftNum, bagID)
         if not sent:
             Printer().printlist_append(['join_lottery', '', 'user', "# 没有将要过期的礼物~"])
