@@ -98,29 +98,29 @@ async def auto_send_gift():
             BiliTimer().append2list_jobs([auto_send_gift, [], int(CurrentTime()), 21600])
             return 
         json_res = await bilibili().gift_list()
-        temp_dic = {j['id']: j['price'] for j in json_res['data']}
+        temp_dic = {j['id']: (j['price'] / 100) for j in json_res['data']}
         temp = await utils.fetch_bag_list(printer=False)
         roomid = a[0]
         today_feed = a[1]
         day_limit = a[2]
-        left_num = int(day_limit) - int(today_feed)
+        left_score = int(day_limit) - int(today_feed)
         calculate = 0
         for i in temp:
             gift_id = int(i[0])
             gift_num = int(i[1])
             bag_id = int(i[2])
             left_time = i[3]
-            tmp1 = 0
             if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
-                if (gift_num * (temp_dic[gift_id] / 100) <= left_num):
-                    tmp1 = temp_dic[gift_id] / 100 * gift_num
-                    await utils.send_gift_web(roomid, gift_id, gift_num, bag_id)
-                elif left_num - temp_dic[gift_id] / 100 >= 0:
-                    tmp = (left_num) / (temp_dic[gift_id] / 100)
-                    tmp1 = (temp_dic[gift_id] / 100) * int(tmp)
-                    await utils.send_gift_web(roomid, gift_id, tmp, bag_id)
-                calculate = calculate + tmp1
-                left_num = left_num - tmp1
+                if (gift_num * temp_dic[gift_id] <= left_score):
+                    pass
+                elif left_score - temp_dic[gift_id] >= 0:
+                    gift_num = int((left_score) / (temp_dic[gift_id]))
+                else:
+                    continue
+                score = temp_dic[gift_id] * gift_num
+                await utils.send_gift_web(roomid, gift_id, gift_num, bag_id)
+                calculate = calculate + score
+                left_score = left_score - score
         Printer().printlist_append(['join_lottery', '', 'user', "# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
     BiliTimer().append2list_jobs([auto_send_gift, [], int(CurrentTime()), 21600])
         
