@@ -110,6 +110,7 @@ async def auto_send_gift():
             gift_num = int(i[1])
             bag_id = int(i[2])
             left_time = i[3]
+            tmp1 = 0
             if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
                 if (gift_num * (temp_dic[gift_id] / 100) <= left_num):
                     tmp1 = temp_dic[gift_id] / 100 * gift_num
@@ -118,8 +119,6 @@ async def auto_send_gift():
                     tmp = (left_num) / (temp_dic[gift_id] / 100)
                     tmp1 = (temp_dic[gift_id] / 100) * int(tmp)
                     await utils.send_gift_web(roomid, gift_id, tmp, bag_id)
-                else:
-                    tmp1 = 0
                 calculate = calculate + tmp1
                 left_num = left_num - tmp1
         Printer().printlist_append(['join_lottery', '', 'user', "# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
