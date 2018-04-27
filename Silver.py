@@ -34,7 +34,7 @@ async def GetAllSilver():
             sleeptime = (utils.seconds_until_tomorrow() + 300)
             BiliTimer().append2list_jobs([GetAllSilver, [], int(utils.CurrentTime()), sleeptime])
             return
-        elif json_rsp['code'] == 0:
+        elif not json_rsp['code']:
             Printer().printlist_append(['join_lottery', '', 'user', "# 打开了宝箱"])
         else:
             Printer().printlist_append(['join_lottery', '', 'user',"# 继续等待宝箱冷却..."])

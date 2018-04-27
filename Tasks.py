@@ -50,7 +50,7 @@ async def Daily_Task():
 
 async def Sign1Group(session, i1, i2):
     json_response = await bilibili().assign_group(session, i1, i2)
-    if json_response['code'] == 0:
+    if not json_response['code']:
         if (json_response['data']['status']) == 1:
             Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 已应援过" % (i1)])
         if (json_response['data']['status']) == 0:

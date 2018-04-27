@@ -40,7 +40,7 @@ def seconds_until_tomorrow():
 async def WearingMedalInfo():
     json_response = await bilibili().ReqWearingMedal()
     # print(json_response)
-    if json_response['code'] == 0:
+    if not json_response['code']:
         data = json_response['data']
         if data:
             # print(data['roominfo']['room_id'], data['today_feed'], data['day_limit'])
@@ -54,7 +54,7 @@ async def WearingMedalInfo():
 async def TitleInfo():
     json_response = await bilibili().ReqTitleInfo()
     # print(json_response)
-    if json_response['code'] == 0:
+    if not json_response['code']:
         data = json_response['data']
         for i in data['list']:
             if i['level']:
@@ -73,7 +73,7 @@ async def fetch_medal(printer=True):
     dic_worn = {'1': '正在佩戴', '0': '待机状态'}
     json_response = await bilibili().request_fetchmedal()
     # print(json_response)
-    if json_response['code'] == 0:
+    if not json_response['code']:
         for i in json_response['data']['fansMedalList']:
             if printer:
                 printlist.append('{} {} {:^14} {:^14} {} {:^6} '.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])),
@@ -117,7 +117,7 @@ def find_live_user_roomid(wanted_name):
 async def fetch_capsule_info():
     json_response = await bilibili().request_fetch_capsule()
     # print(json_response)
-    if (json_response['code'] == 0):
+    if not json_response['code']:
         data = json_response['data']
         if data['colorful']['status']:
             print(f'梦幻扭蛋币: {data["colorful"]["coin"]}个')
@@ -133,7 +133,7 @@ async def fetch_capsule_info():
 async def open_capsule(count):
     json_response = await bilibili().request_open_capsule(count)
     # print(json_response)
-    if (json_response['code'] == 0):
+    if not json_response['code']:
         # print(json_response['data']['text'])
         for i in json_response['data']['text']:
             print(i)
@@ -145,7 +145,7 @@ async def watch_living_video(cid):
     sound.play_effect('piano:D3')
     json_response = await bilibili().request_playurl(cid)
     print(json_response)
-    if (json_response['code'] == 0):
+    if not json_response['code']:
         data = json_response['data']
         print(data)
         webbrowser.open(data)
@@ -155,10 +155,10 @@ async def fetch_user_info():
     json_response = await bilibili().request_fetch_user_info()
     json_response_ios = await bilibili().request_fetch_user_infor_ios()
     print('[{}] 查询用户信息'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))))
-    if json_response_ios['code'] == 0:
+    if not json_response_ios['code']:
         gold_ios = json_response_ios['data']['gold']
     # print(json_response_ios)
-    if (json_response['code'] == 0):
+    if not json_response['code']:
         data = json_response['data']
         # print(data)
         userInfo = data['userInfo']
@@ -215,7 +215,7 @@ async def fetch_bag_list(verbose=False, bagid=None, printer=True):
         gift_name = i['gift_name']
         expireat = i['expire_at']
         left_time = (expireat - json_response['data']['time'])
-        if expireat == 0:
+        if not expireat:
             left_days = '+∞'.center(6)
             left_time = None
         else:
@@ -236,7 +236,7 @@ async def fetch_bag_list(verbose=False, bagid=None, printer=True):
 async def check_taskinfo():
     json_response = await bilibili().request_check_taskinfo()
     # print(json_response)
-    if json_response['code'] == 0:
+    if not json_response['code']:
         data = json_response['data']
         double_watch_info = data['double_watch_info']
         box_info = data['box_info']
@@ -285,12 +285,12 @@ async def check_taskinfo():
             
 async def check_room(roomid):
     json_response = await bilibili().request_check_room(roomid)
-    if json_response['code'] == 0:
+    if not json_response['code']:
         # print(json_response)
         print('查询结果:')
         data = json_response['data']
         
-        if data['short_id'] == 0:
+        if not data['short_id']:
             print('# 此房间无短房号')
         else:
             print(f'# 短号为:{data["short_id"]}')
@@ -307,7 +307,7 @@ async def send_gift_web(roomid, giftid, giftnum, bagid):
     biz_id = json_response['data']['room_id']
     # 200027 不足数目
     json_response1 = await bilibili().request_send_gift_web(giftid, giftnum, bagid, ruid, biz_id)
-    if json_response1['code'] == 0:
+    if not json_response1['code']:
         # print(json_response1['data'])
         print(f'# 送出礼物: {json_response1["data"]["gift_name"]}X{json_response1["data"]["gift_num"]}')
     else:
@@ -316,7 +316,7 @@ async def send_gift_web(roomid, giftid, giftnum, bagid):
         
 async def fetch_liveuser_info(real_roomid):
     json_response = await bilibili().request_fetch_liveuser_info(real_roomid)
-    if json_response['code'] == 0:
+    if not json_response['code']:
         data = json_response['data']
         # print(data)
         print(f'# 主播姓名 {data["info"]["uname"]}')
@@ -325,7 +325,7 @@ async def fetch_liveuser_info(real_roomid):
         json_response_fan = await bilibili().request_fetch_fan(real_roomid, uid)
         # print(json_response_fan)
         data_fan = json_response_fan['data']
-        if json_response_fan['code'] == 0 and data_fan['medal']['status'] == 2:
+        if not json_response_fan['code'] and data_fan['medal']['status'] == 2:
             print(f'# 勋章名字: {data_fan["list"][0]["medal_name"]}')
         else:
             print('# 该主播暂时没有开通勋章')
@@ -344,7 +344,7 @@ async def fetch_liveuser_info(real_roomid):
 async def check_room_true(roomid):
     json_response = await bilibili().request_check_room(roomid)
     
-    if json_response['code'] == 0:
+    if not json_response['code']:
         data = json_response['data']
         param1 = data['is_hidden']
         param2 = data['is_locked']

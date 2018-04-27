@@ -20,7 +20,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid):
         ['join_lottery', '小电视', 'user', "# 小电视道具抽奖状态: ", json_response2['msg']])
     # -400不存在
     # -500繁忙
-    if json_response2['code'] == 0:
+    if not json_response2['code']:
         Statistics().append_to_TVlist(raffleid, real_roomid)
         return True
     elif json_response2['code'] == -500:
@@ -34,7 +34,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid):
 async def handle_1_captain_raffle(num, roomid, raffleid):
     await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
     json_response2 = await bilibili().get_gift_of_captain(roomid, raffleid)
-    if json_response2['code'] == 0:
+    if not json_response2['code']:
         print("# 获取到房间 %s 的总督奖励: " %(roomid), json_response2['data']['message'])
         Statistics().append_to_captainlist()
     else:
@@ -50,7 +50,7 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
     
     Printer().printlist_append(['join_lottery', '', 'user', f'参与了房间{text1:^9}的{bilibili().get_giftids_raffle(str(giftId))}活动抽奖'], True)
 
-    if json_response1['code'] == 0:
+    if not json_response1['code']:
         Printer().printlist_append(['join_lottery', '', 'user', "# 移动端活动抽奖结果: ",
                                    json_response1['data']['gift_desc']])
         Statistics().add_to_result(*(json_response1['data']['gift_desc'].split('X')))
@@ -60,7 +60,7 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
         
     Printer().printlist_append(
             ['join_lottery', '', 'user', "# 网页端活动抽奖状态: ", json_pc_response['message']])
-    if json_pc_response['code'] == 0:
+    if not json_pc_response['code']:
         Statistics().append_to_activitylist(raffleid, text1)
     else:
         print(json_pc_response)
@@ -137,7 +137,7 @@ async def handle_1_room_captain(roomid):
             json_response1 = await bilibili().get_giftlist_of_captain(roomid)
             # print(json_response1)
             num = len(json_response1['data']['guard'])
-            if num == 0:
+            if not num:
                 await asyncio.sleep(5)
             else:
                 break
@@ -281,7 +281,7 @@ class bilibiliClient():
 
     async def SendSocketData(self, packetlength, magic, ver, action, param, body):
         bytearr = body.encode('utf-8')
-        if packetlength == 0:
+        if not packetlength:
             packetlength = len(bytearr) + 16
         sendbytes = struct.pack('!IHHII', packetlength, magic, ver, action, param)
         if len(bytearr) != 0:
@@ -297,7 +297,7 @@ class bilibiliClient():
 
     async def ReadSocketData(self, len_wanted):
         bytes_data = b''
-        if len_wanted == 0:
+        if not len_wanted:
             return bytes_data
         len_remain = len_wanted
         while len_remain != 0:

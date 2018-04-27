@@ -182,7 +182,7 @@ class Biliconsole():
                 # print('本批次轮空')
                 pass
                 
-            if len_list_console == 0:
+            if not len_list_console:
                 await asyncio.sleep(1)
             else:
                 self.lock.acquire()

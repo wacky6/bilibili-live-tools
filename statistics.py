@@ -68,7 +68,7 @@ class Statistics:
                 json_response = await bilibili().get_activity_result(self.activity_roomid_list[0], self.activity_raffleid_list[0])
                 # print(json_response)
                 try:
-                    if json_response['code'] == 0:
+                    if not json_response['code']:
                         data = json_response['data']
                         print(f'# 房间{self.activity_roomid_list[0]:^9}网页端活动抽奖结果: {data["gift_name"]}X{data["gift_num"]}')
                         self.add_to_result(data['gift_name'], int(data['gift_num']))

@@ -40,7 +40,7 @@ async def draw_lottery():
     for i in range(68, 90):
         json_response = await bilibili().get_lotterylist(i)
         # -400 不存在
-        if json_response['code'] == 0:
+        if not json_response['code']:
             temp = json_response['data']['title']
             if "测试" in temp or 'test' in temp:
                 print("检测到疑似钓鱼类测试抽奖，默认不参与，请自行判断抽奖可参与性")

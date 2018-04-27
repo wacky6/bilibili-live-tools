@@ -74,7 +74,7 @@ def logout():
 def check_token():
     response = bilibili().request_check_token()
     json_response = response.json()
-    if json_response['code'] == 0 and json_response['data'].get('mid', ''):
+    if not json_response['code'] and json_response['data'].get('mid', ''):
         print('token有效期检查: 仍有效')
         # print(json_response)
         return True
@@ -87,7 +87,7 @@ def RefreshToken():
     response = bilibili().request_refresh_token()
     json_response = response.json()
     # print(json_response)
-    if json_response['code'] == 0 and json_response['data'].get('mid', ''):
+    if not json_response['code'] and json_response['data'].get('mid', ''):
         print('token刷新成功')
         dic_saved_session = {
                 'access_key': json_response['data']['access_token'],
