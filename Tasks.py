@@ -11,7 +11,7 @@ import aiohttp
     
 # 获取每日包裹奖励
 async def Daily_bag():
-    json_response = await bilibili().get_dailybag()
+    json_response = await bilibili.get_dailybag()
     # no done code
     # print('Daily_bag', json_response)
     for i in json_response['data']['bag_list']:
@@ -26,7 +26,7 @@ def CurrentTime():
 # 签到功能
 async def DoSign():
     # -500 done
-    temp = await bilibili().get_dosign()
+    temp = await bilibili.get_dosign()
     # print('DoSign', temp)
     Printer().printlist_append(['join_lottery', '', 'user', "# 签到状态:",temp['msg']])
     if temp['code'] == -500 and '已' in temp['msg']:
@@ -38,7 +38,7 @@ async def DoSign():
 # 领取每日任务奖励
 async def Daily_Task():
     #-400 done/not yet
-    json_response2 = await bilibili().get_dailytask()
+    json_response2 = await bilibili.get_dailytask()
     Printer().printlist_append(['join_lottery', '', 'user', "# 双端观看直播:", json_response2["msg"]])
     # print('Daily_Task', json_response2)
     if json_response2['code'] == -400 and '已' in json_response2['msg']:
@@ -49,7 +49,7 @@ async def Daily_Task():
 
 
 async def Sign1Group(session, i1, i2):
-    json_response = await bilibili().assign_group(session, i1, i2)
+    json_response = await bilibili.assign_group(session, i1, i2)
     if not json_response['code']:
         if (json_response['data']['status']) == 1:
             Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 已应援过" % (i1)])
@@ -61,7 +61,7 @@ async def Sign1Group(session, i1, i2):
 # 应援团签到
 async def link_sign():
     async with aiohttp.ClientSession() as session:
-        json_rsp = await bilibili().get_grouplist(session)
+        json_rsp = await bilibili.get_grouplist(session)
         list_check = json_rsp['data']['list']
         id_list = ((i['group_id'], i['owner_uid'])  for i in list_check)
         if list_check:
@@ -97,7 +97,7 @@ async def auto_send_gift():
             print('暂未佩戴任何勋章')
             BiliTimer().append2list_jobs([auto_send_gift, [], int(CurrentTime()), 21600])
             return 
-        json_res = await bilibili().gift_list()
+        json_res = await bilibili.gift_list()
         temp_dic = {j['id']: (j['price'] / 100) for j in json_res['data']}
         temp = await utils.fetch_bag_list(printer=False)
         roomid = a[0]
@@ -126,17 +126,17 @@ async def auto_send_gift():
         
 async def doublegain_coin2silver():
     if ConfigLoader().dic_user['task_control']['doublegain_coin2silver']:
-        json_response0 = await bilibili().request_doublegain_coin2silver()
-        json_response1 = await bilibili().request_doublegain_coin2silver()
+        json_response0 = await bilibili.request_doublegain_coin2silver()
+        json_response1 = await bilibili.request_doublegain_coin2silver()
         print(json_response0['msg'], json_response1['msg'])
     BiliTimer().append2list_jobs([doublegain_coin2silver, [], int(CurrentTime()), 21600])
 
 async def sliver2coin():
     if ConfigLoader().dic_user['task_control']['silver2coin']:
         # -403 done
-        json_response = await bilibili().silver2coin_web()
+        json_response = await bilibili.silver2coin_web()
         # 403 done
-        json_response1 = await bilibili().silver2coin_app()
+        json_response1 = await bilibili.silver2coin_app()
         Printer().printlist_append(['join_lottery', '', 'user',"# ", json_response['msg']])
         Printer().printlist_append(['join_lottery', '', 'user', "# ", json_response1['msg']])
         if json_response['code'] == -403 and '只' in json_response['msg']:

@@ -65,7 +65,7 @@ class Statistics:
         # print(self.activity_raffleid_list)
         if self.activity_raffleid_list:
             for i in range(0, len(self.activity_roomid_list)):
-                json_response = await bilibili().get_activity_result(self.activity_roomid_list[0], self.activity_raffleid_list[0])
+                json_response = await bilibili.get_activity_result(self.activity_roomid_list[0], self.activity_raffleid_list[0])
                 # print(json_response)
                 try:
                     if not json_response['code']:
@@ -95,7 +95,7 @@ class Statistics:
         if self.TV_raffleid_list:
             for i in range(0, len(self.TV_roomid_list)):
 
-                json_response = await  bilibili().get_TV_result(self.TV_roomid_list[0], self.TV_raffleid_list[0])
+                json_response = await  bilibili.get_TV_result(self.TV_roomid_list[0], self.TV_raffleid_list[0])
                 # if response.json()['data']['gift_name'] != "":
                 # print(json_response)
                 try:

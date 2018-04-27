@@ -7,7 +7,7 @@ from bilitimer import BiliTimer
 # 领瓜子时判断领取周期的参数
 async def time_start():
 
-    temp = await bilibili().get_time_about_silver()
+    temp = await bilibili.get_time_about_silver()
     # print (temp['code'])    #宝箱领完返回的code为-10017
     if temp['code'] == -10017:
         Printer().printlist_append(['join_lottery', '', 'user', "# 今日宝箱领取完毕"])
@@ -23,7 +23,7 @@ async def GetAward():
         timestart, timeend = silver_time
     else:
         return
-    json_response = await bilibili().get_silver(timestart, timeend)
+    json_response = await bilibili.get_silver(timestart, timeend)
     return json_response
 
 async def GetAllSilver():

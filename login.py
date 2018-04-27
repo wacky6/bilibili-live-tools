@@ -17,15 +17,15 @@ def calc_name_passw(key, Hash, username, password):
 def LoginWithPwd():
     username = ConfigLoader().dic_bilibili['account']['username']
     password = ConfigLoader().dic_bilibili['account']['password']
-    response = bilibili().request_getkey()
+    response = bilibili.request_getkey()
     value = response.json()['data']
     key = value['key']
     Hash = str(value['hash'])
     username, password = calc_name_passw(key, Hash, username, password)
     
-    response = bilibili().normal_login(username, password)
+    response = bilibili.normal_login(username, password)
     while response.json()['code'] == -105:
-        response = bilibili().login_with_captcha(username, password)
+        response = bilibili.login_with_captcha(username, password)
     try:
         # print(response.json())
         data = response.json()['data']
@@ -42,7 +42,7 @@ def LoginWithPwd():
             'uid': cookie[1]['value']
             }
         # print(dic_saved_session)
-        bilibili().load_session(dic_saved_session)
+        bilibili.load_session(dic_saved_session)
         if ConfigLoader().dic_user['other_control']['keep-login']:
             ConfigLoader().write2bilibili(dic_saved_session)
         print("[{}] {}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '密码登陆成功'))
@@ -54,14 +54,14 @@ def LoginWithPwd():
 
 def login():    
     if ConfigLoader().dic_bilibili['saved-session']['cookie']:
-        bilibili().load_session(ConfigLoader().dic_bilibili['saved-session'])
+        bilibili.load_session(ConfigLoader().dic_bilibili['saved-session'])
         return HandleExpire()
     else:
         return LoginWithPwd()
             
 
 def logout():
-    response = bilibili().request_logout()
+    response = bilibili.request_logout()
     if response.text.find('成功退出登录') == -1:
         print('登出失败', response)
     else:
@@ -69,7 +69,7 @@ def logout():
 
                 
 def check_token():
-    response = bilibili().request_check_token()
+    response = bilibili.request_check_token()
     json_response = response.json()
     if not json_response['code'] and json_response['data'].get('mid', ''):
         print('token有效期检查: 仍有效')
@@ -81,7 +81,7 @@ def check_token():
         
 def RefreshToken():
     # return
-    response = bilibili().request_refresh_token()
+    response = bilibili.request_refresh_token()
     json_response = response.json()
     # print(json_response)
     if not json_response['code'] and json_response['data'].get('mid', ''):
@@ -90,7 +90,7 @@ def RefreshToken():
                 'access_key': json_response['data']['access_token'],
                 'refresh_token': json_response['data']['refresh_token']
                 }
-        bilibili().load_session(dic_saved_session)
+        bilibili.load_session(dic_saved_session)
         if ConfigLoader().dic_user['other_control']['keep-login']:
             ConfigLoader().write2bilibili(dic_saved_session)
         # 更新token信息
