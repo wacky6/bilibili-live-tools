@@ -21,7 +21,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid):
     # -400不存在
     # -500繁忙
     if not json_response2['code']:
-        Statistics().append_to_TVlist(raffleid, real_roomid)
+        Statistics.append_to_TVlist(raffleid, real_roomid)
         return True
     elif json_response2['code'] == -500:
         print('# -500繁忙，稍后重试')
@@ -36,7 +36,7 @@ async def handle_1_captain_raffle(num, roomid, raffleid):
     json_response2 = await bilibili.get_gift_of_captain(roomid, raffleid)
     if not json_response2['code']:
         print("# 获取到房间 %s 的总督奖励: " %(roomid), json_response2['data']['message'])
-        Statistics().append_to_captainlist()
+        Statistics.append_to_captainlist()
     else:
         print(json_response2)
     return True
@@ -53,7 +53,7 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
     if not json_response1['code']:
         Printer().printlist_append(['join_lottery', '', 'user', "# 移动端活动抽奖结果: ",
                                    json_response1['data']['gift_desc']])
-        Statistics().add_to_result(*(json_response1['data']['gift_desc'].split('X')))
+        Statistics.add_to_result(*(json_response1['data']['gift_desc'].split('X')))
     else:
         print(json_response1)
         Printer().printlist_append(['join_lottery', '', 'user', "# 移动端活动抽奖结果: ", json_response1['message']])
@@ -61,7 +61,7 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
     Printer().printlist_append(
             ['join_lottery', '', 'user', "# 网页端活动抽奖状态: ", json_pc_response['message']])
     if not json_pc_response['code']:
-        Statistics().append_to_activitylist(raffleid, text1)
+        Statistics.append_to_activitylist(raffleid, text1)
     else:
         print(json_pc_response)
     return True
@@ -82,7 +82,7 @@ async def handle_1_room_TV(real_roomid):
             # await asyncio.sleep(random.uniform(0.5, 1))
             resttime = j['dtime']
             raffleid = j['id']
-            if Statistics().check_TVlist(raffleid):
+            if Statistics.check_TVlist(raffleid):
                 list_available_raffleid.append(raffleid)
         tasklist = []
         num_available = len(list_available_raffleid)
@@ -110,7 +110,7 @@ async def handle_1_room_activity(giftId, text1, text2):
             # await asyncio.sleep(random.uniform(0.5, 1))
             resttime = j['time']
             raffleid = j['raffleId']
-            if Statistics().check_activitylist(raffleid):
+            if Statistics.check_activitylist(raffleid):
                 list_available_raffleid.append(raffleid)
         tasklist = []
         num_available = len(list_available_raffleid)
@@ -183,7 +183,7 @@ async def parseDanMu(messages):
                 giftId = dic['giftId']
                 Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
                 Rafflehandler().append2list_activity(giftId, text1, text2)
-                Statistics().append2pushed_activitylist()
+                Statistics.append2pushed_activitylist()
                         
             elif dic['giftId'] == 39:
                 Printer().printlist_append(['join_lottery', '', 'user', "节奏风暴"])
@@ -203,7 +203,7 @@ async def parseDanMu(messages):
                     giftId = dic['giftId']
                     Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
                     Rafflehandler().append2list_activity(giftId, text1, text2)
-                    Statistics().append2pushed_activitylist()
+                    Statistics.append2pushed_activitylist()
                             
                 except:
                     pass
@@ -221,7 +221,7 @@ async def parseDanMu(messages):
                 Printer().printlist_append(['join_lottery', '小电视', 'user', f'检测到房间{real_roomid:^9}的小电视抽奖'], True)
                 # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
                 Rafflehandler().append2list_TV(real_roomid)
-                Statistics().append2pushed_TVlist()
+                Statistics.append2pushed_TVlist()
                 
             except:
                 print('请联系开发者', dic)
@@ -234,7 +234,7 @@ async def parseDanMu(messages):
             roomid = utils.find_live_user_roomid(str(res.group()))
             Printer().printlist_append(['join_lottery', '', 'user', f'检测到房间{roomid:^9}开通总督'], True)
             Rafflehandler().append2list_captain(roomid)
-            Statistics().append2pushed_captainlist()
+            Statistics.append2pushed_captainlist()
                                                           
 
 class bilibiliClient():

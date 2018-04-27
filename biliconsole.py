@@ -103,8 +103,8 @@ def process_watch_living_video():
     print('仅支持ios')
 
 options = {
-    '1': Statistics().getlist,
-    '2': Statistics().getresult,
+    '1': Statistics.getlist,
+    '2': Statistics.getresult,
     '3': utils.fetch_bag_list,  # async
     '4': utils.fetch_medal,  # async
     '5': utils.fetch_user_info,  # async
@@ -120,7 +120,7 @@ options = {
     '15': preprocess_open_capsule,
     '16': process_watch_living_video,  # input async
     '17': utils.TitleInfo,
-    '18': BiliTimer().getresult,
+    '18': BiliTimer.getresult,
     '19': Rafflehandler().getlist,
     'help': guide_of_console,
     'h': guide_of_console

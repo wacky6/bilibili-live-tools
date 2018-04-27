@@ -32,23 +32,29 @@ class Statistics:
             # cls.instance.activitysleeptime = 125
         return cls.instance
 
-    def add_to_result(self, type, num):
-        self.result[type] = self.result.get(type, 0) + int(num)
+    @staticmethod
+    def add_to_result(type, num):
+        inst = Statistics.instance
+        inst.result[type] = inst.result.get(type, 0) + int(num)
 
-    def getlist(self):
-        # print(self.joined_event)
-        # print(self.joined_TV)
-        print('本次推送活动抽奖次数:', len(self.pushed_event))
-        print('本次推送电视抽奖次数:', len(self.pushed_TV))
-        print('本次推送总督抽奖次数:', len(self.pushed_captain))
+    @staticmethod
+    def getlist():
+        inst = Statistics.instance
+        # print(inst.joined_event)
+        # print(inst.joined_TV)
+        print('本次推送活动抽奖次数:', len(inst.pushed_event))
+        print('本次推送电视抽奖次数:', len(inst.pushed_TV))
+        print('本次推送总督抽奖次数:', len(inst.pushed_captain))
         print()
-        print('本次参与活动抽奖次数:', len(self.joined_event))
-        print('本次参与电视抽奖次数:', len(self.joined_TV))
-        print('本次参与总督抽奖次数:', len(self.joined_captain))
+        print('本次参与活动抽奖次数:', len(inst.joined_event))
+        print('本次参与电视抽奖次数:', len(inst.joined_TV))
+        print('本次参与总督抽奖次数:', len(inst.joined_captain))
 
-    def getresult(self):
+    @staticmethod
+    def getresult():
+        inst = Statistics.instance
         print('本次参与抽奖结果为：')
-        for k, v in self.result.items():
+        for k, v in inst.result.items():
             print(f'{k}X{v}')
 
     def delete_0st_activitylist(self):
@@ -59,25 +65,27 @@ class Statistics:
     def delete_0st_TVlist(self):
         del self.TV_roomid_list[0]
         del self.TV_raffleid_list[0]
-        # del self.TV_time_list[0]
+        # del inst.TV_time_list[0]
 
-    async def clean_activity(self):
-        # print(self.activity_raffleid_list)
-        if self.activity_raffleid_list:
-            for i in range(0, len(self.activity_roomid_list)):
-                json_response = await bilibili.get_activity_result(self.activity_roomid_list[0], self.activity_raffleid_list[0])
+    @staticmethod
+    async def clean_activity():
+        inst = Statistics.instance
+        # print(inst.activity_raffleid_list)
+        if inst.activity_raffleid_list:
+            for i in range(0, len(inst.activity_roomid_list)):
+                json_response = await bilibili.get_activity_result(inst.activity_roomid_list[0], inst.activity_raffleid_list[0])
                 # print(json_response)
                 try:
                     if not json_response['code']:
                         data = json_response['data']
-                        print(f'# 房间{self.activity_roomid_list[0]:^9}网页端活动抽奖结果: {data["gift_name"]}X{data["gift_num"]}')
-                        self.add_to_result(data['gift_name'], int(data['gift_num']))
+                        print(f'# 房间{inst.activity_roomid_list[0]:^9}网页端活动抽奖结果: {data["gift_name"]}X{data["gift_num"]}')
+                        inst.add_to_result(data['gift_name'], int(data['gift_num']))
     
-                        self.delete_0st_activitylist()
+                        inst.delete_0st_activitylist()
                     # {'code': -400, 'msg': '尚未开奖，请耐心等待！', 'message': '尚未开奖，请耐心等待！', 'data': []}
                     elif json_response['code'] == -400:
-                        # sleepseconds = self.activitysleeptime + self.activity_time_list[0] - int(CurrentTime())+ 2
-                        # sleepseconds = self.activity_time_list[0] - int(CurrentTime())
+                        # sleepseconds = inst.activitysleeptime + inst.activity_time_list[0] - int(CurrentTime())+ 2
+                        # sleepseconds = inst.activity_time_list[0] - int(CurrentTime())
                         # return sleepsecondsq
                         return
     
@@ -90,12 +98,14 @@ class Statistics:
         else:
             return
 
-    async def clean_TV(self):
-        # print(self.TV_raffleid_list)
-        if self.TV_raffleid_list:
-            for i in range(0, len(self.TV_roomid_list)):
+    @staticmethod
+    async def clean_TV():
+        inst = Statistics.instance
+        # print(inst.TV_raffleid_list)
+        if inst.TV_raffleid_list:
+            for i in range(0, len(inst.TV_roomid_list)):
 
-                json_response = await  bilibili.get_TV_result(self.TV_roomid_list[0], self.TV_raffleid_list[0])
+                json_response = await  bilibili.get_TV_result(inst.TV_roomid_list[0], inst.TV_raffleid_list[0])
                 # if response.json()['data']['gift_name'] != "":
                 # print(json_response)
                 try:
@@ -106,16 +116,16 @@ class Statistics:
                     elif json_response['data']['gift_id'] != '-1':
     
                         data = json_response['data']
-                        print(f'# 房间{self.TV_roomid_list[0]:^9}小电视道具抽奖结果: {data["gift_name"]}X{data["gift_num"]}')
-                        self.add_to_result(data['gift_name'], int(data['gift_num']))
+                        print(f'# 房间{inst.TV_roomid_list[0]:^9}小电视道具抽奖结果: {data["gift_name"]}X{data["gift_num"]}')
+                        inst.add_to_result(data['gift_name'], int(data['gift_num']))
     
-                        self.delete_0st_TVlist()
+                        inst.delete_0st_TVlist()
                 except:
                     print(json_response)
             # else:
             # print(int(CurrentTime()))
-            # sleepseconds = self.TV_time_list[0] - int(CurrentTime()) + 1
-            # sleepseconds = self.TV_time_list[0] - int(CurrentTime())
+            # sleepseconds = inst.TV_time_list[0] - int(CurrentTime()) + 1
+            # sleepseconds = inst.TV_time_list[0] - int(CurrentTime())
             # return
 
             #  else:
@@ -123,40 +133,56 @@ class Statistics:
         else:
             return
 
-    def append_to_activitylist(self, raffleid, text1, time=''):
-        self.activity_raffleid_list.append(raffleid)
-        self.activity_roomid_list.append(text1)
-        # self.activity_time_list.append(int(time))
-        # self.activity_time_list.append(int(CurrentTime()))
-        self.joined_event.append(decimal_time())
-        # print("activity加入成功", self.joined_event)
+    @staticmethod
+    def append_to_activitylist(raffleid, text1, time=''):
+        inst = Statistics.instance
+        inst.activity_raffleid_list.append(raffleid)
+        inst.activity_roomid_list.append(text1)
+        # inst.activity_time_list.append(int(time))
+        # inst.activity_time_list.append(int(CurrentTime()))
+        inst.joined_event.append(decimal_time())
+        # print("activity加入成功", inst.joined_event)
 
-    def append_to_TVlist(self, raffleid, real_roomid, time=''):
-        self.TV_raffleid_list.append(raffleid)
-        self.TV_roomid_list.append(real_roomid)
-        # self.TV_time_list.append(int(time)+int(CurrentTime()))
-        # self.TV_time_list.append(int(CurrentTime()))
-        self.joined_TV.append(decimal_time())
-        # print("tv加入成功", self.joined_TV)
+    @staticmethod
+    def append_to_TVlist(raffleid, real_roomid, time=''):
+        inst = Statistics.instance
+        inst.TV_raffleid_list.append(raffleid)
+        inst.TV_roomid_list.append(real_roomid)
+        # inst.TV_time_list.append(int(time)+int(CurrentTime()))
+        # inst.TV_time_list.append(int(CurrentTime()))
+        inst.joined_TV.append(decimal_time())
+        # print("tv加入成功", inst.joined_TV)
         
-    def append_to_captainlist(self):
-        self.joined_captain.append(decimal_time())
+    @staticmethod
+    def append_to_captainlist():
+        inst = Statistics.instance
+        inst.joined_captain.append(decimal_time())
         
-    def append2pushed_activitylist(self):
-        self.pushed_event.append(decimal_time())
+    @staticmethod
+    def append2pushed_activitylist():
+        inst = Statistics.instance
+        inst.pushed_event.append(decimal_time())
         
-    def append2pushed_TVlist(self):
-        self.pushed_TV.append(decimal_time())
+    @staticmethod
+    def append2pushed_TVlist():
+        inst = Statistics.instance
+        inst.pushed_TV.append(decimal_time())
         
-    def append2pushed_captainlist(self):
-        self.pushed_captain.append(decimal_time())
+    @staticmethod
+    def append2pushed_captainlist():
+        inst = Statistics.instance
+        inst.pushed_captain.append(decimal_time())
 
-    def check_TVlist(self, raffleid):
-        if raffleid not in self.TV_raffleid_list:
+    @staticmethod
+    def check_TVlist(raffleid):
+        inst = Statistics.instance
+        if raffleid not in inst.TV_raffleid_list:
             return True
         return False
 
-    def check_activitylist(self, raffleid):
-        if raffleid not in self.activity_raffleid_list:
+    @staticmethod
+    def check_activitylist(raffleid):
+        inst = Statistics.instance
+        if raffleid not in inst.activity_raffleid_list:
             return True
         return False

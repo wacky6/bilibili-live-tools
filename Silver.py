@@ -32,7 +32,7 @@ async def GetAllSilver():
         json_rsp = await GetAward()
         if json_rsp is None or json_rsp['code'] == -10017:
             sleeptime = (utils.seconds_until_tomorrow() + 300)
-            BiliTimer().append2list_jobs([GetAllSilver, [], int(utils.CurrentTime()), sleeptime])
+            BiliTimer.append2list_jobs([GetAllSilver, [], int(utils.CurrentTime()), sleeptime])
             return
         elif not json_rsp['code']:
             Printer().printlist_append(['join_lottery', '', 'user', "# 打开了宝箱"])
@@ -41,9 +41,9 @@ async def GetAllSilver():
             # 未来如果取消了这个东西就睡眠185s，否则精确睡眠
             # surplus里面是min，float格式
             sleeptime = (json_rsp['data'].get('surplus', 3)) * 60 + 5
-            BiliTimer().append2list_jobs([GetAllSilver, [], int(utils.CurrentTime()), sleeptime])
+            BiliTimer.append2list_jobs([GetAllSilver, [], int(utils.CurrentTime()), sleeptime])
             return
 
                                               
 def init():
-    BiliTimer().append2list_jobs([GetAllSilver, [], 0, 0])
+    BiliTimer.append2list_jobs([GetAllSilver, [], 0, 0])

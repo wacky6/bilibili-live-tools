@@ -17,19 +17,19 @@ async def apppost_heartbeat():
     json_response = await bilibili.apppost_heartbeat()
     # print('apppost_heartbeat', json_response)
     Printer().printlist_append(['join_lottery', '', 'user', "心跳"], True)
-    BiliTimer().append2list_jobs([apppost_heartbeat, [], int(CurrentTime()), 300])
+    BiliTimer.append2list_jobs([apppost_heartbeat, [], int(CurrentTime()), 300])
 
 
 async def pcpost_heartbeat():
     json_response = await bilibili.pcpost_heartbeat()
     # print('pcpost_heartbeat', json_response)
-    BiliTimer().append2list_jobs([pcpost_heartbeat, [], int(CurrentTime()), 300])
+    BiliTimer.append2list_jobs([pcpost_heartbeat, [], int(CurrentTime()), 300])
 
 
 async def heart_gift():
     json_response =  await bilibili.heart_gift()
     # print('heart_gift', json_response)
-    BiliTimer().append2list_jobs([heart_gift, [], int(CurrentTime()), 300])
+    BiliTimer.append2list_jobs([heart_gift, [], int(CurrentTime()), 300])
 
 
 # 因为休眠时间差不多,所以放到这里,此为实验性功能
@@ -56,13 +56,13 @@ async def draw_lottery():
                         pass
         else:
             break
-    BiliTimer().append2list_jobs([draw_lottery, [], int(CurrentTime()), 300])
+    BiliTimer.append2list_jobs([draw_lottery, [], int(CurrentTime()), 300])
 
         
 def init():
-    BiliTimer().append2list_jobs([apppost_heartbeat, [], 0, 0])
-    BiliTimer().append2list_jobs([pcpost_heartbeat, [], 0, 0])
-    BiliTimer().append2list_jobs([heart_gift, [], 0, 0])
-    BiliTimer().append2list_jobs([draw_lottery, [], 0, 0])
+    BiliTimer.append2list_jobs([apppost_heartbeat, [], 0, 0])
+    BiliTimer.append2list_jobs([pcpost_heartbeat, [], 0, 0])
+    BiliTimer.append2list_jobs([heart_gift, [], 0, 0])
+    BiliTimer.append2list_jobs([draw_lottery, [], 0, 0])
 
 

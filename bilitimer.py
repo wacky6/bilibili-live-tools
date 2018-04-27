@@ -45,16 +45,18 @@ class BiliTimer:
             sleeptime = - int(CurrentTime()) + recent_time
             # print('智能睡眠', sleeptime)
             await asyncio.sleep(max(sleeptime, 0))
-                
-    def append2list_jobs(self, job):
+      
+    @staticmethod          
+    def append2list_jobs(job):
         # [func, x(list), starttime(s), delay(s)]
         # print('welcome to appending')
-        self.jobs.append(job)
+        BiliTimer.instance.jobs.append(job)
         # print('添加任务', job)
         return
         
-    def getresult(self):
-        print('目前timer任务队列状况', self.jobs)
-        print('数目', len(self.jobs))
+    @staticmethod
+    def getresult():
+        print('目前timer任务队列状况', BiliTimer.instance.jobs)
+        print('数目', len(BiliTimer.instance.jobs))
         
     
