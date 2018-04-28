@@ -36,9 +36,7 @@ danmu_connection = connect()
 
 
 bili_timer = BiliTimer()
-OnlineHeart.init()
 Tasks.init()
-Silver.init()
 
 
 console_thread = threading.Thread(target=biliconsole.controler)
@@ -51,8 +49,8 @@ tasks = [
     # utils.fetch_bag_list(),
     # utils.fetch_medal(),
     
-    # OnlineHeart.run(),
-    # Silver.run(),
+    OnlineHeart.run(),
+    Silver.run(),
     # Tasks.run(),
     danmu_connection.run(),
     LotteryResult.run(),
