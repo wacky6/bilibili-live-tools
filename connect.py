@@ -7,6 +7,7 @@ from configloader import ConfigLoader
 
 
 class connect():
+    __slots__ = ('danmuji')
     instance = None
     
     def __new__(cls, *args, **kw):
@@ -42,12 +43,13 @@ class connect():
             if time_end - time_start < 5:
                 print('# 当前网络不稳定，为避免频繁不必要尝试，将自动在5秒后重试')
                 await asyncio.sleep(5)
-            
-    def reconnect(self, roomid):
+    
+    @staticmethod        
+    def reconnect(roomid):
         ConfigLoader().dic_user['other_control']['default_monitor_roomid'] = roomid
         print('已经切换roomid')
-        if self.danmuji is not None:
-            self.danmuji.close_connection()
+        if connect.instance.danmuji is not None:
+            connect.instance.danmuji.close_connection()
         
         
         

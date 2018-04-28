@@ -72,7 +72,7 @@ def process_send_gift_web():
 def preprocess_change_danmuji_roomid():
     roomid = input('请输入roomid')
     real_roomid = fetch_real_roomid(roomid)
-    Biliconsole().append2list_console([[real_roomid], 'normal', connect().reconnect])
+    Biliconsole().append2list_console([[real_roomid], 'normal', connect.reconnect])
 
 
 def change_printer_dic_user():
@@ -121,7 +121,7 @@ options = {
     '16': process_watch_living_video,  # input async
     '17': utils.TitleInfo,
     '18': BiliTimer.getresult,
-    '19': Rafflehandler().getlist,
+    '19': Rafflehandler.getlist,
     'help': guide_of_console,
     'h': guide_of_console
 }
