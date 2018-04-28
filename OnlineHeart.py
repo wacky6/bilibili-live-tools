@@ -14,7 +14,6 @@ def CurrentTime():
 async def apppost_heartbeat():
     json_response = await bilibili.apppost_heartbeat()
     # print('apppost_heartbeat', json_response)
-    Printer().printlist_append(['join_lottery', '', 'user', "心跳"], True)
 
 
 async def pcpost_heartbeat():

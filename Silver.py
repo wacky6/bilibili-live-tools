@@ -38,5 +38,6 @@ async def run():
             Printer().printlist_append(['join_lottery', '', 'user',"# 继续等待宝箱冷却..."])
             # 未来如果取消了这个东西就睡眠185s，否则精确睡眠
             # surplus里面是min，float格式
+            sleeptime = (json_rsp['data'].get('surplus', 3)) * 60 + 5
             await asyncio.sleep(sleeptime)
             
