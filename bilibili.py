@@ -42,6 +42,7 @@ base_url = 'https://api.live.bilibili.com'
 
         
 class bilibili():
+    __slots__ = ('dic_bilibili', 'bili_session')
     instance = None
 
     def __new__(cls, *args, **kw):

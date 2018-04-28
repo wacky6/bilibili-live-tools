@@ -8,6 +8,7 @@ def CurrentTime():
     return str(currenttime)
 
 class BiliTimer:
+    __slots__ = ('jobs',)
     instance = None
 
     def __new__(cls, *args, **kw):

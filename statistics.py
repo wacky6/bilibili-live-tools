@@ -9,6 +9,7 @@ def decimal_time():
 
 
 class Statistics:
+    __slots__ = ('activity_raffleid_list', 'activity_roomid_list', 'TV_raffleid_list', 'TV_roomid_list', 'pushed_event', 'pushed_TV', 'pushed_captain', 'joined_event', 'joined_TV', 'joined_captain', 'result')
     instance = None
 
     def __new__(cls, *args, **kw):
