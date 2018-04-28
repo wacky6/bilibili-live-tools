@@ -82,7 +82,7 @@ async def handle_1_room_TV(real_roomid):
             # await asyncio.sleep(random.uniform(0.5, 1))
             resttime = j['dtime']
             raffleid = j['id']
-            if Statistics.check_TVlist(raffleid):
+            if Statistics.check_TVlist(real_roomid, raffleid):
                 list_available_raffleid.append(raffleid)
         tasklist = []
         num_available = len(list_available_raffleid)
@@ -110,7 +110,7 @@ async def handle_1_room_activity(giftId, text1, text2):
             # await asyncio.sleep(random.uniform(0.5, 1))
             resttime = j['time']
             raffleid = j['raffleId']
-            if Statistics.check_activitylist(raffleid):
+            if Statistics.check_activitylist(text1, raffleid):
                 list_available_raffleid.append(raffleid)
         tasklist = []
         num_available = len(list_available_raffleid)
