@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import time
+import Tasks
 
 
 def CurrentTime():
@@ -18,6 +19,7 @@ class BiliTimer:
         return cls.instance
         
     async def run(self):
+        await Tasks.init()
         while True:
             i = await self.jobs.get()
             currenttime = CurrentTime()
