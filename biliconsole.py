@@ -144,52 +144,32 @@ def controler():
 class Biliconsole():
     instance = None
 
-    def __new__(cls, *args, **kw):
+    def __new__(cls, loop=None, queue=None):
         if not cls.instance:
-            cls.instance = super(Biliconsole, cls).__new__(cls, *args, **kw)
-            cls.instance.list_console = []
-            cls.lock = threading.Lock()
+            cls.instance = super(Biliconsole, cls).__new__(cls)
+            cls.instance.queue_console = queue
+            cls.instance.loop = loop
         return cls.instance
         
     def append2list_console(self, request):
-        self.lock.acquire()
-        self.list_console.append(request)
-        self.lock.release()
+        self.loop.call_soon_threadsafe(self.queue_console.put_nowait, request)
         
     async def run(self):
         while True:
-            len_list_console = len(self.list_console)
-            tasklist = []
-            for i in self.list_console:
-                if isinstance(i, list):
-                    # 对10号单独简陋处理
-                    for j in range(len(i[0])):
-                        if isinstance(i[0][j], list):
-                            # print('检测')
-                            i[0][j] = await i[0][j][1](*(i[0][j][0]))
-                    if i[1] == 'normal':
-                        i[2](*i[0])
-                    else:
-                        task = asyncio.ensure_future(i[1](*i[0]))
-                        tasklist.append(task)
+            i = await self.queue_console.get()
+            if isinstance(i, list):
+                # 对10号单独简陋处理
+                for j in range(len(i[0])):
+                    if isinstance(i[0][j], list):
+                        # print('检测')
+                        i[0][j] = await i[0][j][1](*(i[0][j][0]))
+                if i[1] == 'normal':
+                    i[2](*i[0])
                 else:
-                    task = asyncio.ensure_future(i())
-                    tasklist.append(task)
-            if tasklist:
-                await asyncio.wait(tasklist, return_when=asyncio.ALL_COMPLETED)
-                # print('本批次结束')
+                    await i[1](*i[0])
             else:
-                # print('本批次轮空')
-                pass
-                
-            if not len_list_console:
-                await asyncio.sleep(1)
-            else:
-                self.lock.acquire()
-                del self.list_console[:len_list_console]
-                self.lock.release()
-                await asyncio.sleep(0.3)
-        
+                await i()
+            # print('剩余', self.queue_console.qsize())
         
         
     

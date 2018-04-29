@@ -17,6 +17,7 @@ from bilitimer import BiliTimer
 
 
 loop = asyncio.get_event_loop()
+queue = asyncio.Queue()
 fileDir = os.path.dirname(os.path.realpath('__file__'))
 file_color = f'{fileDir}/conf/color.conf'
 file_user = f'{fileDir}/conf/user.conf'
@@ -30,7 +31,7 @@ login.login()
 Statistics()
 
 rafflehandler = Rafflehandler()
-biliconsole.Biliconsole()
+biliconsole.Biliconsole(loop, queue)
 
 danmu_connection = connect()
 
