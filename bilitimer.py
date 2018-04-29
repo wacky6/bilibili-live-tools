@@ -34,7 +34,7 @@ class BiliTimer:
     @staticmethod          
     async def append2list_jobs(func, delay):
         await BiliTimer.instance.jobs.put((CurrentTime() + delay, func.__name__, func))
-        print('添加任务')
+        # print('添加任务')
         return
         
     @staticmethod
