@@ -43,8 +43,6 @@ console_thread = threading.Thread(target=biliconsole.controler)
 
 console_thread.start()
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(asyncio.wait([Tasks.init()]))
 tasks = [
     OnlineHeart.run(),
     Silver.run(),
