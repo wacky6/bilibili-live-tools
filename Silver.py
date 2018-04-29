@@ -1,6 +1,7 @@
 from bilibili import bilibili
 import utils
 from printer import Printer
+import asyncio
 
 
 # 领瓜子时判断领取周期的参数
@@ -26,7 +27,7 @@ async def GetAward():
     return json_response
 
 async def run():
-    while 1:
+    while True:
         Printer().printlist_append(['join_lottery', '', 'user', "检查宝箱状态"], True)
         json_rsp = await GetAward()
         if json_rsp is None or json_rsp['code'] == -10017:
