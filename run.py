@@ -37,7 +37,7 @@ danmu_connection = connect()
 
 
 bili_timer = BiliTimer()
-Tasks.init()
+
 
 
 console_thread = threading.Thread(target=biliconsole.controler)
@@ -45,6 +45,7 @@ console_thread = threading.Thread(target=biliconsole.controler)
 console_thread.start()
 
 loop = asyncio.get_event_loop()
+loop.run_until_complete(asyncio.wait([Tasks.init()]))
 tasks = [
     # utils.fetch_user_info(),
     # utils.fetch_bag_list(),
