@@ -120,6 +120,7 @@ options = {
     '17': utils.TitleInfo,
     '18': BiliTimer.getresult,
     '19': Rafflehandler.getlist,
+    '20': Statistics.checklist,
     'help': guide_of_console,
     'h': guide_of_console
 }

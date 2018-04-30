@@ -104,7 +104,7 @@ def HandleExpire():
             return LoginWithPwd()
         else:
             if not check_token():
-                print('请联系作者')
+                # print('请联系作者')
                 return LoginWithPwd()
     return True
     

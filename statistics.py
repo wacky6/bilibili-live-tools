@@ -181,3 +181,8 @@ class Statistics:
         if (real_roomid, raffleid) not in inst.activity_id_list:
             return True
         return False
+        
+    @staticmethod
+    def checklist():
+        print('目前activity任务队列状况:', Statistics.instance.activity_id_list)
+        print('TV:', Statistics.instance.TV_id_list)
