@@ -75,7 +75,7 @@ def check_token():
         print('token有效期检查: 仍有效')
         # print(json_response)
         return True
-    print('token可能过期')
+    print('token可能过期', json_response)
     return False
 
         
