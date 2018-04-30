@@ -545,11 +545,11 @@ class bilibili():
         return response1
 
     @staticmethod
-    def get_giftids_raffle(self):
+    def get_giftids_raffle():
         return bilibili.instance.dic_bilibili['giftids_raffle'][str]
 
     @staticmethod
-    def get_giftids_raffle_keys(self):
+    def get_giftids_raffle_keys():
         return bilibili.instance.dic_bilibili['giftids_raffle'].keys()
 
     @staticmethod
