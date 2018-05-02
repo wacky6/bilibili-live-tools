@@ -20,8 +20,8 @@ class Rafflehandler:
             list_raffle = list(set(list_raffle0))
                 
             # print('过滤完毕')
-            if len(list_raffle) != len(list_raffle0):
-                print('过滤机制起作用')
+            # if len(list_raffle) != len(list_raffle0):
+                # print('过滤机制起作用')
             
             tasklist = []
             for i in list_raffle:
@@ -35,7 +35,7 @@ class Rafflehandler:
     def Put2Queue(func, value):
         # print('welcome to appending')
         Rafflehandler.instance.queue_raffle.put_nowait((func, value))
-        print('appended')
+        # print('appended')
         return
             
     @staticmethod
