@@ -6,6 +6,7 @@ from PIL import Image
 from io import BytesIO
 import webbrowser
 import re
+import aiohttp
 
 
 def adjust_for_chinese(str):
@@ -351,5 +352,22 @@ async def check_room_true(roomid):
         param3 = data['encrypted']
         # print(param1, param2, param3)
         return param1, param2, param3
+        
+
+async def GiveCoin2Av(video_id, num):
+    if num not in set((1, 2)):
+        return False
+    async with aiohttp.ClientSession() as session:
+        # 10004 稿件已经被删除
+        # 34005 超过，满了
+        json_rsp = await bilibili().ReqGiveCoin2Av(session, video_id, num)
+        if not json_rsp['code']:
+            print(f'给视频av{video_id}投{num}枚硬币成功')
+            return True
+        else:
+            print('投币失败', json_rsp['message'])
+            return False
+        
+    
     
 

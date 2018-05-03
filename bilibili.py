@@ -693,3 +693,20 @@ class bilibili():
         res = await bilibili.instance.bili_section_get(url)
         return res
         
+        
+    async def ReqGiveCoin2Av(self, session, video_id, num):
+        url = 'https://api.bilibili.com/x/web-interface/coin/add'
+        pcheaders = self.dic_bilibili['pcheaders'].copy()
+        pcheaders['Host'] = "api.bilibili.com"
+        pcheaders['referer'] = f'https://www.bilibili.com/video/av{video_id}'
+        data = {
+            'aid': video_id,
+            'multiply': num,
+            'cross_domain': 'true',
+            'csrf': self.dic_bilibili['csrf']
+            }
+        response = await session.post(url, headers=pcheaders, data=data)
+        json_response = await response.json(content_type=None)
+        return json_response
+        
+        

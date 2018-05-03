@@ -99,6 +99,11 @@ def process_watch_living_video():
         Biliconsole.append2list_console([[real_roomid], utils.watch_living_video])
         return
     print('仅支持ios')
+    
+def InputGiveCoin2Av():
+    video_id = input('请输入av号')
+    num = input('输入数目')
+    Biliconsole.append2list_console([[int(video_id), int(num)], utils.GiveCoin2Av])
 
 options = {
     '1': Statistics.getlist,
@@ -121,6 +126,7 @@ options = {
     '18': BiliTimer.getresult,
     '19': Rafflehandler.getlist,
     '20': Statistics.checklist,
+    '21': InputGiveCoin2Av,
     'help': guide_of_console,
     'h': guide_of_console
 }
