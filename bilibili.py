@@ -143,9 +143,7 @@ class bilibili():
     def request_logout():
         inst = bilibili.instance
         url = 'https://passport.bilibili.com/login?act=exit'
-        pcheaders = inst.dic_bilibili['pcheaders'].copy()
-        pcheaders['Host'] = "passport.bilibili.com"
-        response = requests.get(url, headers=pcheaders)
+        response = requests.get(url, headers=inst.dic_bilibili['pcheaders'])
         return response
         
     # 1:900兑换
@@ -412,10 +410,8 @@ class bilibili():
         list_cookie = inst.dic_bilibili['cookie'].split(';')
         params = ('&'.join(sorted(list_url.split('&') + list_cookie)))
         sign = inst.calc_sign(params)
-        appheaders = inst.dic_bilibili['appheaders'].copy()
-        appheaders['Host'] = "passport.bilibili.com"
         true_url = f'https://passport.bilibili.com/api/v2/oauth2/info?{params}&sign={sign}'
-        response1 = requests.get(true_url, headers=appheaders)
+        response1 = requests.get(true_url, headers=inst.dic_bilibili['appheaders'])
         return response1
         
     @staticmethod
@@ -424,9 +420,7 @@ class bilibili():
         data = f'access_token={inst.dic_bilibili["access_key"]}&appkey={inst.dic_bilibili["appkey"]}&refresh_token={inst.dic_bilibili["refresh_token"]}'
         sign = inst.calc_sign(data)
         url = f'https://passport.bilibili.com/api/oauth2/refreshToken?{data}&sign={sign}'
-        appheaders = inst.dic_bilibili['appheaders'].copy()
-        appheaders['Host'] = "passport.bilibili.com"
-        response1 = requests.post(url, headers=appheaders)
+        response1 = requests.post(url, headers=inst.dic_bilibili['appheaders'])
         return response1
     
     @staticmethod
@@ -669,9 +663,7 @@ class bilibili():
     async def get_grouplist(session):
         inst = bilibili.instance
         url = "https://api.vc.bilibili.com/link_group/v1/member/my_groups"
-        pcheaders = inst.dic_bilibili['pcheaders'].copy()
-        pcheaders['Host'] = "api.vc.bilibili.com"
-        response = await session.get(url, headers=pcheaders)
+        response = await session.get(url, headers=inst.dic_bilibili['pcheaders'])
         json_response = await response.json(content_type=None)
         return json_response
 
@@ -681,9 +673,7 @@ class bilibili():
         temp_params = f'_device={inst.dic_bilibili["device"]}&_hwid=SX1NL0wuHCsaKRt4BHhIfRguTXxOfj5WN1BkBTdLfhstTn9NfUouFiUV&access_key={inst.dic_bilibili["access_key"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&group_id={i1}&mobi_app={inst.dic_bilibili["mobi_app"]}&owner_id={i2}&platform={inst.dic_bilibili["platform"]}&src=xiaomi&trace_id=20171224024300024&ts={CurrentTime()}&version=5.20.1.520001'
         sign = inst.calc_sign(temp_params)
         url = f'https://api.vc.bilibili.com/link_setting/v1/link_setting/sign_in?{temp_params}&sign={sign}'
-        appheaders = inst.dic_bilibili['appheaders'].copy()
-        appheaders['Host'] = "api.vc.bilibili.com"
-        response = await session.get(url, headers=appheaders)
+        response = await session.get(url, headers=inst.dic_bilibili['appheaders'])
         json_response = await response.json(content_type=None)
         return json_response
 
@@ -697,7 +687,6 @@ class bilibili():
     async def ReqGiveCoin2Av(self, session, video_id, num):
         url = 'https://api.bilibili.com/x/web-interface/coin/add'
         pcheaders = self.dic_bilibili['pcheaders'].copy()
-        pcheaders['Host'] = "api.bilibili.com"
         pcheaders['referer'] = f'https://www.bilibili.com/video/av{video_id}'
         data = {
             'aid': video_id,
