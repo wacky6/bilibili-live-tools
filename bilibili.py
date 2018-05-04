@@ -698,4 +698,9 @@ class bilibili():
         json_response = await response.json(content_type=None)
         return json_response
         
-        
+    async def ReqCoinExp(self, session):
+        url = 'https://www.bilibili.com/plus/account/exp.php'
+        pcheaders = self.dic_bilibili['pcheaders'].copy()
+        response = await session.post(url, headers=pcheaders)
+        json_response = await response.json(content_type=None)
+        return json_response
