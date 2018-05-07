@@ -160,11 +160,13 @@ async def GetVideoExp():
         if not (await utils.GetRewardInfo(False))['watch_av']:
             await utils.GetUesrInfo()
             print('开始获取视频观看经验')
-            await bilibili().Heartbeat(22957815, 38161588, session)
+            id = list(await utils.GetTopVideoList())
+            cid = await utils.GetVideoCid(id[0])
+            await bilibili().Heartbeat(id[0], cid, session)
             await asyncio.sleep(20)
             print('结束获取视频观看经验')
             await utils.GetUesrInfo()
-        await BiliTimer.append2list_jobs(GetVideoExp(), utils.seconds_until_tomorrow() + 300)
+        await BiliTimer.append2list_jobs(GetVideoExp, utils.seconds_until_tomorrow() + 300)
 
 async def init():
     await BiliTimer.append2list_jobs(sliver2coin, 0)
