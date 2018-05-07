@@ -709,10 +709,12 @@ class bilibili():
         data = {'aid': aid, 'cid': cid, 'mid': self.dic_bilibili['uid'], 'csrf': self.dic_bilibili['csrf'],
                 'played_time': 0, 'realtime': 0,
                 'start_ts': int(time.time()), 'type': 3, 'dt': 2, 'play_type': 1}
-        await session.post(url, data=data, headers=self.dic_bilibili['pcheaders'])
+        response = await session.post(url, data=data, headers=self.dic_bilibili['pcheaders'])
+        json_response = await response.json(content_type=None)
+        return json_response
 
-    async def ReqUserInfo(self, session):
-        url = 'https://account.bilibili.com/home/userInfo'
+    async def ReqMasterInfo(self,session):
+        url = 'https://account.bilibili.com/home/reward'
         response = await session.get(url, headers=self.dic_bilibili['pcheaders'])
         json_response = await response.json(content_type=None)
         return json_response['data']
@@ -721,6 +723,6 @@ class bilibili():
         temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&aid={video_aid}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&ts={CurrentTime()}'
         sign = self.calc_sign(temp_params)
         url = f'https://app.bilibili.com/x/v2/view/page?{temp_params}&sign={sign}'
-        response = await session.get(url, headers=self.dic_bilibili['pcheaders'])
+        response = await session.get(url, headers=self.dic_bilibili['appheaders'])
         json_response = await response.json(content_type=None)
         return json_response['data']
