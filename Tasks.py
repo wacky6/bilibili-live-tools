@@ -158,6 +158,9 @@ async def sliver2coin():
         
     await BiliTimer.append2list_jobs(sliver2coin, 21600)
 
+async def appendtask(task,time):
+    await BiliTimer.append2list_jobs(task, time)
+
 
 async def init():
     await BiliTimer.append2list_jobs(sliver2coin, 0)

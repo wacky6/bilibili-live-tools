@@ -8,6 +8,7 @@ import webbrowser
 import re
 import aiohttp
 import asyncio
+import Tasks
 
 
 def adjust_for_chinese(str):
@@ -397,11 +398,15 @@ async def GetTopVideoList():
         list = set(list)
         return list
 
+async def GetVideoCid(video_aid):
+    async with aiohttp.ClientSession() as session:
+        json_rsp=await bilibili().ReqVideoInfo(video_aid,session)
+        print(json_rsp['pages'][0]['cid'])
 
 async def GetVideoExp():
     async with aiohttp.ClientSession() as session:
         print('开始获取视频观看经验')
-        await bilibili().Heartbeat(22957815, 38161588, 415, session)
+        await bilibili().Heartbeat(22957815, 38161588, session)
         await asyncio.sleep(20)
         print('结束获取视频观看经验')
 
@@ -419,4 +424,4 @@ async def GetVideoExpPlus():
 
 async def GetExpinit():
     await GetVideoExpPlus()
-    await BiliTimer.append2list_jobs(GetExpinit, seconds_until_tomorrow() + 300)
+    await Tasks.appendtask(GetExpinit, seconds_until_tomorrow() + 300)

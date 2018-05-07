@@ -704,13 +704,7 @@ class bilibili():
         json_response = await response.json(content_type=None)
         return json_response
 
-    async def ReqGetVdieoCid(self, session, video_id):
-        url = f'https://www.bilibili.com/video/av{video_id}/'
-        response = await session.get(url, headers=self.dic_bilibili['pcheaders'])
-        cid = re.match(r'(?<="cid":)\d+(?=,)', await response.text())
-        return cid
-
-    async def Heartbeat(self, aid, cid, alltime, session):
+    async def Heartbeat(self, aid, cid, session):
         url = 'https://api.bilibili.com/x/report/web/heartbeat'
         data = {'aid': aid, 'cid': cid, 'mid': self.dic_bilibili['uid'], 'csrf': self.dic_bilibili['csrf'],
                 'played_time': 0, 'realtime': 0,
@@ -718,7 +712,15 @@ class bilibili():
         await session.post(url, data=data, headers=self.dic_bilibili['pcheaders'])
 
     async def ReqUserInfo(self, session):
-        url='https://account.bilibili.com/home/userInfo'
+        url = 'https://account.bilibili.com/home/userInfo'
+        response = await session.get(url, headers=self.dic_bilibili['pcheaders'])
+        json_response = await response.json(content_type=None)
+        return json_response['data']
+
+    async def ReqVideoInfo(self, video_aid, session):
+        temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&aid={video_aid}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&ts={CurrentTime()}'
+        sign = self.calc_sign(temp_params)
+        url = f'https://app.bilibili.com/x/v2/view/page?{temp_params}&sign={sign}'
         response = await session.get(url, headers=self.dic_bilibili['pcheaders'])
         json_response = await response.json(content_type=None)
         return json_response['data']
