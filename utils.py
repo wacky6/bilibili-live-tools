@@ -376,8 +376,9 @@ async def GetTopVideoList():
 
 async def GetVideoCid(video_aid):
     async with aiohttp.ClientSession() as session:
-        json_rsp = await bilibili().ReqVideoInfo(video_aid, session)
-        print(json_rsp['pages'][0]['cid'])
+        json_rsp = await bilibili().ReqVideoCid(video_aid, session)
+        print(json_rsp)
+        print(json_rsp[0]['cid'])
 
 async def GetUesrInfo():
     async with aiohttp.ClientSession() as session:
