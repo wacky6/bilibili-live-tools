@@ -700,37 +700,25 @@ class bilibili():
 
     async def ReqCoinExp(self, session):
         url = 'https://www.bilibili.com/plus/account/exp.php'
-        pcheaders = self.dic_bilibili['pcheaders'].copy()
-        response = await session.post(url, headers=pcheaders)
+        response = await session.post(url, headers=self.dic_bilibili['pcheaders'])
         json_response = await response.json(content_type=None)
         return json_response
 
-    async def ReqGetVdieoCid(self, session, vedio_id):
-        url = f'https://www.bilibili.com/video/av{vedio_id}/'
-        pchearders = self.dic_bilibili['pcheaders'].copy()
-        response = await session.get(url, headers=pchearders)
+    async def ReqGetVdieoCid(self, session, video_id):
+        url = f'https://www.bilibili.com/video/av{video_id}/'
+        response = await session.get(url, headers=self.dic_bilibili['pcheaders'])
         cid = re.match(r'(?<="cid":)\d+(?=,)', await response.text())
         return cid
 
-    async def ReqVedioLength(self, session, vedio_id, vedio_cid, vedio_sign):
-        temp_params = f'?cid={vedio_cid}&appkey=84956560bc028eb7&otype=json&type=&quality=80&qn=112&sign={vedio_sign}'
-        url = 'https://interface.bilibili.com/v2/playurl' + temp_params
-        pchearders = self.dic_bilibili['pcheaders'].copy()
-        response = await session.get(url, headers=pchearders)
-        json_response = await response.json(content_type=None)
-        return int(json_response['timelength'])
-
     async def Heartbeat(self, aid, cid, alltime, session):
         url = 'https://api.bilibili.com/x/report/web/heartbeat'
-        pchearders = self.dic_bilibili['pcheaders'].copy()
         data = {'aid': aid, 'cid': cid, 'mid': self.dic_bilibili['uid'], 'csrf': self.dic_bilibili['csrf'],
                 'played_time': 0, 'realtime': 0,
                 'start_ts': int(time.time()), 'type': 3, 'dt': 2, 'play_type': 1}
-        await session.post(url, data=data, headers=pchearders)
+        await session.post(url, data=data, headers=self.dic_bilibili['pcheaders'])
 
     async def ReqUserInfo(self, session):
         url='https://account.bilibili.com/home/userInfo'
-        pchearders = self.dic_bilibili['pcheaders'].copy()
-        response = await session.get(url, headers=pchearders)
+        response = await session.get(url, headers=self.dic_bilibili['pcheaders'])
         json_response = await response.json(content_type=None)
         return json_response['data']

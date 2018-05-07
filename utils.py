@@ -390,7 +390,7 @@ async def CoinExp():
         return int(json_rsp["number"])
 
 
-async def GetTopVedioList():
+async def GetTopVideoList():
     async with aiohttp.ClientSession() as session:
         html = await session.get('https://www.bilibili.com/ranking/all/0/0/1/')
         list = re.findall(r'(?<=www.bilibili.com/video/av)\d+(?=/)', await html.text())
@@ -398,7 +398,7 @@ async def GetTopVedioList():
         return list
 
 
-async def GetVedioExp():
+async def GetVideoExp():
     async with aiohttp.ClientSession() as session:
         print('开始获取视频观看经验')
         await bilibili().Heartbeat(22957815, 38161588, 415, session)
@@ -412,11 +412,11 @@ async def GetUesrInfo():
         print(f'主站等级{json_rsp["level_info"]["current_level"]} {json_rsp["level_info"]["current_exp"]}/{json_rsp["level_info"]["next_exp"]}')
 
 
-async def GetVedioExpPlus():
+async def GetVideoExpPlus():
     await GetUesrInfo()
-    await GetVedioExp()
+    await GetVideoExp()
     await GetUesrInfo()
 
 async def GetExpinit():
-    await GetVedioExpPlus()
+    await GetVideoExpPlus()
     await BiliTimer.append2list_jobs(GetExpinit, seconds_until_tomorrow() + 300)
