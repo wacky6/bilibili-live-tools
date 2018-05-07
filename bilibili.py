@@ -725,7 +725,7 @@ class bilibili():
         pchearders = self.dic_bilibili['pcheaders'].copy()
         data = {'aid': aid, 'cid': cid, 'mid': self.dic_bilibili['uid'], 'csrf': self.dic_bilibili['csrf'],
                 'played_time': 0, 'realtime': 0,
-                'start_ts': int(time.time()) - alltime, 'type': 3, 'dt': 2, 'play_type': 1}
+                'start_ts': int(time.time()), 'type': 3, 'dt': 2, 'play_type': 1}
         await session.post(url, data=data, headers=pchearders)
 
     async def ReqUserInfo(self, session):

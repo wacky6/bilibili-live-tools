@@ -402,11 +402,21 @@ async def GetVedioExp():
     async with aiohttp.ClientSession() as session:
         print('开始获取视频观看经验')
         await bilibili().Heartbeat(22957815, 38161588, 415, session)
-        await asyncio.sleep(10)
+        await asyncio.sleep(20)
         print('结束获取视频观看经验')
 
 
 async def GetUesrInfo():
     async with aiohttp.ClientSession() as session:
-        json_rsp=await bilibili().ReqUserInfo(session)
-        printf(f'主站等级{json_rsp["level_info"]["current_level"]} {json_rsp["current_exp"]}/{json_rsp["next_exp"]}')
+        json_rsp = await bilibili().ReqUserInfo(session)
+        print(f'主站等级{json_rsp["level_info"]["current_level"]} {json_rsp["level_info"]["current_exp"]}/{json_rsp["level_info"]["next_exp"]}')
+
+
+async def GetVedioExpPlus():
+    await GetUesrInfo()
+    await GetVedioExp()
+    await GetUesrInfo()
+
+async def GetExpinit():
+    await GetVedioExpPlus()
+    await BiliTimer.append2list_jobs(GetExpinit, seconds_until_tomorrow() + 300)
