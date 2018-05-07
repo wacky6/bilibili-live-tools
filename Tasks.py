@@ -7,6 +7,7 @@ import utils
 from printer import Printer
 from bilitimer import BiliTimer
 import aiohttp
+import random
 
 # 获取每日包裹奖励
 async def Daily_bag():
@@ -160,7 +161,9 @@ async def GetVideoExp():
         if not (await utils.GetRewardInfo())['watch_av']:
             await utils.GetUesrInfo()
             print('开始获取视频观看经验')
-            await bilibili().Heartbeat(22957815, 38161588, session)
+            aid = (await utils.GetTopVideoList())[random.randint(0, 19)]
+            cid = await utils.GetVideoCid(aid)
+            await bilibili().Heartbeat(aid, cid, session)
             await asyncio.sleep(20)
             print('结束获取视频观看经验')
             await utils.GetUesrInfo()

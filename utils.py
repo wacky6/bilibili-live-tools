@@ -345,7 +345,7 @@ async def check_room_true(roomid):
         return param1, param2, param3
 
 async def GiveCoin2Av(video_id, num):
-    if num not in set((1, 2)):
+    if num not in (1, 2):
         return False
     async with aiohttp.ClientSession() as session:
         # 10004 稿件已经被删除
@@ -371,7 +371,7 @@ async def GetTopVideoList():
     async with aiohttp.ClientSession() as session:
         html = await session.get('https://www.bilibili.com/ranking/all/0/0/1/')
         list = re.findall(r'(?<=www.bilibili.com/video/av)\d+(?=/)', await html.text())
-        list = set(list)
+        list = list(set(list))
         return list
 
 async def GetVideoCid(video_aid):
@@ -388,6 +388,6 @@ async def GetUesrInfo():
 async def GetRewardInfo(show=True):
     async with aiohttp.ClientSession() as session:
         json_rsp = await bilibili().ReqMasterInfo(session)
-        num=await CoinExp(False)
-        if show:print(f'每日登陆：{json_rsp["login"]} 每日观看：{json_rsp["watch_av"]} 每日投币：{num}/50 每日分享：{json_rsp["share_av"]}')
+        num = await CoinExp(False)
+        if show: print(f'每日登陆：{json_rsp["login"]} 每日观看：{json_rsp["watch_av"]} 每日投币：{num}/50 每日分享：{json_rsp["share_av"]}')
         return json_rsp
