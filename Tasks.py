@@ -167,7 +167,7 @@ async def GetVideoExp():
             print('结束获取视频观看经验')
             await utils.GetUesrInfo()
             await utils.GetRewardInfo()
-        await BiliTimer.append2list_jobs(GetVideoExp(), utils.seconds_until_tomorrow() + 300)
+        await BiliTimer.append2list_jobs(GetVideoExp, utils.seconds_until_tomorrow() + 300)
 
 async def init():
     await BiliTimer.append2list_jobs(sliver2coin, 0)
