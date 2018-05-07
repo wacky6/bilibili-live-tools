@@ -726,3 +726,9 @@ class bilibili():
         response = await session.get(url, headers=self.dic_bilibili['appheaders'])
         json_response = await response.json(content_type=None)
         return json_response['data']
+
+    async def ReqVideoCid(self,video_aid:,session):
+        url=f'https://www.bilibili.com/widget/getPageList?aid={video_aid}'
+        response = await session.get(url, headers=self.dic_bilibili['appheaders'])
+        json_response = await response.json(content_type=None)
+        return json_response
