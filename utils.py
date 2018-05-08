@@ -350,12 +350,16 @@ async def GiveCoin2Av(video_id, num):
     async with aiohttp.ClientSession() as session:
         # 10004 稿件已经被删除
         # 34005 超过，满了
+        # -104 不足硬币
         json_rsp = await bilibili().ReqGiveCoin2Av(session, video_id, num)
-        if not json_rsp['code']:
+        code = json_rsp['code']
+        if not code:
             print(f'给视频av{video_id}投{num}枚硬币成功')
             return True
         else:
             print('投币失败', json_rsp['message'])
+            if code == -104:
+                return None
             return False
 
 async def CoinExp(show=True):

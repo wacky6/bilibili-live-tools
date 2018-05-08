@@ -181,7 +181,10 @@ async def GiveCoinTask():
     coin_remain = coin_set - coin_sent
     while coin_remain > 0:
         aid = (await utils.GetTopVideoList())[random.randint(0, 50)]
-        if (await utils.GiveCoin2Av(aid, 1)):
+        rsp = await utils.GiveCoin2Av(aid, 1)
+        if rsp is None:
+            break
+        elif rsp:
             coin_remain -= 1
             
     # b站傻逼有记录延迟，3点左右成功率高一点
