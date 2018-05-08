@@ -732,3 +732,10 @@ class bilibili():
         response = await session.get(url)
         json_response = await response.json(content_type=None)
         return json_response
+
+    async def DailyVideoShare(self, video_aid, session):
+        url = 'https://api.bilibili.com/x/web-interface/share/add'
+        data = {'aid': video_aid, 'jsonp': 'jsonp', 'csrf': self.dic_bilibili['csrf']}
+        response = await session.post(url, data=data, headers=self.dic_bilibili['pcheaders'])
+        json_response = await response.json(content_type=None)
+        return json_response
