@@ -196,7 +196,7 @@ async def GetVideoShareExp():
             print('开始获取视频分享经验')
             aid = (await utils.GetTopVideoList())[random.randint(0, 19)]
             await bilibili().DailyVideoShare(aid, session)
-            await asyncio.sleep(10)
+            await asyncio.sleep(3)
             print('结束获取视频分享经验')
             await utils.GetRewardInfo()
         await BiliTimer.append2list_jobs(GetVideoShareExp, utils.seconds_until_tomorrow() + 10800)
@@ -211,4 +211,5 @@ async def init():
     await BiliTimer.append2list_jobs(send_gift, 0)
     await BiliTimer.append2list_jobs(auto_send_gift, 0)
     await BiliTimer.append2list_jobs(GetVideoExp, 0)
+    await BiliTimer.append2list_jobs(GetVideoShareExp, 0)
     await BiliTimer.append2list_jobs(GiveCoinTask, 0)
