@@ -74,6 +74,7 @@ async def link_sign():
 async def send_gift():
     if ConfigLoader().dic_user['task_control']['clean-expiring-gift']:
         argvs = await utils.fetch_bag_list(printer=False)
+        # print(argvs)
         sent = False
         roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
         for i in argvs:
@@ -103,12 +104,14 @@ async def auto_send_gift():
         day_limit = a[2]
         left_score = int(day_limit) - int(today_feed)
         calculate = 0
+        # print(temp)
         for i in temp:
             gift_id = int(i[0])
             gift_num = int(i[1])
             bag_id = int(i[2])
             left_time = i[3]
             if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
+                # print(gift_id, bag_id)
                 if (gift_num * temp_dic[gift_id] <= left_score):
                     pass
                 elif left_score - temp_dic[gift_id] >= 0:
@@ -164,11 +167,26 @@ async def GetVideoExp():
             aid = (await utils.GetTopVideoList())[random.randint(0, 19)]
             cid = await utils.GetVideoCid(aid)
             await bilibili().Heartbeat(aid, cid, session)
-            await asyncio.sleep(20)
+            # await asyncio.sleep(20)
             print('结束获取视频观看经验')
             await utils.GetUesrInfo()
             await utils.GetRewardInfo()
-        await BiliTimer.append2list_jobs(GetVideoExp, utils.seconds_until_tomorrow() + 300)
+        # b站傻逼有记录延迟，3点左右成功率高一点
+        await BiliTimer.append2list_jobs(GetVideoExp, utils.seconds_until_tomorrow() + 10800)
+
+
+async def GiveCoinTask():
+    coin_sent = (await utils.CoinExp()) / 10
+    coin_set = int(ConfigLoader().dic_user['task_control']['givecoin'])
+    coin_remain = coin_set - coin_sent
+    while coin_remain > 0:
+        aid = (await utils.GetTopVideoList())[random.randint(0, 50)]
+        if (await utils.GiveCoin2Av(aid, 1)):
+            coin_remain -= 1
+            
+    # b站傻逼有记录延迟，3点左右成功率高一点
+    await BiliTimer.append2list_jobs(GiveCoinTask, utils.seconds_until_tomorrow() + 10800)
+            
 
 async def init():
     await BiliTimer.append2list_jobs(sliver2coin, 0)
@@ -180,3 +198,4 @@ async def init():
     await BiliTimer.append2list_jobs(send_gift, 0)
     await BiliTimer.append2list_jobs(auto_send_gift, 0)
     await BiliTimer.append2list_jobs(GetVideoExp, 0)
+    await BiliTimer.append2list_jobs(GiveCoinTask, 0)
