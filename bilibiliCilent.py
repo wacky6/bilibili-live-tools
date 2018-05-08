@@ -79,11 +79,6 @@ async def handle_1_room_TV(real_roomid):
         # print(json_response['data']['list'])
         checklen = json_response['data']['list']
         list_available_raffleid = []
-        if not checklen:
-            print('怀疑延迟，请反馈')
-            Rafflehandler.Put2Queue(handle_1_room_TV, (real_roomid,))
-            print(json_response)
-            return 
         for j in checklen:
             # await asyncio.sleep(random.uniform(0.5, 1))
             # resttime = j['dtime']
