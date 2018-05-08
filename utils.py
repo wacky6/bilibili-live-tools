@@ -370,15 +370,15 @@ async def CoinExp(show=True):
 async def GetTopVideoList():
     async with aiohttp.ClientSession() as session:
         html = await session.get('https://www.bilibili.com/ranking/all/0/0/1/')
-        list = re.findall(r'(?<=www.bilibili.com/video/av)\d+(?=/)', await html.text())
-        list = list(set(list))
-        return list
+        list_av = re.findall(r'(?<=www.bilibili.com/video/av)\d+(?=/)', await html.text())
+        list_av = list(set(list_av))
+        return list_av
 
 async def GetVideoCid(video_aid):
     async with aiohttp.ClientSession() as session:
         json_rsp = await bilibili().ReqVideoCid(video_aid, session)
-        print(json_rsp)
         print(json_rsp[0]['cid'])
+        return (json_rsp[0]['cid'])
 
 async def GetUesrInfo():
     async with aiohttp.ClientSession() as session:
