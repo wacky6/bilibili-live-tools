@@ -9,7 +9,6 @@ import requests
 import base64
 import aiohttp
 import asyncio
-import re
 
 reload(sys)
 
@@ -565,16 +564,8 @@ class bilibili():
     @staticmethod
     async def get_TV_result(TV_roomid, TV_raffleid):
         inst = bilibili.instance
-        url = f"{base_url}/gift/v2/smalltv/notice?roomid={TV_roomid}&raffleId={TV_raffleid}"
-        headers = {
-            'Accept': 'application/json, text/plain, */*',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-            'accept-encoding': 'gzip, async deflate',
-            'Host': 'api.live.bilibili.com',
-            'cookie': inst.dic_bilibili['cookie'],
-        }
-        response = await inst.bili_section_get(url, headers=headers)
+        url = f"{base_url}/gift/v3/smalltv/notice?type=small_tv&raffleId={TV_raffleid}"
+        response = await inst.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
         return response
 
     @staticmethod
