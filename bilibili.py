@@ -475,15 +475,20 @@ class bilibili():
         # response1 = await inst.bili_section_get(true_url, params=params, headers=headers)
         response1 = await inst.bili_section_get(true_url, headers=headers)
         return response1
-
+   
     @staticmethod
-    async def get_gift_of_TV(real_roomid, raffleid):
+    async def get_gift_of_TV(real_roomid, TV_raffleid):
         inst = bilibili.instance
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&id={raffleid}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&roomid={real_roomid}&ts={CurrentTime()}'
-        sign = inst.calc_sign(temp_params)
-        true_url = f'{base_url}/AppSmallTV/join?{temp_params}&sign={sign}'
-        response2 = await inst.bili_section_get(true_url, headers=inst.dic_bilibili['appheaders'])
-        return response2
+        url = f"{base_url}/gift/v3/smalltv/join"
+        payload = {
+            "roomid": real_roomid,
+            "raffleId": TV_raffleid, 
+            "type": "Gift", 
+            "csrf_token": inst.dic_bilibili['csrf']
+            }
+            
+        response = await inst.bili_section_post(url, data=payload, headers=inst.dic_bilibili['pcheaders'])
+        return response
 
     @staticmethod
     async def get_gift_of_captain(roomid, id):
@@ -510,14 +515,8 @@ class bilibili():
     @staticmethod
     async def get_giftlist_of_TV(real_roomid):
         inst = bilibili.instance
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&roomid={real_roomid}&ts={CurrentTime()}'
-        sign = inst.calc_sign(temp_params)
-        check_url = f'{base_url}/AppSmallTV/index?{temp_params}&sign={sign}'
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
-        }
-        response = await inst.bili_section_get(check_url, headers=headers)
-
+        url = f"{base_url}/gift/v3/smalltv/check?roomid={real_roomid}"
+        response = await inst.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
         return response
 
     @staticmethod
