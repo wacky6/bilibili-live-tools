@@ -3,6 +3,8 @@
 
 yjqiang分支是一个次分支，特别感谢主分支所有参与者的基础奠定
 
+docker使用 https://github.com/Muromi-Rikka/bilibili-live-tools-docker
+
 
 目前已完成：
 ------
