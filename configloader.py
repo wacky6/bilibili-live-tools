@@ -30,11 +30,7 @@ def load_bilibili(file):
         dic_bilibili['account']['username'] = username
         dic_bilibili['account']['password'] = password
         with open(file, 'w',encoding="utf-8") as f:
-            toml.dump(dic_bilibili, f)
-        dic_bilibili['account']['username'] = username
-        dic_bilibili['account']['password'] = password
-        
-    
+            toml.dump(dic_bilibili, f)    
             
     return dic_bilibili
     
