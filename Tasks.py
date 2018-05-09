@@ -176,7 +176,7 @@ async def GetVideoExp():
 
 async def GiveCoinTask():
     coin_sent = (await utils.CoinExp()) / 10
-    coin_set = int(ConfigLoader().dic_user['task_control']['givecoin'])
+    coin_set = min((ConfigLoader().dic_user['task_control']['givecoin']), 5)
     coin_remain = coin_set - coin_sent
     while coin_remain > 0:
         aid = (await utils.GetTopVideoList())[random.randint(0, 50)]
