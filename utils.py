@@ -7,8 +7,7 @@ from io import BytesIO
 import webbrowser
 import re
 import aiohttp
-import asyncio
-import Tasks
+
 
 def adjust_for_chinese(str):
     SPACE = '\N{IDEOGRAPHIC SPACE}'
@@ -101,7 +100,7 @@ def find_live_user_roomid(wanted_name):
         response = bilibili.request_search_user(wanted_name[:i])
         results = response.json()['result']
         if results is None:
-            print('屏蔽全名')
+            # print('屏蔽全名')
             continue
         for i in results:
             real_name = re.sub(r'<[^>]*>', '', i['uname'])
@@ -109,7 +108,21 @@ def find_live_user_roomid(wanted_name):
             if real_name == wanted_name:
                 print('找到结果', i['room_id'])
                 return i['room_id']
-        print('结束一次')
+        # print('结束一次')
+    print('备份模式启用，请反馈开发者')
+    for i in range(len(wanted_name)):
+        response = bilibili.request_search_user(wanted_name[i:])
+        results = response.json()['result']
+        if results is None:
+            # print('屏蔽全名')
+            continue
+        for i in results:
+            real_name = re.sub(r'<[^>]*>', '', i['uname'])
+            # print('去除干扰', real_name)
+            if real_name == wanted_name:
+                print('找到结果', i['room_id'])
+                return i['room_id']
+        # print('结束一次')
 
 async def fetch_capsule_info():
     json_response = await bilibili.request_fetch_capsule()
