@@ -77,9 +77,10 @@ async def send_gift():
         # print(argvs)
         sent = False
         roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
+        time_set = ConfigLoader().dic_user['task_control']['set-expiring-time']
         for i in argvs:
             left_time = i[3]
-            if left_time is not None and 0 < int(left_time) < 43200:  # 剩余时间少于半天时自动送礼
+            if left_time is not None and 0 < int(left_time) < time_set:  # 剩余时间少于半天时自动送礼
                 sent = True
                 giftID = i[0]
                 giftNum = i[1]
