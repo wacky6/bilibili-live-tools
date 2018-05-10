@@ -84,7 +84,7 @@ async def send_gift():
                 giftID = i[0]
                 giftNum = i[1]
                 bagID = i[2]
-                await utils.send_gift_web(roomID, giftID, giftNum, bagID)
+                await utils.send_gift_web(roomID, giftNum, bagID, giftID)
         if not sent:
             Printer().printlist_append(['join_lottery', '', 'user', "# 没有将要过期的礼物~"])
     await BiliTimer.append2list_jobs(send_gift, 21600)
@@ -119,7 +119,7 @@ async def auto_send_gift():
                 else:
                     continue
                 score = temp_dic[gift_id] * gift_num
-                await utils.send_gift_web(roomid, gift_id, gift_num, bag_id)
+                await utils.send_gift_web(roomid, gift_num, bag_id, gift_id)
                 calculate = calculate + score
                 left_score = left_score - score
         Printer().printlist_append(['join_lottery', '', 'user', "# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])

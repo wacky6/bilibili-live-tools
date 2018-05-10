@@ -61,10 +61,11 @@ def process_send_gift_web():
     Biliconsole.append2list_console([[True], utils.fetch_bag_list])
     bagid = input('请输入要发送的礼物编号:')
     # print('是谁', giftid)
-    giftnum = input('请输入要发送的礼物数目:')
+    giftnum = int(input('请输入要发送的礼物数目:'))
     roomid = input('请输入要发送的房间号:')
     real_roomid = fetch_real_roomid(roomid)
-    Biliconsole.append2list_console([[real_roomid, [[False, bagid], utils.fetch_bag_list], giftnum, bagid], utils.send_gift_web])
+    # Biliconsole.append2list_console([[real_roomid, [[False, bagid], utils.fetch_bag_list], giftnum, bagid], utils.send_gift_web])
+    Biliconsole.append2list_console([[real_roomid, giftnum, bagid], utils.send_gift_web])
     
     
 def preprocess_change_danmuji_roomid():

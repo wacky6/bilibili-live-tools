@@ -231,7 +231,7 @@ async def fetch_bag_list(verbose=False, bagid=None, printer=True):
             left_days = round(left_time / 86400, 1)
         if bagid is not None:
             if bag_id == int(bagid):
-                return gift_id
+                return gift_id, gift_num
         else:
             if verbose:
                 print(f'# 编号为{bag_id}的{gift_name:^3}X{gift_num:^4} (在{left_days:^6}天后过期)')
@@ -309,12 +309,15 @@ async def check_room(roomid):
     elif json_response['code'] == 60004:
         print(json_response['msg'])
 
-async def send_gift_web(roomid, giftid, giftnum, bagid):
+async def send_gift_web(roomid, num_wanted, bagid, giftid=None):
+    if giftid is None:
+        giftid, num_owned = await fetch_bag_list(False, bagid)
+        num_wanted = min(num_owned, num_wanted)
     json_response = await bilibili.request_check_room(roomid)
     ruid = json_response['data']['uid']
     biz_id = json_response['data']['room_id']
     # 200027 不足数目
-    json_response1 = await bilibili.request_send_gift_web(giftid, giftnum, bagid, ruid, biz_id)
+    json_response1 = await bilibili.request_send_gift_web(giftid, num_wanted, bagid, ruid, biz_id)
     if not json_response1['code']:
         # print(json_response1['data'])
         print(f'# 送出礼物: {json_response1["data"]["gift_name"]}X{json_response1["data"]["gift_num"]}')
