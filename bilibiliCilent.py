@@ -242,6 +242,16 @@ async def parseDanMu(messages):
             Printer().printlist_append(['join_lottery', '', 'user', f'检测到房间{roomid:^9}开通总督'], True)
             Rafflehandler.Put2Queue(handle_1_room_captain, (roomid,))
             Statistics.append2pushed_captainlist()
+        else:
+            a = re.compile(r"(.*)欢迎(.*)总督(.*)登船")
+            res = re.search(a, dic['msg'])
+            if res is not None:
+                print('请反馈')
+                roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
+                Printer().printlist_append(['join_lottery', '', 'user', f'检测到房间{roomid:^9}开通总督'], True)
+                Rafflehandler.Put2Queue(handle_1_room_captain, (roomid,))
+                Statistics.append2pushed_captainlist()
+            
                                                           
 
 class bilibiliClient():
