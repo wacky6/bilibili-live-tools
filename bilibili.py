@@ -243,8 +243,9 @@ class bilibili():
     @staticmethod
     async def request_fetch_user_infor_ios():
         inst = bilibili.instance
-        # 长串请求起作用的就这几个破玩意儿
-        url = f'{base_url}/mobile/getUser?access_key={inst.dic_bilibili["access_key"]}&platform=ios'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}'
+        sign = inst.calc_sign(temp_params)
+        url = f'{base_url}/mobile/getUser?{temp_params}&sign={sign}'
         response = await inst.bili_section_get(url)
         return response
 
@@ -258,62 +259,6 @@ class bilibili():
     @staticmethod
     def request_load_img(url):
         return requests.get(url)
-
-    @staticmethod
-    async def request_send_danmu_msg_andriod(msg, roomId):
-        inst = bilibili.instance
-        # url = f'{base_url}/api/sendmsg?'
-        # page ??
-        time = CurrentTime()
-        list_url = f'access_key={inst.dic_bilibili["access_key"]}&aid=&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&page=1'
-        sign = inst.calc_sign(list_url)
-
-        url = f'{base_url}/api/sendmsg?{list_url}&sign={sign}'
-
-        data = {
-            'access_key': inst.dic_bilibili['access_key'],
-            'actionKey': "appkey",
-            'appkey': inst.dic_bilibili['appkey'],
-            'build': inst.dic_bilibili['build'],
-            # 房间号
-            'cid': int(roomId),
-            # 颜色
-            'color': '16777215',
-            'device': inst.dic_bilibili['device'],
-            # 字体大小
-            'fontsize': '25',
-            # 实际上并不需要包含 mid 就可以正常发送弹幕, 但是真实的 Android 客户端确实发送了 mid
-            # 自己的用户 ID!!!!
-            'from': '',
-            # 'mid': '1008****'
-            'mobi_app': inst.dic_bilibili['mobi_app'],
-            # 弹幕模式
-            # 1 普通  4 底端  5 顶端 6 逆向  7 特殊   9 高级
-            # 一些模式需要 VIP
-            'mode': '1',
-            # 内容
-            "msg": msg,
-            'platform': inst.dic_bilibili['platform'],
-            # 播放时间
-            'playTime': '0.0',
-            # 弹幕池  尚且只见过为 0 的情况
-            'pool': '0',
-            # random   随机数
-            # 在 web 端发送弹幕, 该字段是固定的, 为用户进入直播页面的时间的时间戳. 但是在 Android 端, 这是一个随机数
-            # 该随机数不包括符号位有 9 位
-            # '1367301983632698015'
-            'rnd': str((int)(1000000000000000000.0 + 2000000000000000000.0 * random.random())),
-            "screen_state": '',
-            # 反正不管用 没实现的
-            'sign': sign,
-            'ts': time,
-            # 必须为 "json"
-            'type': "json"
-        }
-        # print('send msg app')
-
-        response = await inst.bili_section_post(url, headers=inst.dic_bilibili['appheaders'], data=data)
-        return response
 
     @staticmethod
     async def request_send_danmu_msg_web(msg, roomId):
@@ -353,7 +298,9 @@ class bilibili():
     @staticmethod
     async def ReqTitleInfo():
         inst = bilibili.instance
-        url = f'{base_url}/appUser/myTitleList?access_key={inst.dic_bilibili["access_key"]}'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}'
+        sign = inst.calc_sign(temp_params)
+        url = f'{base_url}/appUser/myTitleList?{temp_params}&sign={sign}'
         response = await inst.bili_section_get(url, headers=inst.dic_bilibili['appheaders'])
         return response
 

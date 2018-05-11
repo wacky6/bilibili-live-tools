@@ -113,7 +113,7 @@ options = {
     '4': utils.fetch_medal,  # async
     '5': utils.fetch_user_info,  # async
     '6': utils.check_taskinfo,  # async
-    '7': preprocess_send_danmu_msg_andriod,  # input async
+    '7': preprocess_send_danmu_msg_web,  # input async
     '8': preprocess_send_danmu_msg_web,  # input async
     '9': preprocess_check_room,  # input async
     '10': process_send_gift_web,  # input async !!!
