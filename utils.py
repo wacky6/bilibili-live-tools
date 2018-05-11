@@ -397,7 +397,7 @@ async def GetTopVideoList():
 async def GetVideoCid(video_aid):
     async with aiohttp.ClientSession() as session:
         json_rsp = await bilibili().ReqVideoCid(video_aid, session)
-        print(json_rsp[0]['cid'])
+        # print(json_rsp[0]['cid'])
         return (json_rsp[0]['cid'])
 
 async def GetUesrInfo():
@@ -408,6 +408,9 @@ async def GetUesrInfo():
 async def GetRewardInfo(show=True):
     async with aiohttp.ClientSession() as session:
         json_rsp = await bilibili().ReqMasterInfo(session)
-        num = await CoinExp(False)
-        if show: print(f'每日登陆：{json_rsp["login"]} 每日观看：{json_rsp["watch_av"]} 每日投币经验：{num}/50 每日分享：{json_rsp["share_av"]}')
-        return json_rsp
+        login = json_rsp['login']
+        watch_av = json_rsp['watch_av']
+        coins_av = json_rsp['coins_av']
+        share_av = json_rsp['share_av']
+        if show: print(f'每日登陆：{login} 每日观看：{watch_av} 每日投币经验：{coins_av}/50 每日分享：{share_av}')
+        return login, watch_av, coins_av, share_av

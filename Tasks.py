@@ -8,6 +8,7 @@ from printer import Printer
 from bilitimer import BiliTimer
 import aiohttp
 import random
+import sys
 
 # 获取每日包裹奖励
 async def Daily_bag():
@@ -161,24 +162,13 @@ async def sliver2coin():
     await BiliTimer.append2list_jobs(sliver2coin, 21600)
 
 async def GetVideoExp():
+    print('开始获取视频观看经验')
+    aid = (await utils.GetTopVideoList())[random.randint(0, 19)]
+    cid = await utils.GetVideoCid(aid)
     async with aiohttp.ClientSession() as session:
-        if not (await utils.GetRewardInfo())['watch_av']:
-            await utils.GetUesrInfo()
-            print('开始获取视频观看经验')
-            aid = (await utils.GetTopVideoList())[random.randint(0, 19)]
-            cid = await utils.GetVideoCid(aid)
-            await bilibili().Heartbeat(aid, cid, session)
-            # await asyncio.sleep(20)
-            print('结束获取视频观看经验')
-            await utils.GetUesrInfo()
-            await utils.GetRewardInfo()
-        # b站傻逼有记录延迟，3点左右成功率高一点
-        await BiliTimer.append2list_jobs(GetVideoExp, utils.seconds_until_tomorrow() + 10800)
+        await bilibili().Heartbeat(aid, cid, session)
 
-async def GiveCoinTask():
-    coin_sent = (await utils.CoinExp()) / 10
-    coin_set = min((ConfigLoader().dic_user['task_control']['givecoin']), 5)
-    coin_remain = coin_set - coin_sent
+async def GiveCoinTask(coin_remain):
     while coin_remain > 0:
         aid = (await utils.GetTopVideoList())[random.randint(0, 50)]
         rsp = await utils.GiveCoin2Av(aid, 1)
@@ -187,20 +177,31 @@ async def GiveCoinTask():
         elif rsp:
             coin_remain -= 1
 
-    # b站傻逼有记录延迟，3点左右成功率高一点
-    await BiliTimer.append2list_jobs(GiveCoinTask, utils.seconds_until_tomorrow() + 10800)
-
 async def GetVideoShareExp():
+    print('开始获取视频分享经验')
+    aid = (await utils.GetTopVideoList())[random.randint(0, 19)]
     async with aiohttp.ClientSession() as session:
-        if not (await utils.GetRewardInfo(False))['share_av']:
-            await utils.GetRewardInfo()
-            print('开始获取视频分享经验')
-            aid = (await utils.GetTopVideoList())[random.randint(0, 19)]
-            await bilibili().DailyVideoShare(aid, session)
-            await asyncio.sleep(3)
-            print('结束获取视频分享经验')
-            await utils.GetRewardInfo()
-        await BiliTimer.append2list_jobs(GetVideoShareExp, utils.seconds_until_tomorrow() + 10800)
+        await bilibili().DailyVideoShare(aid, session)
+
+async def BiliMainTask():
+    try:
+        await utils.GetUesrInfo()
+        login, watch_av, num, share_av= await utils.GetRewardInfo()
+    except :
+        # print('当前网络不好，正在重试，请反馈开发者!!!!')
+        print(sys.exc_info()[0], sys.exc_info()[1])
+        return 
+    if (not login) or not watch_av:
+        await GetVideoExp()
+    coin_sent = (num) / 10
+    coin_set = min((ConfigLoader().dic_user['task_control']['givecoin']), 5)
+    coin_remain = coin_set - coin_sent
+    await GiveCoinTask(coin_remain)
+    if not share_av:
+        await GetVideoShareExp()
+    # b站傻逼有记录延迟，3点左右成功率高一点
+    await BiliTimer.append2list_jobs(BiliMainTask, utils.seconds_until_tomorrow() + 10800)
+        
 
 async def init():
     await BiliTimer.append2list_jobs(sliver2coin, 0)
@@ -211,6 +212,5 @@ async def init():
     await BiliTimer.append2list_jobs(link_sign, 0)
     await BiliTimer.append2list_jobs(send_gift, 0)
     await BiliTimer.append2list_jobs(auto_send_gift, 0)
-    await BiliTimer.append2list_jobs(GetVideoExp, 0)
-    await BiliTimer.append2list_jobs(GetVideoShareExp, 0)
-    await BiliTimer.append2list_jobs(GiveCoinTask, 0)
+    await BiliTimer.append2list_jobs(BiliMainTask, 0)
+    
