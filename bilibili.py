@@ -2,7 +2,6 @@ import sys
 from imp import reload
 from configloader import ConfigLoader
 import hashlib
-import random
 import datetime
 import time
 import requests
@@ -43,14 +42,16 @@ base_url = 'https://api.live.bilibili.com'
 
 
 class bilibili():
-    __slots__ = ('dic_bilibili', 'bili_session')
+    __slots__ = ('dic_bilibili', 'bili_session', 'app_params')
     instance = None
 
     def __new__(cls, *args, **kw):
         if not cls.instance:
             cls.instance = super(bilibili, cls).__new__(cls, *args, **kw)
             cls.instance.dic_bilibili = ConfigLoader().dic_bilibili
+            dic_bilibili = ConfigLoader().dic_bilibili
             cls.instance.bili_session = None
+            cls.instance.app_params = f'actionKey={dic_bilibili["actionKey"]}&appkey={dic_bilibili["appkey"]}&build={dic_bilibili["build"]}&device={dic_bilibili["device"]}&mobi_app={dic_bilibili["mobi_app"]}&platform={dic_bilibili["platform"]}'
         return cls.instance
 
     @property
@@ -177,7 +178,7 @@ class bilibili():
     @staticmethod
     async def silver2coin_app():
         inst = bilibili.instance
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&ts={CurrentTime()}'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}&ts={CurrentTime()}'
         sign = inst.calc_sign(temp_params)
         app_url = f"{base_url}/AppExchange/silver2coin?{temp_params}&sign={sign}"
         response1 = await inst.bili_section_post(app_url, headers=inst.dic_bilibili['appheaders'])
@@ -243,7 +244,7 @@ class bilibili():
     @staticmethod
     async def request_fetch_user_infor_ios():
         inst = bilibili.instance
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}'
         sign = inst.calc_sign(temp_params)
         url = f'{base_url}/mobile/getUser?{temp_params}&sign={sign}'
         response = await inst.bili_section_get(url)
@@ -298,7 +299,7 @@ class bilibili():
     @staticmethod
     async def ReqTitleInfo():
         inst = bilibili.instance
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}'
         sign = inst.calc_sign(temp_params)
         url = f'{base_url}/appUser/myTitleList?{temp_params}&sign={sign}'
         response = await inst.bili_section_get(url, headers=inst.dic_bilibili['appheaders'])
@@ -353,7 +354,7 @@ class bilibili():
     @staticmethod
     def request_check_token():
         inst = bilibili.instance
-        list_url = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&ts={CurrentTime()}'
+        list_url = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}&ts={CurrentTime()}'
         list_cookie = inst.dic_bilibili['cookie'].split(';')
         params = ('&'.join(sorted(list_url.split('&') + list_cookie)))
         sign = inst.calc_sign(params)
@@ -526,7 +527,7 @@ class bilibili():
     async def apppost_heartbeat():
         inst = bilibili.instance
         time = CurrentTime()
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&ts={time}'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}&ts={time}'
         sign = inst.calc_sign(temp_params)
         url = f'{base_url}/mobile/userOnlineHeart?{temp_params}&sign={sign}'
         payload = {'roomid': 23058, 'scale': 'xhdpi'}
@@ -559,7 +560,7 @@ class bilibili():
     async def get_time_about_silver():
         inst = bilibili.instance
         time = CurrentTime()
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&ts={time}'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}&ts={time}'
         sign = inst.calc_sign(temp_params)
         GetTask_url = f'{base_url}/mobile/freeSilverCurrentTask?{temp_params}&sign={sign}'
         response = await inst.bili_section_get(GetTask_url, headers=inst.dic_bilibili['appheaders'])
@@ -569,7 +570,7 @@ class bilibili():
     async def get_silver(timestart, timeend):
         inst = bilibili.instance
         time = CurrentTime()
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&time_end={timeend}&time_start={timestart}&ts={time}'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}&time_end={timeend}&time_start={timestart}&ts={time}'
         sign = inst.calc_sign(temp_params)
         url = f'{base_url}/mobile/freeSilverAward?{temp_params}&sign={sign}'
         response = await inst.bili_section_get(url, headers=inst.dic_bilibili['appheaders'])
