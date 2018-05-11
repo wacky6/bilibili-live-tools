@@ -353,7 +353,7 @@ class bilibili():
     @staticmethod
     def request_check_token():
         inst = bilibili.instance
-        list_url = f'access_key={inst.dic_bilibili["access_key"]}&appkey={inst.dic_bilibili["appkey"]}&access_token={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&ts={CurrentTime()}'
+        list_url = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&ts={CurrentTime()}'
         list_cookie = inst.dic_bilibili['cookie'].split(';')
         params = ('&'.join(sorted(list_url.split('&') + list_cookie)))
         sign = inst.calc_sign(params)
@@ -608,7 +608,7 @@ class bilibili():
     @staticmethod
     async def assign_group(session, i1, i2):
         inst = bilibili.instance
-        temp_params = f'_device={inst.dic_bilibili["device"]}&_hwid=SX1NL0wuHCsaKRt4BHhIfRguTXxOfj5WN1BkBTdLfhstTn9NfUouFiUV&access_key={inst.dic_bilibili["access_key"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&group_id={i1}&mobi_app={inst.dic_bilibili["mobi_app"]}&owner_id={i2}&platform={inst.dic_bilibili["platform"]}&src=xiaomi&trace_id=20171224024300024&ts={CurrentTime()}&version=5.20.1.520001'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&group_id={i1}&mobi_app={inst.dic_bilibili["mobi_app"]}&owner_id={i2}&platform={inst.dic_bilibili["platform"]}&ts={CurrentTime()}'
         sign = inst.calc_sign(temp_params)
         url = f'https://api.vc.bilibili.com/link_setting/v1/link_setting/sign_in?{temp_params}&sign={sign}'
         response = await session.get(url, headers=inst.dic_bilibili['appheaders'])
