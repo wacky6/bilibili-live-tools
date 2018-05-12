@@ -449,20 +449,20 @@ class bilibili():
     @staticmethod
     async def get_giftlist_of_events(text1):
         url = f'{base_url}/activity/v1/Raffle/check?roomid={text1}'
-        response = await bilibili.instance.bili_section_get(url)
+        response = await bilibili.instance.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
         return response
 
     @staticmethod
     async def get_giftlist_of_TV(real_roomid):
         inst = bilibili.instance
         url = f"{base_url}/gift/v3/smalltv/check?roomid={real_roomid}"
-        response = await inst.bili_section_get(url)
+        response = await inst.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
         return response
 
     @staticmethod
     async def get_giftlist_of_captain(roomid):
         true_url = f'{base_url}/lottery/v1/lottery/check?roomid={roomid}'
-        response1 = await bilibili.instance.bili_section_get(true_url)
+        response1 = await bilibili.instance.bili_section_get(true_url, headers=inst.dic_bilibili['pcheaders'])
         return response1
 
     @staticmethod

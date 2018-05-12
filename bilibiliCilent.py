@@ -87,7 +87,7 @@ async def handle_1_room_TV(real_roomid):
                 # print('未参加')
                 list_available_raffleid.append(raffleid)
             elif j['status'] == 2:
-                # print('过滤')
+                print('过滤')
                 pass
             else:
                 print(checklen)
@@ -154,7 +154,13 @@ async def handle_1_room_captain(roomid):
             print(json_response1)
         for j in json_response1['data']['guard']:
             id = j['id']
-            list_available_raffleid.append(id)
+            if j['status'] == 1:
+                # print('未参加')
+                list_available_raffleid.append(id)
+            elif j['status'] == 2:
+                print('过滤')
+                pass
+            
               
         tasklist = []
         num_available = len(list_available_raffleid)
