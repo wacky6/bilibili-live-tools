@@ -83,11 +83,12 @@ async def handle_1_room_TV(real_roomid):
             # await asyncio.sleep(random.uniform(0.5, 1))
             # resttime = j['dtime']
             raffleid = j['raffleId']
-            if j['status'] == 1:
+            status = j['status']
+            if status == 1:
                 # print('未参加')
                 list_available_raffleid.append(raffleid)
-            elif j['status'] == 2:
-                print('过滤')
+            elif status == 2:
+                # print('过滤')
                 pass
             else:
                 print(checklen)
@@ -154,12 +155,15 @@ async def handle_1_room_captain(roomid):
             print(json_response1)
         for j in json_response1['data']['guard']:
             id = j['id']
-            if j['status'] == 1:
+            status = j['status']
+            if status == 1:
                 # print('未参加')
                 list_available_raffleid.append(id)
-            elif j['status'] == 2:
-                print('过滤')
+            elif status == 2:
+                # print('过滤')
                 pass
+            else:
+                print(json_response1)
             
               
         tasklist = []
