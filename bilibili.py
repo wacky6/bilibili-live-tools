@@ -448,41 +448,21 @@ class bilibili():
 
     @staticmethod
     async def get_giftlist_of_events(text1):
-        headers = {
-            'Accept': 'application/json, text/plain, */*',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-            'accept-encoding': 'gzip, async deflate',
-            'Host': 'api.live.bilibili.com',
-        }
         url = f'{base_url}/activity/v1/Raffle/check?roomid={text1}'
-        response = await bilibili.instance.bili_section_get(url, headers=headers)
-
+        response = await bilibili.instance.bili_section_get(url)
         return response
 
     @staticmethod
     async def get_giftlist_of_TV(real_roomid):
         inst = bilibili.instance
         url = f"{base_url}/gift/v3/smalltv/check?roomid={real_roomid}"
-        response = await inst.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
+        response = await inst.bili_section_get(url)
         return response
 
     @staticmethod
     async def get_giftlist_of_captain(roomid):
         true_url = f'{base_url}/lottery/v1/lottery/check?roomid={roomid}'
-        headers = {
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q = 0.8",
-            "Accept-Encoding": "gzip,async deflate,br",
-            "Accept-Language": "zh-CN",
-            "DNT": "1",
-            "Cookie": "LIVE_BUVID=AUTO7715232653604550",
-            "Connection": "keep-alive",
-            "Cache-Control": "max-age =0",
-            "Host": "api.live.bilibili.com",
-            "Upgrade-Insecure-Requests": "1",
-            "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:59.0) Gecko/20100101 Firefox/59.0'
-        }
-        response1 = await bilibili.instance.bili_section_get(true_url, headers=headers)
+        response1 = await bilibili.instance.bili_section_get(true_url)
         return response1
 
     @staticmethod
