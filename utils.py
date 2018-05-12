@@ -95,7 +95,6 @@ async def send_danmu_msg_web(msg, roomId):
     print(json_response)
 
 def find_live_user_roomid(wanted_name):
-    print('期望名字', wanted_name)
     for i in range(len(wanted_name), 0, -1):
         response = bilibili.request_search_user(wanted_name[:i])
         results = response.json()['result']

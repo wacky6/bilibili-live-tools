@@ -444,7 +444,6 @@ class bilibili():
         join_url = f"{base_url}/lottery/v1/lottery/join"
         payload = {"roomid": roomid, "id": id, "type": "guard", "csrf_token": ''}
         response2 = await inst.bili_section_post(join_url, data=payload, headers=inst.dic_bilibili['pcheaders'])
-        print(response2)
         return response2
 
     @staticmethod
