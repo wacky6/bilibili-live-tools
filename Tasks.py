@@ -161,25 +161,25 @@ async def sliver2coin():
 
     await BiliTimer.append2list_jobs(sliver2coin, 21600)
 
-async def GetVideoExp():
+async def GetVideoExp(list_topvideo):
     print('开始获取视频观看经验')
-    aid = (await utils.GetTopVideoList())[random.randint(0, 19)]
+    aid = list_topvideo[random.randint(0, 19)]
     cid = await utils.GetVideoCid(aid)
     async with aiohttp.ClientSession() as session:
         await bilibili().Heartbeat(aid, cid, session)
 
-async def GiveCoinTask(coin_remain):
+async def GiveCoinTask(coin_remain, list_topvideo):
     while coin_remain > 0:
-        aid = (await utils.GetTopVideoList())[random.randint(0, 50)]
+        aid = list_topvideo[random.randint(0, 50)]
         rsp = await utils.GiveCoin2Av(aid, 1)
         if rsp is None:
             break
         elif rsp:
             coin_remain -= 1
 
-async def GetVideoShareExp():
+async def GetVideoShareExp(list_topvideo):
     print('开始获取视频分享经验')
-    aid = (await utils.GetTopVideoList())[random.randint(0, 19)]
+    aid = list_topvideo[random.randint(0, 19)]
     async with aiohttp.ClientSession() as session:
         await bilibili().DailyVideoShare(aid, session)
 
@@ -191,14 +191,15 @@ async def BiliMainTask():
         # print('当前网络不好，正在重试，请反馈开发者!!!!')
         print(sys.exc_info()[0], sys.exc_info()[1])
         return 
+    list_topvideo = await utils.GetTopVideoList()
     if (not login) or not watch_av:
-        await GetVideoExp()
+        await GetVideoExp(list_topvideo)
     coin_sent = (num) / 10
     coin_set = min((ConfigLoader().dic_user['task_control']['givecoin']), 5)
     coin_remain = coin_set - coin_sent
-    await GiveCoinTask(coin_remain)
+    await GiveCoinTask(coin_remain, list_topvideo)
     if not share_av:
-        await GetVideoShareExp()
+        await GetVideoShareExp(list_topvideo)
     # b站傻逼有记录延迟，3点左右成功率高一点
     await BiliTimer.append2list_jobs(BiliMainTask, utils.seconds_until_tomorrow() + 10800)
         
