@@ -637,14 +637,6 @@ class bilibili():
         json_response = await response.json(content_type=None)
         return json_response['data']
 
-    async def ReqVideoInfo(self, video_aid, session):
-        temp_params = f'access_key={self.dic_bilibili["access_key"]}&actionKey={self.dic_bilibili["actionKey"]}&aid={video_aid}&appkey={self.dic_bilibili["appkey"]}&build={self.dic_bilibili["build"]}&device={self.dic_bilibili["device"]}&mobi_app={self.dic_bilibili["mobi_app"]}&platform={self.dic_bilibili["platform"]}&ts={CurrentTime()}'
-        sign = self.calc_sign(temp_params)
-        url = f'https://app.bilibili.com/x/v2/view/page?{temp_params}&sign={sign}'
-        response = await session.get(url, headers=self.dic_bilibili['appheaders'])
-        json_response = await response.json(content_type=None)
-        return json_response['data']
-        
     async def ReqVideoCid(self, video_aid, session):
         url = f'https://www.bilibili.com/widget/getPageList?aid={video_aid}'
         response = await session.get(url)
