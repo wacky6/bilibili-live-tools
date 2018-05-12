@@ -291,7 +291,7 @@ class bilibili():
         url = f'{base_url}/live_user/v1/UserInfo/get_weared_medal'
         data = {
             'uid': inst.dic_bilibili['uid'],
-            'csrf_token': inst.dic_bilibili['csrf']
+            'csrf_token': ''
         }
         response = await inst.bili_section_post(url, data=data, headers=inst.dic_bilibili['pcheaders'])
         return response
@@ -432,7 +432,7 @@ class bilibili():
             "roomid": real_roomid,
             "raffleId": TV_raffleid, 
             "type": "Gift", 
-            "csrf_token": inst.dic_bilibili['csrf']
+            "csrf_token": ''
             }
             
         response = await inst.bili_section_post(url, data=payload, headers=inst.dic_bilibili['pcheaders'])
@@ -442,8 +442,9 @@ class bilibili():
     async def get_gift_of_captain(roomid, id):
         inst = bilibili.instance
         join_url = f"{base_url}/lottery/v1/lottery/join"
-        payload = {"roomid": roomid, "id": id, "type": "guard", "csrf_token": inst.dic_bilibili['csrf']}
+        payload = {"roomid": roomid, "id": id, "type": "guard", "csrf_token": ''}
         response2 = await inst.bili_section_post(join_url, data=payload, headers=inst.dic_bilibili['pcheaders'])
+        print(response2)
         return response2
 
     @staticmethod
@@ -613,12 +614,6 @@ class bilibili():
             'csrf': self.dic_bilibili['csrf']
         }
         response = await session.post(url, headers=pcheaders, data=data)
-        json_response = await response.json(content_type=None)
-        return json_response
-
-    async def ReqCoinExp(self, session):
-        url = 'https://www.bilibili.com/plus/account/exp.php'
-        response = await session.post(url, headers=self.dic_bilibili['pcheaders'])
         json_response = await response.json(content_type=None)
         return json_response
 

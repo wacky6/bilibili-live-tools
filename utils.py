@@ -378,15 +378,6 @@ async def GiveCoin2Av(video_id, num):
                 return None
             return False
 
-async def CoinExp(show=True):
-    async with aiohttp.ClientSession() as session:
-        json_rsp = await bilibili().ReqCoinExp(session)
-        if not json_rsp["code"]:
-            if show: print(f'今日已投币获取经验值为{json_rsp["number"]}exp')
-        else:
-            if show: print(f'获取已投币经验值失败,error_code={json_rsp["code"]},error_msg={json_rsp["message"]}')
-        return int(json_rsp["number"])
-
 async def GetTopVideoList():
     async with aiohttp.ClientSession() as session:
         html = await session.get('https://www.bilibili.com/ranking/all/0/0/1/')
