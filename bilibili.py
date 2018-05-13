@@ -461,8 +461,9 @@ class bilibili():
 
     @staticmethod
     async def get_giftlist_of_captain(roomid):
+        inst = bilibili.instance
         true_url = f'{base_url}/lottery/v1/lottery/check?roomid={roomid}'
-        response1 = await bilibili.instance.bili_section_get(true_url, headers=inst.dic_bilibili['pcheaders'])
+        response1 = await inst.bili_section_get(true_url, headers=inst.dic_bilibili['pcheaders'])
         return response1
 
     @staticmethod
