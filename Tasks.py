@@ -185,7 +185,6 @@ async def GetVideoShareExp(list_topvideo):
 
 async def BiliMainTask():
     try:
-        await utils.GetUesrInfo()
         login, watch_av, num, share_av= await utils.GetRewardInfo()
     except :
         # print('当前网络不好，正在重试，请反馈开发者!!!!')
