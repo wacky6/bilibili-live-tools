@@ -244,9 +244,8 @@ class bilibili():
     @staticmethod
     async def request_fetch_user_infor_ios():
         inst = bilibili.instance
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}'
-        sign = inst.calc_sign(temp_params)
-        url = f'{base_url}/mobile/getUser?{temp_params}&sign={sign}'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&platform=ios'
+        url = f'{base_url}/mobile/getUser?{temp_params}'
         response = await inst.bili_section_get(url)
         return response
 
