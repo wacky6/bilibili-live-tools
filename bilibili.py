@@ -448,6 +448,7 @@ class bilibili():
 
     @staticmethod
     async def get_giftlist_of_events(text1):
+        inst = bilibili.instance
         url = f'{base_url}/activity/v1/Raffle/check?roomid={text1}'
         response = await bilibili.instance.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
         return response
