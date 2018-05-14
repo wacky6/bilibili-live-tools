@@ -151,8 +151,7 @@ async def handle_1_room_captain(roomid):
                 break
             
         list_available_raffleid = []
-        if num > 1:
-            print(json_response1)
+        # guard这里领取后，list对应会消失，其实就没有status了，这里是为了统一
         for j in json_response1['data']['guard']:
             id = j['id']
             status = j['status']
