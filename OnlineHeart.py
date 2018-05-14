@@ -30,12 +30,13 @@ async def heart_gift():
 async def draw_lottery():
     for i in range(68, 90):
         json_response = await bilibili.get_lotterylist(i)
+        blacklist = ['test', 'TEST', '测试', '加密']
         # -400 不存在
         if not json_response['code']:
             temp = json_response['data']['title']
-            if "测试" in temp or 'test' in temp:
+            if any(word in temp for word in blacklist):
                 print("检测到疑似钓鱼类测试抽奖，默认不参与，请自行判断抽奖可参与性")
-                # print(url)
+                print(temp)
             else:
                 check = json_response['data']['typeB']
                 for g, value in enumerate(check):
