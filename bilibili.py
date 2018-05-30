@@ -364,10 +364,16 @@ class bilibili():
     @staticmethod
     def request_refresh_token():
         inst = bilibili.instance
-        data = f'access_token={inst.dic_bilibili["access_key"]}&appkey={inst.dic_bilibili["appkey"]}&refresh_token={inst.dic_bilibili["refresh_token"]}'
-        sign = inst.calc_sign(data)
-        url = f'https://passport.bilibili.com/api/oauth2/refreshToken?{data}&sign={sign}'
-        response1 = requests.post(url, headers=inst.dic_bilibili['appheaders'])
+        list_url = f'access_key={inst.dic_bilibili["access_key"]}&access_token={inst.dic_bilibili["access_key"]}&{inst.app_params}&refresh_token={inst.dic_bilibili["refresh_token"]}&ts={CurrentTime()}'
+        list_cookie = inst.dic_bilibili['cookie'].split(';')
+        params = ('&'.join(sorted(list_url.split('&') + list_cookie)))
+        sign = inst.calc_sign(params)
+        payload = f'{params}&sign={sign}'
+        # print(payload)
+        url = f'https://passport.bilibili.com/api/v2/oauth2/refresh_token'
+        appheaders = inst.dic_bilibili['appheaders'].copy()
+        appheaders['Content-type'] = "application/x-www-form-urlencoded"
+        response1 = requests.post(url, headers=appheaders, data=payload)
         return response1
 
     @staticmethod
