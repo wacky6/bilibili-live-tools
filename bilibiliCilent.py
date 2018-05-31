@@ -71,7 +71,7 @@ async def DanMuraffle(area_id, messages):
             try:
                 TV_url = dic['url']
                 real_roomid = dic['real_roomid']
-                print(dic)
+                # print(dic)
                 type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
                 Printer().printlist_append(['join_lottery', '小电视', 'user', f'{area_id}分区检测器检测到房间{real_roomid:^9}的{type_text}抽奖'], True)
                 # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
