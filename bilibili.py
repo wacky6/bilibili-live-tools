@@ -116,7 +116,13 @@ class bilibili():
         return response
 
     @staticmethod
-    def request_search_user(name):
+    def request_search_liveuser(name):
+        search_url = f'https://search.bilibili.com/api/search?search_type=live_user&keyword={name}&page=1'
+        response = requests.get(search_url)
+        return response
+
+    @staticmethod
+    def request_search_biliuser(name):
         search_url = f"https://search.bilibili.com/api/search?search_type=bili_user&keyword={name}"
         response = requests.get(search_url)
         return response
