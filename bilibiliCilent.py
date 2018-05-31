@@ -246,7 +246,7 @@ class bilibiliClient():
                         except:
                             continue
                         state = await DanMuraffle(self.area_id, messages)
-                        continue
+                        # continue
                     elif num == 5 or num == 6 or num == 7:
                         continue
                     else:
@@ -284,7 +284,7 @@ class bilibiliClient():
                         except:
                             continue
                         state = printDanMu(self.area_id, messages)
-                        continue
+                        # continue
                     elif num == 5 or num == 6 or num == 7:
                         continue
                     else:
