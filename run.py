@@ -2,7 +2,7 @@ import OnlineHeart
 import Silver
 import LotteryResult
 import Tasks
-from connect import connect
+import connect
 from rafflehandler import Rafflehandler
 import asyncio
 from printer import Printer
@@ -33,7 +33,12 @@ Statistics()
 rafflehandler = Rafflehandler()
 biliconsole.Biliconsole(loop, queue)
 
-danmu_connection = connect()
+
+list_roomid = connect.get_all()
+list_raffle_connection = [connect.RaffleConnect(*i) for i in list_roomid]
+list_raffle_connection_task = [i.run() for i in list_raffle_connection]
+
+danmu_connection = connect.connect()
 
 
 bili_timer = BiliTimer()
@@ -54,7 +59,7 @@ tasks = [
     
 ]
 try:
-    loop.run_until_complete(asyncio.wait(tasks))
+    loop.run_until_complete(asyncio.wait(tasks + list_raffle_connection_task))
 except KeyboardInterrupt:
     # print(sys.exc_info()[0], sys.exc_info()[1])
     if ConfigLoader().dic_user['other_control']['keep-login']:

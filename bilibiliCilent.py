@@ -12,19 +12,21 @@ import re
 import sys
 
 
-async def parseDanMu(messages):
-    # await bilibili.request_send_danmu_msg_andriod('hbhnukunkunk', 6149819)
-
+async def DanMuraffle(area_id, messages):
     try:
         dic = json.loads(messages)
     except:
         return
     cmd = dic['cmd']
-
+    '''
     if cmd == 'DANMU_MSG':
         # print(dic)
         Printer().printlist_append(['danmu', '弹幕', 'user', dic])
         return
+    '''    
+    if cmd == 'PREPARING':
+        Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器下播！将切换监听房间'], True)  
+        return False  
     if cmd == 'SYS_GIFT':
         if 'giftId' in dic.keys():
             if str(dic['giftId']) in bilibili.get_giftids_raffle_keys():
@@ -69,7 +71,9 @@ async def parseDanMu(messages):
             try:
                 TV_url = dic['url']
                 real_roomid = dic['real_roomid']
-                Printer().printlist_append(['join_lottery', '小电视', 'user', f'检测到房间{real_roomid:^9}的小电视抽奖'], True)
+                print(dic)
+                type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
+                Printer().printlist_append(['join_lottery', '小电视', 'user', f'{area_id}分区检测器检测到房间{real_roomid:^9}的{type_text}抽奖'], True)
                 # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
                 rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_TV, (real_roomid,))
                 Statistics.append2pushed_TVlist()
@@ -83,7 +87,7 @@ async def parseDanMu(messages):
         if res is not None:
             print(str(res.group()))
             roomid = utils.find_live_user_roomid(str(res.group()))
-            Printer().printlist_append(['join_lottery', '', 'user', f'检测到房间{roomid:^9}开通总督'], True)
+            Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{roomid:^9}开通总督'], True)
             rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_captain, (roomid,))
             Statistics.append2pushed_captainlist()
         else:
@@ -92,21 +96,41 @@ async def parseDanMu(messages):
             if res is not None:
                 print('请反馈')
                 roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
-                Printer().printlist_append(['join_lottery', '', 'user', f'检测到房间{roomid:^9}开通总督'], True)
+                Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{roomid:^9}开通总督'], True)
                 rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_captain, (roomid,))
                 Statistics.append2pushed_captainlist()
-            
+  
+def printDanMu(area_id, messages):
+
+    try:
+        dic = json.loads(messages)
+    except:
+        return
+    cmd = dic['cmd']
+
+    if cmd == 'DANMU_MSG':
+        # print(dic)
+        Printer().printlist_append(['danmu', '弹幕', 'user', dic])
+        return          
                                                           
 
 class bilibiliClient():
     
-    __slots__ = ('_reader', '_writer', 'connected', '_UserCount')
+    __slots__ = ('_reader', '_writer', 'connected', '_UserCount', 'roomid', 'raffle_handle', 'area_id')
 
-    def __init__(self):
+    def __init__(self, roomid=None, area_id=None):
         self._reader = None
         self._writer = None
         self.connected = False
         self._UserCount = 0
+        if roomid is None:
+            self.roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
+            self.area_id = 0
+            self.raffle_handle = False
+        else:
+            self.roomid = roomid
+            self.area_id = area_id
+            self.raffle_handle = True
 
         
     def close_connection(self):
@@ -121,9 +145,9 @@ class bilibiliClient():
             return False
         self._reader = reader
         self._writer = writer
-        if (await self.SendJoinChannel(ConfigLoader().dic_user['other_control']['default_monitor_roomid'])):
+        if (await self.SendJoinChannel(self.roomid)):
             self.connected = True
-            Printer().printlist_append(['join_lottery', '', 'user', '连接弹幕服务器成功'], True)
+            Printer().printlist_append(['join_lottery', '', 'user', f'连接弹幕服务器{self.roomid}成功'], True)
             # await self.ReceiveMessageLoop()
             return True
 
@@ -193,40 +217,81 @@ class bilibiliClient():
         return bytes_data
         
     async def ReceiveMessageLoop(self):
-        while self.connected:
-            tmp = await self.ReadSocketData(16)
-            if tmp is None:
-                break
-            
-            expr, = struct.unpack('!I', tmp[:4])
-
-            num, = struct.unpack('!I', tmp[8:12])
-
-            num2 = expr - 16
-
-            tmp = await self.ReadSocketData(num2)
-            if tmp is None:
-                break
-
-            if num2 != 0:
-                num -= 1
-                if num == 0 or num == 1 or num == 2:
-                    num3, = struct.unpack('!I', tmp)
-                    self._UserCount = num3
-                    continue
-                elif num == 3 or num == 4:
-                    try:
-                        messages = tmp.decode('utf-8')
-                    except:
+        state = None
+        if self.raffle_handle:
+            while self.connected:
+                tmp = await self.ReadSocketData(16)
+                if tmp is None:
+                    break
+                
+                expr, = struct.unpack('!I', tmp[:4])
+    
+                num, = struct.unpack('!I', tmp[8:12])
+    
+                num2 = expr - 16
+    
+                tmp = await self.ReadSocketData(num2)
+                if tmp is None:
+                    break
+    
+                if num2 != 0:
+                    num -= 1
+                    if num == 0 or num == 1 or num == 2:
+                        num3, = struct.unpack('!I', tmp)
+                        self._UserCount = num3
                         continue
-                    await parseDanMu(messages)
-                    continue
-                elif num == 5 or num == 6 or num == 7:
-                    continue
-                else:
-                    if num != 16:
-                        pass
+                    elif num == 3 or num == 4:
+                        try:
+                            messages = tmp.decode('utf-8')
+                        except:
+                            continue
+                        state = await DanMuraffle(self.area_id, messages)
+                        continue
+                    elif num == 5 or num == 6 or num == 7:
+                        continue
                     else:
+                        if num != 16:
+                            pass
+                        else:
+                            continue
+                if state is not None and not state:
+                    break
+        else:
+             while self.connected:
+                tmp = await self.ReadSocketData(16)
+                if tmp is None:
+                    break
+                
+                expr, = struct.unpack('!I', tmp[:4])
+    
+                num, = struct.unpack('!I', tmp[8:12])
+    
+                num2 = expr - 16
+    
+                tmp = await self.ReadSocketData(num2)
+                if tmp is None:
+                    break
+    
+                if num2 != 0:
+                    num -= 1
+                    if num == 0 or num == 1 or num == 2:
+                        num3, = struct.unpack('!I', tmp)
+                        self._UserCount = num3
                         continue
-                        
+                    elif num == 3 or num == 4:
+                        try:
+                            messages = tmp.decode('utf-8')
+                        except:
+                            continue
+                        state = printDanMu(self.area_id, messages)
+                        continue
+                    elif num == 5 or num == 6 or num == 7:
+                        continue
+                    else:
+                        if num != 16:
+                            pass
+                        else:
+                            continue  
+                if state is not None and not state:
+                    break         
     

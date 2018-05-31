@@ -51,9 +51,9 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid):
     # print('参与')
     await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
     json_response2 = await bilibili.get_gift_of_TV(real_roomid, raffleid)
-    Printer().printlist_append(['join_lottery', '小电视', 'user', f'参与了房间{real_roomid:^9}的小电视抽奖'], True)
+    Printer().printlist_append(['join_lottery', '小电视', 'user', f'参与了房间{real_roomid:^9}的道具抽奖'], True)
     Printer().printlist_append(
-        ['join_lottery', '小电视', 'user', "# 小电视道具抽奖状态: ", json_response2['msg']])
+        ['join_lottery', '小电视', 'user', "# 道具抽奖状态: ", json_response2['msg']])
     # -400不存在
     # -500繁忙
     if not json_response2['code']:
