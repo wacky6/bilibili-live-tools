@@ -36,7 +36,7 @@ async def DanMuraffle(area_id, messages):
                 giftId = dic['giftId']
                 Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
                 rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_activity, (giftId, text1, text2))
-                Statistics.append2pushed_activitylist()
+                Statistics.append2pushed_raffle('活动', area_id=area_id)
                         
             elif dic['giftId'] == 39:
                 Printer().printlist_append(['join_lottery', '', 'user', "节奏风暴"])
@@ -56,7 +56,7 @@ async def DanMuraffle(area_id, messages):
                     giftId = dic['giftId']
                     Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
                     rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_activity, (giftId, text1, text2))
-                    Statistics.append2pushed_activitylist()
+                    Statistics.append2pushed_raffle('活动', area_id=area_id)
                             
                 except:
                     pass
@@ -76,7 +76,7 @@ async def DanMuraffle(area_id, messages):
                 Printer().printlist_append(['join_lottery', '小电视', 'user', f'{area_id}分区检测器检测到房间{real_roomid:^9}的{type_text}抽奖'], True)
                 # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
                 rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_TV, (real_roomid,))
-                Statistics.append2pushed_TVlist()
+                Statistics.append2pushed_raffle(type_text, area_id=area_id)
                 
             except:
                 print('请联系开发者', dic)
@@ -89,7 +89,7 @@ async def DanMuraffle(area_id, messages):
             roomid = utils.find_live_user_roomid(str(res.group()))
             Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{roomid:^9}开通总督'], True)
             rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_captain, (roomid,))
-            Statistics.append2pushed_captainlist()
+            Statistics.append2pushed_raffle('总督', area_id=area_id)
         else:
             a = re.compile(r"(.*)欢迎(.*)总督(.*)登船")
             res = re.search(a, dic['msg'])
@@ -98,7 +98,7 @@ async def DanMuraffle(area_id, messages):
                 roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
                 Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{roomid:^9}开通总督'], True)
                 rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_captain, (roomid,))
-                Statistics.append2pushed_captainlist()
+                Statistics.append2pushed_raffle('总督', area_id=area_id)
   
 def printDanMu(area_id, messages):
 
