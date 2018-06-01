@@ -124,7 +124,8 @@ class RaffleConnect():
                 continue
             task_main = asyncio.ensure_future(self.danmuji.ReceiveMessageLoop())
             task_heartbeat = asyncio.ensure_future(self.danmuji.HeartbeatLoop())
-            finished, pending = await asyncio.wait([task_main, task_heartbeat], return_when=asyncio.FIRST_COMPLETED)
+            task_checkarea = asyncio.ensure_future(self.danmuji.CheckArea())
+            finished, pending = await asyncio.wait([task_main, task_heartbeat, task_checkarea], return_when=asyncio.FIRST_COMPLETED)
             print('# 弹幕姬异常或主动断开，处理完剩余信息后重连')
             self.danmuji.connected = False
             time_end = int(utils.CurrentTime())

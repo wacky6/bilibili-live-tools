@@ -614,6 +614,13 @@ class bilibili():
         url = f"{base_url}/gift/v2/live/room_gift_list?roomid=2721650&area_v2_id=86"
         res = await bilibili.instance.bili_section_get(url)
         return res
+        
+    @staticmethod
+    async def ReqRoomInfo(roomid):
+        inst = bilibili.instance
+        url = f"{base_url}/room/v1/Room/get_info?room_id={roomid}"
+        res = await inst.bili_section_get(url)
+        return res
 
     async def ReqGiveCoin2Av(self, session, video_id, num):
         url = 'https://api.bilibili.com/x/web-interface/coin/add'

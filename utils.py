@@ -439,3 +439,13 @@ async def GetRewardInfo(show=True):
         print(process_bar)
         if show: print(f'每日登陆：{login} 每日观看：{watch_av} 每日投币经验：{coins_av}/50 每日分享：{share_av}')
         return login, watch_av, coins_av, share_av
+        
+        
+async def FetchRoomArea(roomid):
+    json_response = await bilibili.ReqRoomInfo(roomid)
+
+    if not json_response['code']:
+        # print(json_response)
+        # print(json_response['data']['parent_area_id'])
+        return json_response['data']['parent_area_id']
+    

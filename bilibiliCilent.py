@@ -137,6 +137,15 @@ class bilibiliClient():
         self._writer.close()
         self.connected = False
         
+    async def CheckArea(self):
+        while self.connected:
+            # await asyncio.sleep(300)
+            area_id = await utils.FetchRoomArea(self.roomid)
+            if area_id != self.area_id:
+                print(f'主播更换分区{self.area_id}为{area_id}，即将切换至新的有效分区(请反馈)')
+                break
+            await asyncio.sleep(300)
+        
     async def connectServer(self):
         try:
             reader, writer = await asyncio.open_connection(ConfigLoader().dic_bilibili['_ChatHost'], ConfigLoader().dic_bilibili['_ChatPort'])
