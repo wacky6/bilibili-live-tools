@@ -12,7 +12,7 @@ import re
 import sys
 
 
-async def DanMuraffle(area_id, messages):
+async def DanMuraffle(area_id, connect_roomid, messages):
     try:
         dic = json.loads(messages)
     except:
@@ -95,7 +95,7 @@ async def DanMuraffle(area_id, messages):
             res = re.search(a, dic['msg'])
             if res is not None:
                 print('请反馈')
-                roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
+                roomid = connect_roomid
                 Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{roomid:^9}开通总督'], True)
                 rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_captain, (roomid,))
                 Statistics.append2pushed_raffle('总督', area_id=area_id)
@@ -254,7 +254,7 @@ class bilibiliClient():
                             messages = tmp.decode('utf-8')
                         except:
                             continue
-                        state = await DanMuraffle(self.area_id, messages)
+                        state = await DanMuraffle(self.area_id, self.roomid, messages)
                         # continue
                     elif num == 5 or num == 6 or num == 7:
                         continue
