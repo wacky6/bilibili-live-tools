@@ -6,6 +6,7 @@ from bilibili import bilibili
 from configloader import ConfigLoader
 import requests
 import random
+import time
 
      
 def check_state(roomid):
@@ -20,7 +21,33 @@ def get_all():
     # 2 游戏分区
     # 3 手游分区
     # 4 绘画分区  
-    for i in range(1,5):
+    try:
+        for i in range(1,5):
+            while True:
+                url = f'https://api.live.bilibili.com/room/v1/area/getRoomList?platform=web&parent_area_id={i}&cate_id=0&area_id=0&sort_type=online&page=1&page_size=30'
+                response = requests.get(url, timeout=3)
+                data = response.json()['data']
+                roomid = random.choice(data)['roomid']
+                # print(roomid)
+                state = check_state(roomid)
+                if state == 1:
+                    # print('ok')
+                    list_roomid.append((i, roomid))
+                    break
+                else:
+                    print("检测到房间未开播，立即尝试重新获取")
+    except:
+        time.sleep(5)
+        return get_all()
+    print(list_roomid)
+    return list_roomid
+
+def get_one(i):
+    # 1 娱乐分区
+    # 2 游戏分区
+    # 3 手游分区
+    # 4 绘画分区  
+    try:
         while True:
             url = f'https://api.live.bilibili.com/room/v1/area/getRoomList?platform=web&parent_area_id={i}&cate_id=0&area_id=0&sort_type=online&page=1&page_size=30'
             response = requests.get(url, timeout=3)
@@ -30,30 +57,12 @@ def get_all():
             state = check_state(roomid)
             if state == 1:
                 # print('ok')
-                list_roomid.append((i, roomid))
                 break
             else:
                 print("检测到房间未开播，立即尝试重新获取")
-    print(list_roomid)
-    return list_roomid
-
-def get_one(i):
-    # 1 娱乐分区
-    # 2 游戏分区
-    # 3 手游分区
-    # 4 绘画分区  
-    while True:
-        url = f'https://api.live.bilibili.com/room/v1/area/getRoomList?platform=web&parent_area_id={i}&cate_id=0&area_id=0&sort_type=online&page=1&page_size=30'
-        response = requests.get(url, timeout=3)
-        data = response.json()['data']
-        roomid = random.choice(data)['roomid']
-        # print(roomid)
-        state = check_state(roomid)
-        if state == 1:
-            # print('ok')
-            break
-        else:
-            print("检测到房间未开播，立即尝试重新获取")
+    except:
+        time.sleep(5)
+        return get_one(i)
     print(i, roomid)
     return i, roomid
 
@@ -87,6 +96,7 @@ class connect():
             time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
+                await self.danmuji.close_connection()
                 print('# 弹幕主程序退出，立即取消心跳模块')
             else:
                 await asyncio.wait(pending)
@@ -96,11 +106,11 @@ class connect():
                 await asyncio.sleep(5)
     
     @staticmethod        
-    def reconnect(roomid):
+    async def reconnect(roomid):
         ConfigLoader().dic_user['other_control']['default_monitor_roomid'] = roomid
         print('已经切换roomid')
         if connect.instance.danmuji is not None:
-            connect.instance.danmuji.close_connection()
+            await connect.instance.danmuji.close_connection()
         
         
         
@@ -131,6 +141,7 @@ class RaffleConnect():
             time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
+                await self.danmuji.close_connection()
                 print('# 弹幕主程序退出，立即取消心跳模块')
             else:
                 await asyncio.wait(pending)

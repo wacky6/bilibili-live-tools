@@ -5,7 +5,7 @@ import rafflehandler
 from configloader import ConfigLoader
 import utils
 import asyncio
-import random
+import websockets
 import struct
 import json
 import re
@@ -105,9 +105,10 @@ def printDanMu(area_id, messages):
     try:
         dic = json.loads(messages)
     except:
+        print(messages)
         return
     cmd = dic['cmd']
-
+    # print(cmd)
     if cmd == 'DANMU_MSG':
         # print(dic)
         Printer().printlist_append(['danmu', '弹幕', 'user', dic])
@@ -116,11 +117,10 @@ def printDanMu(area_id, messages):
 
 class bilibiliClient():
     
-    __slots__ = ('_reader', '_writer', 'connected', '_UserCount', 'roomid', 'raffle_handle', 'area_id')
+    __slots__ = ('ws', 'connected', '_UserCount', 'roomid', 'raffle_handle', 'area_id')
 
     def __init__(self, roomid=None, area_id=None):
-        self._reader = None
-        self._writer = None
+        self.ws = None
         self.connected = False
         self._UserCount = 0
         if roomid is None:
@@ -132,9 +132,12 @@ class bilibiliClient():
             self.area_id = area_id
             self.raffle_handle = True
 
-        
-    def close_connection(self):
-        self._writer.close()
+    # 待确认    
+    async def close_connection(self):
+        try: 
+            await self.ws.close()
+        except :
+            print('请联系开发者', sys.exc_info()[0], sys.exc_info()[1])
         self.connected = False
         
     async def CheckArea(self):
@@ -148,12 +151,11 @@ class bilibiliClient():
         
     async def connectServer(self):
         try:
-            reader, writer = await asyncio.open_connection(ConfigLoader().dic_bilibili['_ChatHost'], ConfigLoader().dic_bilibili['_ChatPort'])
+            self.ws = await websockets.connect('ws://broadcastlv.chat.bilibili.com:2244/sub')
         except:
             print("# 连接无法建立，请检查本地网络状况")
+            print(sys.exc_info()[0], sys.exc_info()[1])
             return False
-        self._reader = reader
-        self._writer = writer
         if (await self.SendJoinChannel(self.roomid)):
             self.connected = True
             Printer().printlist_append(['join_lottery', '', 'user', f'连接弹幕服务器{self.roomid}成功'], True)
@@ -168,8 +170,7 @@ class bilibiliClient():
             await asyncio.sleep(30)
 
     async def SendJoinChannel(self, channelId):
-        uid = (int)(100000000000000.0 + 200000000000000.0 * random.random())
-        body = '{"roomid":%s,"uid":%s}' % (channelId, uid)
+        body = f'{{"uid":0,"roomid":{channelId},"protover":1,"platform":"web","clientver":"1.3.3"}}'
         await self.SendSocketData(0, 16, ConfigLoader().dic_bilibili['_protocolversion'], 7, 1, body)
         return True
 
@@ -182,125 +183,112 @@ class bilibiliClient():
             sendbytes = sendbytes + bytearr
         # print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), sendbytes)
         try:
-            self._writer.write(sendbytes)
+            await self.ws.send(sendbytes)
+        except websockets.exceptions.ConnectionClosed:
+              print("# 主动关闭或者远端主动关闭.")
+              await self.ws.close()
+              self.connected = False
+              return None
         except:
             print(sys.exc_info()[0], sys.exc_info()[1])
             self.connected = False
 
-        await self._writer.drain()
-
-    async def ReadSocketData(self, len_wanted):
+    async def ReadSocketData(self):
         bytes_data = b''
-        if not len_wanted:
-            return bytes_data
-        len_remain = len_wanted
-        while len_remain != 0:
-            try:
-                tmp = await asyncio.wait_for(self._reader.read(len_remain), timeout=35.0)
-            except asyncio.TimeoutError:
-                print('# 由于心跳包30s一次，但是发现35内没有收到任何包，说明已经悄悄失联了，主动断开')
-                self._writer.close()
-                self.connected = False
-                return None
-            except ConnectionResetError:
-                print('# RESET，网络不稳定或者远端不正常断开')
-                self._writer.close()
-                self.connected = False
-                return None
-            except:
-                print(sys.exc_info()[0], sys.exc_info()[1])
-                print('请联系开发者')
-                self._writer.close()
-                self.connected = False
-                return None
-                
-            if not tmp:
-                print("# 主动关闭或者远端主动发来FIN")
-                self._writer.close()
-                self.connected = False
-                return None
-            else:
-                bytes_data = bytes_data + tmp
-                len_remain = len_remain - len(tmp)
-                
+        try:
+            bytes_data = await asyncio.wait_for(self.ws.recv(), timeout=35.0)
+            # print('hhhhh')
+        except asyncio.TimeoutError:
+              print('# 由于心跳包30s一次，但是发现35内没有收到任何包，说明已经悄悄失联了，主动断开')
+              await self.ws.close()  
+              self.connected = False
+              return None
+        except websockets.exceptions.ConnectionClosed:
+              print("# 主动关闭或者远端主动关闭")
+              await self.ws.close()
+              await self.ws.close()  
+              self.connected = False
+              return None
+        except:
+            #websockets.exceptions.ConnectionClosed'>
+            print(sys.exc_info()[0], sys.exc_info()[1])
+            print('请联系开发者')
+            await self.ws.close()
+            self.connected = False
+            return None
+        # print(tmp) 
+           
+        # print('测试0', bytes_data)                    
         return bytes_data
-        
+    
+                    
     async def ReceiveMessageLoop(self):
-        state = None
         if self.raffle_handle:
             while self.connected:
-                tmp = await self.ReadSocketData(16)
-                if tmp is None:
+                bytes_datas = await self.ReadSocketData()
+                if bytes_datas is None:
                     break
-                
-                expr, = struct.unpack('!I', tmp[:4])
-    
-                num, = struct.unpack('!I', tmp[8:12])
-    
-                num2 = expr - 16
-    
-                tmp = await self.ReadSocketData(num2)
-                if tmp is None:
-                    break
-    
-                if num2 != 0:
-                    num -= 1
-                    if num == 0 or num == 1 or num == 2:
-                        num3, = struct.unpack('!I', tmp)
-                        self._UserCount = num3
-                        continue
-                    elif num == 3 or num == 4:
-                        try:
-                            messages = tmp.decode('utf-8')
-                        except:
-                            continue
-                        state = await DanMuraffle(self.area_id, self.roomid, messages)
-                        # continue
-                    elif num == 5 or num == 6 or num == 7:
-                        continue
-                    else:
-                        if num != 16:
+                len_read = 0
+                while len_read < len(bytes_datas):
+                    state = None
+                    split_header = struct.unpack('!I2H2I', bytes_datas[len_read:16+len_read])
+                    len_data, len_header, ver, opt, seq = split_header
+                    remain_data = bytes_datas[len_read+16:len_read+len_data]
+        
+                    if len_data != 16:
+                        if opt == 3:
+                            num3, = struct.unpack('!I', remain_data)
+                            self._UserCount = num3
+                        elif opt == 5:
+                            try:
+                                messages = remain_data.decode('utf-8')
+                            except:
+                                self.connected = False
+                                print(bytes_datas[len_read:len_read + len_data])
+                            state = await DanMuraffle(self.area_id, self.roomid, messages)
+                        elif opt == 8:
                             pass
                         else:
-                            continue
-                if state is not None and not state:
-                    break
+                            self.connected = False
+                            print(bytes_datas[len_read:len_read + len_data])
+                                
+                    if state is not None and not state:
+                        return       
+                    len_read += len_data
         else:
-             while self.connected:
-                tmp = await self.ReadSocketData(16)
-                if tmp is None:
+            while self.connected:
+                bytes_datas = await self.ReadSocketData()
+                if bytes_datas is None:
                     break
-                
-                expr, = struct.unpack('!I', tmp[:4])
-    
-                num, = struct.unpack('!I', tmp[8:12])
-    
-                num2 = expr - 16
-    
-                tmp = await self.ReadSocketData(num2)
-                if tmp is None:
-                    break
-    
-                if num2 != 0:
-                    num -= 1
-                    if num == 0 or num == 1 or num == 2:
-                        num3, = struct.unpack('!I', tmp)
-                        self._UserCount = num3
-                        continue
-                    elif num == 3 or num == 4:
-                        try:
-                            messages = tmp.decode('utf-8')
-                        except:
-                            continue
-                        state = printDanMu(self.area_id, messages)
-                        # continue
-                    elif num == 5 or num == 6 or num == 7:
-                        continue
-                    else:
-                        if num != 16:
+                len_read = 0
+                # print(bytes_datas)
+                while len_read < len(bytes_datas):
+                    state = None
+                    split_header = struct.unpack('!I2H2I', bytes_datas[len_read:16 + len_read])
+                    len_data, len_header, ver, opt, seq = split_header
+                    remain_data = bytes_datas[len_read + 16:len_read + len_data]
+                    
+                    # print(split_header)
+                    if len_data != 16:
+                        if opt == 3:
+                            num3, = struct.unpack('!I', remain_data)
+                            self._UserCount = num3
+                        elif opt == 5:
+                            try:
+                                messages = remain_data.decode('utf-8')
+                            except:
+                                self.connected = False
+                                print('风风光光刚回家', bytes_datas[len_read:len_read + len_data])
+                            state = printDanMu(self.area_id, messages)
+                        elif opt == 8:
                             pass
                         else:
-                            continue  
-                if state is not None and not state:
-                    break         
+                            self.connected = False
+                            print(bytes_datas[len_read:len_read + len_data])
+                                
+                    if state is not None and not state:
+                        return       
+                    len_read += len_data 
+                    
+               
     
