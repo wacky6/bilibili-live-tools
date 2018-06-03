@@ -4,7 +4,7 @@
 yjqiang分支是一个次分支，特别感谢主分支所有参与者的基础奠定
 
 docker使用 https://github.com/Muromi-Rikka/bilibili-live-tools-docker
-
+pythonista(ios) https://www.jianshu.com/p/669e63b5ec2b
 
 目前已完成：
 ------
@@ -28,9 +28,11 @@ docker使用 https://github.com/Muromi-Rikka/bilibili-live-tools-docker
         主站每日任务（4个）
 
 version 1.0.0
-    基本稳定
+------
+      基本稳定
 
 version 1.1.0
+------
       抽奖繁忙重试机制建立（目前只支持了tv，因为只有这一个code）
       开始使用f string代替字符串加法或者format，f string大法好
       修复b站sb的屏蔽”御姐”用户名关键词这种（倒着切查，其实应该分词查看）
@@ -39,8 +41,14 @@ version 1.1.0
       其他细节的改变
 
 version 2.0
-      改了一堆。。。忘了，反正一堆
-         
+------
+      摩天大楼多房间
+      主站功能（投币分享等）支持
+      websocket弹幕
+      总督领取
+      token refresh and save cookie 
+      Queue队列
+      其他细节的改变   
       
         
 
