@@ -33,9 +33,7 @@ Statistics()
 rafflehandler = Rafflehandler()
 biliconsole.Biliconsole(loop, queue)
 
-
-list_roomid = connect.get_all()
-list_raffle_connection = [connect.RaffleConnect(*i) for i in list_roomid]
+list_raffle_connection = [connect.RaffleConnect(i) for i in range(1, 5)]
 list_raffle_connection_task = [i.run() for i in list_raffle_connection]
 
 danmu_connection = connect.connect()

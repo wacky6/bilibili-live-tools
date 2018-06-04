@@ -616,6 +616,18 @@ class bilibili():
         return res
         
     @staticmethod
+    async def req_realroomid(areaid):
+        url = f'{base_url}/room/v1/area/getRoomList?platform=web&parent_area_id={areaid}&cate_id=0&area_id=0&sort_type=online&page=1&page_size=30'
+        json_rsp = await bilibili.instance.bili_section_get(url)
+        return json_rsp
+     
+    @staticmethod
+    async def req_room_init(roomid):
+        url = f'{base_url}/room/v1/Room/room_init?id={roomid}'
+        json_rsp = await bilibili.instance.bili_section_get(url)
+        return json_rsp
+    
+    @staticmethod
     async def ReqRoomInfo(roomid):
         inst = bilibili.instance
         url = f"{base_url}/room/v1/Room/get_info?room_id={roomid}"
