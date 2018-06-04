@@ -90,15 +90,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
             Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{roomid:^9}开通总督'], True)
             rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_captain, (roomid,))
             Statistics.append2pushed_raffle('总督', area_id=area_id)
-        else:
-            a = re.compile(r"(.*)欢迎(.*)总督(.*)登船")
-            res = re.search(a, dic['msg'])
-            if res is not None:
-                print('请反馈')
-                roomid = connect_roomid
-                Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{roomid:^9}开通总督'], True)
-                rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_captain, (roomid,))
-                Statistics.append2pushed_raffle('总督', area_id=area_id)
+        
   
 def printDanMu(area_id, messages):
 
