@@ -81,11 +81,11 @@ async def DanMuraffle(area_id, connect_roomid, messages):
             except:
                 print('请联系开发者', dic)
     if cmd == 'GUARD_MSG':
-        print(dic)
+        # print(dic)
         a = re.compile(r"(?<=在主播 )\S+(?= 的直播间开通了总督)")
         res = re.search(a, dic['msg'])
         if res is not None:
-            print(str(res.group()))
+            # print(str(res.group()))
             name = str(res.group())
             Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{name:^9}开通总督'], True)
             rafflehandler.Rafflehandler.Put2Queue((((name,), utils.find_live_user_roomid),), rafflehandler.handle_1_room_captain)
