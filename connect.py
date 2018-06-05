@@ -23,7 +23,7 @@ async def get_one(areaid):
         state = await check_room_state(roomid)
         if state == 1:
             print(areaid, roomid)
-            return state
+            return roomid
             
     while True:
         json_rsp = await bilibili.req_realroomid(areaid)
