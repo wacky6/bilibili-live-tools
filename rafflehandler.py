@@ -30,15 +30,23 @@ class Rafflehandler:
             
             tasklist = []
             for i in list_raffle:
-                task = asyncio.ensure_future(i[0](*i[1]))
+                i = list(i)
+                i[0] = list(i[0])
+                for j in range(len(i[0])):
+                    if isinstance(i[0][j], tuple):
+                        # print('检测')
+                        # i[0] = list(i[0])
+                        i[0][j] = await i[0][j][1](*(i[0][j][0]))
+                # print(i)
+                task = asyncio.ensure_future(i[1](*i[0]))
                 tasklist.append(task)
             
             await asyncio.wait(tasklist, return_when=asyncio.ALL_COMPLETED)
             
     @staticmethod
-    def Put2Queue(func, value):
+    def Put2Queue(value, func):
         # print('welcome to appending')
-        Rafflehandler.instance.queue_raffle.put_nowait((func, value))
+        Rafflehandler.instance.queue_raffle.put_nowait((value, func))
         # print('appended')
         return
             
@@ -137,7 +145,7 @@ async def handle_1_room_TV(real_roomid):
             raffle_results = await asyncio.gather(*tasklist)
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
-                Rafflehandler.Put2Queue(handle_1_room_TV, (real_roomid,))
+                Rafflehandler.Put2Queue((real_roomid,), handle_1_room_TV)
 
 async def handle_1_room_activity(giftId, text1, text2):
     await asyncio.sleep(random.uniform(0.5, 1.5))
@@ -165,7 +173,7 @@ async def handle_1_room_activity(giftId, text1, text2):
             raffle_results = await asyncio.gather(*tasklist)
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
-                Rafflehandler.Put2Queue(handle_1_room_activity, (giftId, text1, text2))
+                Rafflehandler.Put2Queue((giftId, text1, text2), handle_1_room_activity)
             
 
 async def handle_1_room_captain(roomid):
@@ -209,7 +217,7 @@ async def handle_1_room_captain(roomid):
             raffle_results = await asyncio.gather(*tasklist)
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
-                Rafflehandler.Put2Queue(handle_1_room_captain, (roomid,))
+                Rafflehandler.Put2Queue((roomid,), handle_1_room_captain)
                 
          
 

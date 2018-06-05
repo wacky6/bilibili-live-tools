@@ -35,7 +35,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
                 text2 = dic['url']
                 giftId = dic['giftId']
                 Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
-                rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_activity, (giftId, text1, text2))
+                rafflehandler.Rafflehandler.Put2Queue((giftId, text1, text2), rafflehandler.handle_1_room_activity)
                 Statistics.append2pushed_raffle('活动', area_id=area_id)
                         
             elif dic['giftId'] == 39:
@@ -55,7 +55,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
                 try:
                     giftId = dic['giftId']
                     Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
-                    rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_activity, (giftId, text1, text2))
+                    rafflehandler.Rafflehandler.Put2Queue((giftId, text1, text2), rafflehandler.handle_1_room_activity)
                     Statistics.append2pushed_raffle('活动', area_id=area_id)
                             
                 except:
@@ -75,7 +75,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
                 type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
                 Printer().printlist_append(['join_lottery', '小电视', 'user', f'{area_id}分区检测器检测到房间{real_roomid:^9}的{type_text}抽奖'], True)
                 # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
-                rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_TV, (real_roomid,))
+                rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
                 Statistics.append2pushed_raffle(type_text, area_id=area_id)
                 
             except:
@@ -86,9 +86,9 @@ async def DanMuraffle(area_id, connect_roomid, messages):
         res = re.search(a, dic['msg'])
         if res is not None:
             print(str(res.group()))
-            roomid = utils.find_live_user_roomid(str(res.group()))
-            Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{roomid:^9}开通总督'], True)
-            rafflehandler.Rafflehandler.Put2Queue(rafflehandler.handle_1_room_captain, (roomid,))
+            name = str(res.group())
+            Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{name:^9}开通总督'], True)
+            rafflehandler.Rafflehandler.Put2Queue((((name,), utils.find_live_user_roomid),), rafflehandler.handle_1_room_captain)
             Statistics.append2pushed_raffle('总督', area_id=area_id)
         
   

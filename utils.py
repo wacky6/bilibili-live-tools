@@ -7,6 +7,7 @@ from io import BytesIO
 import webbrowser
 import re
 import aiohttp
+import asyncio
 
 
 def adjust_for_chinese(str):
@@ -94,7 +95,8 @@ async def send_danmu_msg_web(msg, roomId):
     json_response = await bilibili.request_send_danmu_msg_web(msg, roomId)
     print(json_response)
 
-def find_live_user_roomid(wanted_name):
+async def find_live_user_roomid(wanted_name):
+    await asyncio.sleep(0)
     for i in range(len(wanted_name), 0, -1):
         response = bilibili.request_search_biliuser(wanted_name[:i])
         results = response.json()['result']
