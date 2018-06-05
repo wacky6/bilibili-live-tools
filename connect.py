@@ -16,7 +16,15 @@ async def get_one(areaid):
     # 1 娱乐分区
     # 2 游戏分区
     # 3 手游分区
-    # 4 绘画分区  
+    # 4 绘画分区 
+    if areaid == 1:
+        roomid = 23058
+        # print(roomid)
+        state = await check_room_state(roomid)
+        if state == 1:
+            print(areaid, roomid)
+            return state
+            
     while True:
         json_rsp = await bilibili.req_realroomid(areaid)
         data = json_rsp['data']
