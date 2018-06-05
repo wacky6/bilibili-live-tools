@@ -42,7 +42,7 @@ base_url = 'https://api.live.bilibili.com'
 
 
 class bilibili():
-    __slots__ = ('dic_bilibili', 'bili_session', 'app_params')
+    __slots__ = ('dic_bilibili', 'bili_session', 'app_params', 'var_other_session')
     instance = None
 
     def __new__(cls, *args, **kw):
@@ -51,6 +51,7 @@ class bilibili():
             cls.instance.dic_bilibili = ConfigLoader().dic_bilibili
             dic_bilibili = ConfigLoader().dic_bilibili
             cls.instance.bili_session = None
+            cls.instance.var_other_session = None
             cls.instance.app_params = f'actionKey={dic_bilibili["actionKey"]}&appkey={dic_bilibili["appkey"]}&build={dic_bilibili["build"]}&device={dic_bilibili["device"]}&mobi_app={dic_bilibili["mobi_app"]}&platform={dic_bilibili["platform"]}'
         return cls.instance
 
@@ -60,6 +61,13 @@ class bilibili():
             self.bili_session = aiohttp.ClientSession()
             # print(0)
         return self.bili_session
+        
+    @property
+    def other_session(self):
+        if self.var_other_session is None:
+            self.var_other_session = aiohttp.ClientSession()
+            # print(0)
+        return self.var_other_session
 
     def calc_sign(self, str):
         str = f'{str}{self.dic_bilibili["app_secret"]}'
@@ -82,6 +90,34 @@ class bilibili():
         while True:
             try:
                 response = await self.bili_section.post(url, headers=headers, data=data)
+                json_response = await response.json(content_type=None)
+                tag = await replay_request(json_response['code'])
+                if tag:
+                    continue
+                return json_response
+            except:
+                # print('当前网络不好，正在重试，请反馈开发者!!!!')
+                # print(sys.exc_info()[0], sys.exc_info()[1])
+                continue
+
+    async def other_session_get(self, url, headers=None, data=None):
+        while True:
+            try:
+                response = await self.other_session.get(url, headers=headers, data=data)
+                json_response = await response.json(content_type=None)
+                tag = await replay_request(json_response['code'])
+                if tag:
+                    continue
+                return json_response
+            except:
+                # print('当前网络不好，正在重试，请反馈开发者!!!!')
+                # print(sys.exc_info()[0], sys.exc_info()[1])
+                continue
+                
+    async def other_session_post(self, url, headers=None, data=None):
+        while True:
+            try:
+                response = await self.other_session.post(url, headers=headers, data=data)
                 json_response = await response.json(content_type=None)
                 tag = await replay_request(json_response['code'])
                 if tag:
@@ -116,16 +152,18 @@ class bilibili():
         return response
 
     @staticmethod
-    def request_search_liveuser(name):
+    async def request_search_liveuser(name):
+        inst = bilibili.instance
         search_url = f'https://search.bilibili.com/api/search?search_type=live_user&keyword={name}&page=1'
-        response = requests.get(search_url)
-        return response
+        json_rsp = await inst.other_session_get(search_url)
+        return json_rsp
 
     @staticmethod
-    def request_search_biliuser(name):
+    async def request_search_biliuser(name):
+        inst = bilibili.instance
         search_url = f"https://search.bilibili.com/api/search?search_type=bili_user&keyword={name}"
-        response = requests.get(search_url)
-        return response
+        json_rsp = await inst.other_session_get(search_url)
+        return json_rsp
 
     @staticmethod
     async def request_fetch_capsule():
@@ -592,22 +630,20 @@ class bilibili():
         return response2
 
     @staticmethod
-    async def get_grouplist(session):
+    async def get_grouplist():
         inst = bilibili.instance
         url = "https://api.vc.bilibili.com/link_group/v1/member/my_groups"
-        response = await session.get(url, headers=inst.dic_bilibili['pcheaders'])
-        json_response = await response.json(content_type=None)
-        return json_response
+        json_rsp = await inst.other_session_get(url, headers=inst.dic_bilibili['pcheaders'])
+        return json_rsp
 
     @staticmethod
-    async def assign_group(session, i1, i2):
+    async def assign_group(i1, i2):
         inst = bilibili.instance
         temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&group_id={i1}&mobi_app={inst.dic_bilibili["mobi_app"]}&owner_id={i2}&platform={inst.dic_bilibili["platform"]}&ts={CurrentTime()}'
         sign = inst.calc_sign(temp_params)
         url = f'https://api.vc.bilibili.com/link_setting/v1/link_setting/sign_in?{temp_params}&sign={sign}'
-        response = await session.get(url, headers=inst.dic_bilibili['appheaders'])
-        json_response = await response.json(content_type=None)
-        return json_response
+        json_rsp = await inst.other_session_get(url, headers=inst.dic_bilibili['appheaders'])
+        return json_rsp
 
     @staticmethod
     async def gift_list():
@@ -634,7 +670,7 @@ class bilibili():
         res = await inst.bili_section_get(url)
         return res
 
-    async def ReqGiveCoin2Av(self, session, video_id, num):
+    async def ReqGiveCoin2Av(self, video_id, num):
         url = 'https://api.bilibili.com/x/web-interface/coin/add'
         pcheaders = self.dic_bilibili['pcheaders'].copy()
         pcheaders['referer'] = f'https://www.bilibili.com/video/av{video_id}'
@@ -644,34 +680,29 @@ class bilibili():
             'cross_domain': 'true',
             'csrf': self.dic_bilibili['csrf']
         }
-        response = await session.post(url, headers=pcheaders, data=data)
-        json_response = await response.json(content_type=None)
-        return json_response
+        json_rsp = await self.other_session_post(url, headers=pcheaders, data=data)
+        return json_rsp
 
-    async def Heartbeat(self, aid, cid, session):
+    async def Heartbeat(self, aid, cid):
         url = 'https://api.bilibili.com/x/report/web/heartbeat'
         data = {'aid': aid, 'cid': cid, 'mid': self.dic_bilibili['uid'], 'csrf': self.dic_bilibili['csrf'],
                 'played_time': 0, 'realtime': 0,
                 'start_ts': int(time.time()), 'type': 3, 'dt': 2, 'play_type': 1}
-        response = await session.post(url, data=data, headers=self.dic_bilibili['pcheaders'])
-        json_response = await response.json(content_type=None)
-        return json_response
+        json_rsp = await self.other_session_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
+        return json_rsp
 
-    async def ReqMasterInfo(self,session):
+    async def ReqMasterInfo(self):
         url = 'https://account.bilibili.com/home/reward'
-        response = await session.get(url, headers=self.dic_bilibili['pcheaders'])
-        json_response = await response.json(content_type=None)
-        return json_response['data']
+        json_rsp = await self.other_session_get(url, headers=self.dic_bilibili['pcheaders'])
+        return json_rsp['data']
 
-    async def ReqVideoCid(self, video_aid, session):
+    async def ReqVideoCid(self, video_aid):
         url = f'https://www.bilibili.com/widget/getPageList?aid={video_aid}'
-        response = await session.get(url)
-        json_response = await response.json(content_type=None)
-        return json_response
+        json_rsp = await self.other_session_get(url)
+        return json_rsp
 
-    async def DailyVideoShare(self, video_aid, session):
+    async def DailyVideoShare(self, video_aid):
         url = 'https://api.bilibili.com/x/web-interface/share/add'
         data = {'aid': video_aid, 'jsonp': 'jsonp', 'csrf': self.dic_bilibili['csrf']}
-        response = await session.post(url, data=data, headers=self.dic_bilibili['pcheaders'])
-        json_response = await response.json(content_type=None)
-        return json_response
+        json_rsp = await self.other_session_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
+        return json_rsp

@@ -7,7 +7,6 @@ from io import BytesIO
 import webbrowser
 import re
 import aiohttp
-import asyncio
 
 
 def adjust_for_chinese(str):
@@ -96,11 +95,10 @@ async def send_danmu_msg_web(msg, roomId):
     print(json_response)
 
 async def find_live_user_roomid(wanted_name):
-    await asyncio.sleep(0)
     print(wanted_name)
     for i in range(len(wanted_name), 0, -1):
-        response = bilibili.request_search_biliuser(wanted_name[:i])
-        results = response.json()['result']
+        json_rsp = await bilibili.request_search_biliuser(wanted_name[:i])
+        results = json_rsp['result']
         if results is None:
             # print('屏蔽全名')
             continue
@@ -114,8 +112,8 @@ async def find_live_user_roomid(wanted_name):
 
     print('第2备份启用')
     for i in range(len(wanted_name)):
-        response = bilibili.request_search_biliuser(wanted_name[i:])
-        results = response.json()['result']
+        json_rsp = await bilibili.request_search_biliuser(wanted_name[i:])
+        results = json_rsp['result']
         if results is None:
             # print('屏蔽全名')
             continue
@@ -128,8 +126,8 @@ async def find_live_user_roomid(wanted_name):
 
     print('第3备份启用')
     for i in range(len(wanted_name), 0, -1):
-        response = bilibili.request_search_liveuser(wanted_name[:i])
-        results = response.json()['result']
+        json_rsp = await bilibili.request_search_liveuser(wanted_name[:i])
+        results = json_rsp['result']
         if results is None:
             # print('屏蔽全名')
             continue
@@ -142,8 +140,8 @@ async def find_live_user_roomid(wanted_name):
 
     print('第4备份启用')
     for i in range(len(wanted_name)):
-        response = bilibili.request_search_liveuser(wanted_name[i:])
-        results = response.json()['result']
+        json_rsp = await bilibili.request_search_liveuser(wanted_name[i:])
+        results = json_rsp['result']
         if results is None:
             # print('屏蔽全名')
             continue
@@ -394,20 +392,19 @@ async def check_room_true(roomid):
 async def GiveCoin2Av(video_id, num):
     if num not in (1, 2):
         return False
-    async with aiohttp.ClientSession() as session:
-        # 10004 稿件已经被删除
-        # 34005 超过，满了
-        # -104 不足硬币
-        json_rsp = await bilibili().ReqGiveCoin2Av(session, video_id, num)
-        code = json_rsp['code']
-        if not code:
-            print(f'给视频av{video_id}投{num}枚硬币成功')
-            return True
-        else:
-            print('投币失败', json_rsp['message'])
-            if code == -104:
-                return None
-            return False
+    # 10004 稿件已经被删除
+    # 34005 超过，满了
+    # -104 不足硬币
+    json_rsp = await bilibili().ReqGiveCoin2Av(video_id, num)
+    code = json_rsp['code']
+    if not code:
+        print(f'给视频av{video_id}投{num}枚硬币成功')
+        return True
+    else:
+        print('投币失败', json_rsp['message'])
+        if code == -104:
+            return None
+        return False
 
 async def GetTopVideoList():
     async with aiohttp.ClientSession() as session:
@@ -417,32 +414,30 @@ async def GetTopVideoList():
         return list_av
 
 async def GetVideoCid(video_aid):
-    async with aiohttp.ClientSession() as session:
-        json_rsp = await bilibili().ReqVideoCid(video_aid, session)
-        # print(json_rsp[0]['cid'])
-        return (json_rsp[0]['cid'])
+    json_rsp = await bilibili().ReqVideoCid(video_aid)
+    # print(json_rsp[0]['cid'])
+    return (json_rsp[0]['cid'])
 
 async def GetRewardInfo(show=True):
-    async with aiohttp.ClientSession() as session:
-        json_rsp = await bilibili().ReqMasterInfo(session)
-        login = json_rsp['login']
-        watch_av = json_rsp['watch_av']
-        coins_av = json_rsp['coins_av']
-        share_av = json_rsp['share_av']
-        level_info = json_rsp["level_info"]
-        current_exp = level_info['current_exp']
-        next_exp = level_info['next_exp']
-        print(f'# 主站等级值 {level_info["current_level"]}')
-        print(f'# 主站经验值 {level_info["current_exp"]}')
-        print(f'# 主站剩余值 {- current_exp + next_exp}')
-        arrow = int(current_exp * 30 / next_exp)
-        line = 30 - arrow
-        percent = current_exp / next_exp * 100.0
-        process_bar = '# [' + '>' * arrow + '-' * line + ']' + '%.2f' % percent + '%'
-        print(process_bar)
-        if show: print(f'每日登陆：{login} 每日观看：{watch_av} 每日投币经验：{coins_av}/50 每日分享：{share_av}')
-        return login, watch_av, coins_av, share_av
-        
+    json_rsp = await bilibili().ReqMasterInfo()
+    login = json_rsp['login']
+    watch_av = json_rsp['watch_av']
+    coins_av = json_rsp['coins_av']
+    share_av = json_rsp['share_av']
+    level_info = json_rsp["level_info"]
+    current_exp = level_info['current_exp']
+    next_exp = level_info['next_exp']
+    print(f'# 主站等级值 {level_info["current_level"]}')
+    print(f'# 主站经验值 {level_info["current_exp"]}')
+    print(f'# 主站剩余值 {- current_exp + next_exp}')
+    arrow = int(current_exp * 30 / next_exp)
+    line = 30 - arrow
+    percent = current_exp / next_exp * 100.0
+    process_bar = '# [' + '>' * arrow + '-' * line + ']' + '%.2f' % percent + '%'
+    print(process_bar)
+    if show: print(f'每日登陆：{login} 每日观看：{watch_av} 每日投币经验：{coins_av}/50 每日分享：{share_av}')
+    return login, watch_av, coins_av, share_av
+    
         
 async def FetchRoomArea(roomid):
     json_response = await bilibili.ReqRoomInfo(roomid)

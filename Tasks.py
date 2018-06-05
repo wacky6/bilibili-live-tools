@@ -6,7 +6,6 @@ from configloader import ConfigLoader
 import utils
 from printer import Printer
 from bilitimer import BiliTimer
-import aiohttp
 import random
 import sys
 
@@ -47,8 +46,8 @@ async def Daily_Task():
     else:
         await BiliTimer.append2list_jobs(Daily_Task, 350)
 
-async def Sign1Group(session, i1, i2):
-    json_response = await bilibili.assign_group(session, i1, i2)
+async def Sign1Group(i1, i2):
+    json_response = await bilibili.assign_group(i1, i2)
     if not json_response['code']:
         if (json_response['data']['status']) == 1:
             Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 已应援过" % (i1)])
@@ -60,16 +59,15 @@ async def Sign1Group(session, i1, i2):
 
 # 应援团签到
 async def link_sign():
-    async with aiohttp.ClientSession() as session:
-        json_rsp = await bilibili.get_grouplist(session)
-        list_check = json_rsp['data']['list']
-        id_list = ((i['group_id'], i['owner_uid']) for i in list_check)
-        if list_check:
-            tasklist = []
-            for (i1, i2) in id_list:
-                task = asyncio.ensure_future(Sign1Group(session, i1, i2))
-                tasklist.append(task)
-            results = await asyncio.gather(*tasklist)
+    json_rsp = await bilibili.get_grouplist()
+    list_check = json_rsp['data']['list']
+    id_list = ((i['group_id'], i['owner_uid']) for i in list_check)
+    if list_check:
+        tasklist = []
+        for (i1, i2) in id_list:
+            task = asyncio.ensure_future(Sign1Group(i1, i2))
+            tasklist.append(task)
+        results = await asyncio.gather(*tasklist)
     await BiliTimer.append2list_jobs(link_sign, 21600)
 
 async def send_gift():
@@ -165,8 +163,7 @@ async def GetVideoExp(list_topvideo):
     print('开始获取视频观看经验')
     aid = list_topvideo[random.randint(0, 19)]
     cid = await utils.GetVideoCid(aid)
-    async with aiohttp.ClientSession() as session:
-        await bilibili().Heartbeat(aid, cid, session)
+    await bilibili().Heartbeat(aid, cid)
 
 async def GiveCoinTask(coin_remain, list_topvideo):
     while coin_remain > 0:
@@ -180,8 +177,7 @@ async def GiveCoinTask(coin_remain, list_topvideo):
 async def GetVideoShareExp(list_topvideo):
     print('开始获取视频分享经验')
     aid = list_topvideo[random.randint(0, 19)]
-    async with aiohttp.ClientSession() as session:
-        await bilibili().DailyVideoShare(aid, session)
+    await bilibili().DailyVideoShare(aid)
 
 async def BiliMainTask():
     try:
