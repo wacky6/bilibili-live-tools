@@ -270,16 +270,12 @@ async def vote_case(id, vote):
                
 async def judge():
     list_result = []
-    i = 10
     while True:
         id = await fetch_case()
         if id is None:
             print('本次未获取到案件')
-            i -= 1
             # await asyncio.sleep(1)
-            if len(list_result) >= 20 or not i:
-                break
-            continue
+            break
         vote = await check(id)
         await vote_case(id, vote)    
         print('投票结果', id, vote)
@@ -288,7 +284,7 @@ async def judge():
         print('______________________________')
         # await asyncio.sleep(1)
     print(list_result, f'共{len(list_result)}案例')
-    await BiliTimer.append2list_jobs(judge, utils.seconds_until_tomorrow() + 300)
+    await BiliTimer.append2list_jobs(judge, 3600)
         
 
 async def init():
