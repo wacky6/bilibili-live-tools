@@ -262,7 +262,7 @@ async def check(id):
                 
 async def vote_case(id, vote):
     if vote is None:
-        return False
+        vote = 3
     json_rsp = await bilibili().req_vote_case(id, vote)
     print(json_rsp)
     return True
@@ -288,7 +288,7 @@ async def judge():
         print('______________________________')
         # await asyncio.sleep(1)
     print(list_result, f'共{len(list_result)}案例')
-    await BiliTimer.append2list_jobs(judge, utils.seconds_until_tomorrow() + 21600)
+    await BiliTimer.append2list_jobs(judge, utils.seconds_until_tomorrow() + 300)
         
 
 async def init():

@@ -102,6 +102,8 @@ class bilibili():
                         if tag:
                             continue
                     return json_response
+                elif response.status == 403:
+                    print('403频繁')
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -118,6 +120,8 @@ class bilibili():
                         if tag:
                             continue
                     return json_response
+                elif response.status == 403:
+                    print('403频繁')
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -134,6 +138,8 @@ class bilibili():
                         if tag:
                             continue
                     return json_response
+                elif response.status == 403:
+                    print('403频繁')
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -150,6 +156,8 @@ class bilibili():
                         if tag:
                             continue
                     return json_response
+                elif response.status == 403:
+                    print('403频繁')
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -161,6 +169,8 @@ class bilibili():
                 response = await self.other_session.get(url, headers=headers, data=data)
                 if response.status == 200:
                     return await response.text()
+                elif response.status == 403:
+                    print('403频繁')
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
