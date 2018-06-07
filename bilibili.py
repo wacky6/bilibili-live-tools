@@ -8,6 +8,7 @@ import requests
 import base64
 import aiohttp
 import asyncio
+import random
 
 reload(sys)
 
@@ -17,12 +18,16 @@ def CurrentTime():
     return str(currenttime)
 
 
+def randomint():
+    return ''.join(str(random.choice(range(10))) for _ in range(17))
+
+
 def cnn_captcha(img):
     url = "http://101.236.6.31:8080/code"
     data = {"image": img}
-    ressponse = requests.post(url, data=data)
-    captcha = ressponse.text
-    print("此次登录出现验证码,识别结果为%s" % (captcha))
+    rsp = requests.post(url, data=data)
+    captcha = rsp.text
+    print(f'此次登录出现验证码,识别结果为{captcha}')
     return captcha
 
 
@@ -91,9 +96,10 @@ class bilibili():
             try:
                 response = await self.bili_section.post(url, headers=headers, data=data)
                 json_response = await response.json(content_type=None)
-                tag = await replay_request(json_response['code'])
-                if tag:
-                    continue
+                if isinstance(json_response, dict):
+                    tag = await replay_request(json_response['code'])
+                    if tag:
+                        continue
                 return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
@@ -105,9 +111,10 @@ class bilibili():
             try:
                 response = await self.other_session.get(url, headers=headers, data=data)
                 json_response = await response.json(content_type=None)
-                tag = await replay_request(json_response['code'])
-                if tag:
-                    continue
+                if isinstance(json_response, dict):
+                    tag = await replay_request(json_response['code'])
+                    if tag:
+                        continue
                 return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
@@ -119,9 +126,10 @@ class bilibili():
             try:
                 response = await self.other_session.post(url, headers=headers, data=data)
                 json_response = await response.json(content_type=None)
-                tag = await replay_request(json_response['code'])
-                if tag:
-                    continue
+                if isinstance(json_response, dict):
+                    tag = await replay_request(json_response['code'])
+                    if tag:
+                        continue
                 return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
@@ -134,13 +142,21 @@ class bilibili():
                 response = await self.bili_section.get(url, headers=headers, data=data)
                 json_response = await response.json(content_type=None)
                 tag = await replay_request(json_response['code'])
-                if tag:
-                    continue
+                if isinstance(json_response, dict):
+                    tag = await replay_request(json_response['code'])
+                    if tag:
+                        continue
                 return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
                 continue
+                
+    async def session_text_get(self, url, headers=None, data=None):
+        while True:
+            response = await self.other_section.get(url, headers=headers, data=data)
+            if response.status == 200:
+                return await response.text()
 
     @staticmethod
     async def request_playurl(cid):
@@ -706,3 +722,36 @@ class bilibili():
         data = {'aid': video_aid, 'jsonp': 'jsonp', 'csrf': self.dic_bilibili['csrf']}
         json_rsp = await self.other_session_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
         return json_rsp
+    
+    async def req_vote_case(self, id, vote):
+        url = 'http://api.bilibili.com/x/credit/jury/vote'
+        payload = {
+            "jsonp": "jsonp",
+            "cid": id,
+            "vote": vote,
+            "content": "",
+            "likes": "",
+            "hates": "",
+            "attr": "1",
+            "csrf": ConfigLoader().dic_bilibili['csrf']
+        }
+        json_rsp = await self.other_session_post(url, headers=self.dic_bilibili['pcheaders'], data=payload)
+        return json_rsp
+        
+    async def req_fetch_case(self):
+        url = 'http://api.bilibili.com/x/credit/jury/caseObtain'
+        json_rsp = await self.other_session_post(url, headers=self.dic_bilibili['pcheaders'])
+        return json_rsp
+        
+    async def req_check_voted(self, id):
+        headers = {
+            "Host": "api.bilibili.com",
+            "Referer": f'https://www.bilibili.com/judgement/vote/{id}',
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Cookie": self.dic_bilibili['pcheaders']['cookie']
+        }
+        url = f'https://api.bilibili.com/x/credit/jury/juryCase?jsonp=jsonp&callback=jQuery1720{randomint()}_{CurrentTime()}&cid={id}&_={CurrentTime()}'
+        text_rsp = await self.session_text_get(url, headers=headers)
+        # print(text_rsp)
+        return text_rsp

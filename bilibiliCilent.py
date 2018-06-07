@@ -16,6 +16,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
     try:
         dic = json.loads(messages)
     except:
+        print(messages)
         return
     cmd = dic['cmd']
     '''
@@ -28,7 +29,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
         Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器下播！将切换监听房间'], True)  
         return False  
     if cmd == 'SYS_GIFT':
-        if 'giftId' in dic.keys():
+        if 'giftId' in dic:
             if str(dic['giftId']) in bilibili.get_giftids_raffle_keys():
                 
                 text1 = dic['real_roomid']
@@ -65,9 +66,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
             Printer().printlist_append(['join_lottery', '普通送礼提示', 'user', ['普通送礼提示', dic['msg_text']]])
         return
     if cmd == 'SYS_MSG':
-        if dic.get('real_roomid', None) is None:
-            Printer().printlist_append(['join_lottery', '系统公告', 'user', dic['msg']])
-        else:
+        if 'real_roomid' in dic:
             try:
                 TV_url = dic['url']
                 real_roomid = dic['real_roomid']
@@ -80,6 +79,9 @@ async def DanMuraffle(area_id, connect_roomid, messages):
                 
             except:
                 print('请联系开发者', dic)
+        else:
+            Printer().printlist_append(['join_lottery', '系统公告', 'user', dic['msg']])
+
     if cmd == 'GUARD_MSG':
         # print(dic)
         a = re.compile(r"(?<=在主播 )\S+(?= 的直播间开通了总督)")

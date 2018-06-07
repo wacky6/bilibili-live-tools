@@ -8,6 +8,8 @@ from printer import Printer
 from bilitimer import BiliTimer
 import random
 import sys
+import re
+import json
 
 # 获取每日包裹奖励
 async def Daily_bag():
@@ -197,6 +199,93 @@ async def BiliMainTask():
         await GetVideoShareExp(list_topvideo)
     # b站傻逼有记录延迟，3点左右成功率高一点
     await BiliTimer.append2list_jobs(BiliMainTask, utils.seconds_until_tomorrow() + 10800)
+
+    
+async def fetch_case():
+    temp = await bilibili().req_fetch_case()
+    if not temp['code']:
+        id = temp['data']['id']
+        return id
+    # 25008 真给力 , 移交众裁的举报案件已经被处理完
+    # 25014 有时有时……
+    if temp['code'] == 25014 or 25008:
+        return
+
+
+async def check(id):
+    # 3放弃
+    # 2 否 voterule
+    # 4 删除 votedelete
+    # 1 封杀 votebreak
+    text_rsp = await bilibili().req_check_voted(id)
+    # print(response.text)
+        
+    pattern = re.compile(r'\((.+)\)')
+    match = pattern.findall(text_rsp)
+    if match:
+        # 使用Match获得分组信息
+        # print(match[0])
+        temp = match[0]
+    temp = json.loads(temp)
+    # print(temp)
+    # print(temp['data']['originUrl'])
+    data = temp['data']
+    print(data['originContent'])
+    votebreak = data['voteBreak']
+    voteDelete = data['voteDelete']
+    voteRule = data['voteRule']
+    voted = votebreak+voteDelete+voteRule
+    percent = voteRule / voted
+    print('目前已投票', voted)
+    print('认为不违反规定的比例', percent)
+    vote = None
+    if voted >= 400: 
+        if percent >= 0.8:
+            vote = 2
+        elif percent <= 0.2:
+            vote = 4
+    elif voted >= 150: 
+        if percent >= 0.9:
+            vote = 2
+        elif percent <= 0.1:
+            vote = 4
+    elif voted >= 50: 
+        if percent >= 0.97:
+            vote = 2
+        elif percent <= 0.03:
+            vote = 4
+    return vote
+    
+                
+async def vote_case(id, vote):
+    if vote is None:
+        return False
+    json_rsp = await bilibili().req_vote_case(id, vote)
+    print(json_rsp)
+    return True
+ 
+               
+async def judge():
+    list_result = []
+    i = 10
+    while True:
+        id = await fetch_case()
+        if id is None:
+            print('本次未获取到案件')
+            i -= 1
+            # await asyncio.sleep(1)
+            if len(list_result) >= 20 or not i:
+                break
+            continue
+        vote = await check(id)
+        await vote_case(id, vote)    
+        print('投票结果', id, vote)
+        list_result.append((id, vote))
+        
+        print('______________________________')
+        # await asyncio.sleep(1)
+    print(list_result, f'共{len(list_result)}案例')
+    await BiliTimer.append2list_jobs(judge, utils.seconds_until_tomorrow() + 21600)
         
 
 async def init():
@@ -209,4 +298,5 @@ async def init():
     await BiliTimer.append2list_jobs(send_gift, 0)
     await BiliTimer.append2list_jobs(auto_send_gift, 0)
     await BiliTimer.append2list_jobs(BiliMainTask, 0)
+    await BiliTimer.append2list_jobs(judge, 0)
     
