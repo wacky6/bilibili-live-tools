@@ -227,7 +227,7 @@ async def check(id):
         # print(match[0])
         temp = match[0]
     temp = json.loads(temp)
-    # print(temp)
+    print(temp)
     # print(temp['data']['originUrl'])
     data = temp['data']
     print(data['originContent'])
@@ -235,7 +235,10 @@ async def check(id):
     voteDelete = data['voteDelete']
     voteRule = data['voteRule']
     voted = votebreak+voteDelete+voteRule
-    percent = voteRule / voted
+    if voted:
+        percent = voteRule / voted
+    else:
+        percent = 0
     print('目前已投票', voted)
     print('认为不违反规定的比例', percent)
     vote = None
