@@ -95,12 +95,13 @@ class bilibili():
         while True:
             try:
                 response = await self.bili_section.post(url, headers=headers, data=data)
-                json_response = await response.json(content_type=None)
-                if isinstance(json_response, dict):
-                    tag = await replay_request(json_response['code'])
-                    if tag:
-                        continue
-                return json_response
+                if response.status == 200:
+                    json_response = await response.json(content_type=None)
+                    if isinstance(json_response, dict):
+                        tag = await replay_request(json_response['code'])
+                        if tag:
+                            continue
+                    return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -110,12 +111,13 @@ class bilibili():
         while True:
             try:
                 response = await self.other_session.get(url, headers=headers, data=data)
-                json_response = await response.json(content_type=None)
-                if isinstance(json_response, dict):
-                    tag = await replay_request(json_response['code'])
-                    if tag:
-                        continue
-                return json_response
+                if response.status == 200:
+                    json_response = await response.json(content_type=None)
+                    if isinstance(json_response, dict):
+                        tag = await replay_request(json_response['code'])
+                        if tag:
+                            continue
+                    return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -125,12 +127,13 @@ class bilibili():
         while True:
             try:
                 response = await self.other_session.post(url, headers=headers, data=data)
-                json_response = await response.json(content_type=None)
-                if isinstance(json_response, dict):
-                    tag = await replay_request(json_response['code'])
-                    if tag:
-                        continue
-                return json_response
+                if response.status == 200:
+                    json_response = await response.json(content_type=None)
+                    if isinstance(json_response, dict):
+                        tag = await replay_request(json_response['code'])
+                        if tag:
+                            continue
+                    return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -140,13 +143,13 @@ class bilibili():
         while True:
             try:
                 response = await self.bili_section.get(url, headers=headers, data=data)
-                json_response = await response.json(content_type=None)
-                tag = await replay_request(json_response['code'])
-                if isinstance(json_response, dict):
-                    tag = await replay_request(json_response['code'])
-                    if tag:
-                        continue
-                return json_response
+                if response.status == 200:
+                    json_response = await response.json(content_type=None)
+                    if isinstance(json_response, dict):
+                        tag = await replay_request(json_response['code'])
+                        if tag:
+                            continue
+                    return json_response
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 # print(sys.exc_info()[0], sys.exc_info()[1])
@@ -154,9 +157,14 @@ class bilibili():
                 
     async def session_text_get(self, url, headers=None, data=None):
         while True:
-            response = await self.other_section.get(url, headers=headers, data=data)
-            if response.status == 200:
-                return await response.text()
+            try:
+                response = await self.other_session.get(url, headers=headers, data=data)
+                if response.status == 200:
+                    return await response.text()
+            except:
+                # print('当前网络不好，正在重试，请反馈开发者!!!!')
+                # print(sys.exc_info()[0], sys.exc_info()[1])
+                continue
 
     @staticmethod
     async def request_playurl(cid):
@@ -722,6 +730,10 @@ class bilibili():
         data = {'aid': video_aid, 'jsonp': 'jsonp', 'csrf': self.dic_bilibili['csrf']}
         json_rsp = await self.other_session_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
         return json_rsp
+    
+    async def req_fetch_av(self):
+        text_tsp = await self.session_text_get('https://www.bilibili.com/ranking/all/0/0/1/')
+        return text_tsp
     
     async def req_vote_case(self, id, vote):
         url = 'http://api.bilibili.com/x/credit/jury/vote'

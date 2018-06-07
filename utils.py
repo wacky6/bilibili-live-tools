@@ -6,7 +6,6 @@ from PIL import Image
 from io import BytesIO
 import webbrowser
 import re
-import aiohttp
 
 
 def adjust_for_chinese(str):
@@ -407,11 +406,10 @@ async def GiveCoin2Av(video_id, num):
         return False
 
 async def GetTopVideoList():
-    async with aiohttp.ClientSession() as session:
-        html = await session.get('https://www.bilibili.com/ranking/all/0/0/1/')
-        list_av = re.findall(r'(?<=www.bilibili.com/video/av)\d+(?=/)', await html.text())
-        list_av = list(set(list_av))
-        return list_av
+    text_rsp = await bilibili().req_fetch_av()
+    list_av = re.findall(r'(?<=www.bilibili.com/video/av)\d+(?=/)', text_rsp)
+    list_av = list(set(list_av))
+    return list_av
 
 async def GetVideoCid(video_aid):
     json_rsp = await bilibili().ReqVideoCid(video_aid)

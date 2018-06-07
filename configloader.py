@@ -1,6 +1,4 @@
-import configparser
 import webcolors
-import codecs
 import toml
 
 
