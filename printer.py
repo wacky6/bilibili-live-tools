@@ -23,9 +23,7 @@ def level(str):
 
 def timestamp(tag_time):
     if tag_time:
-        return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-    else:
-        return None
+        print(f'[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))}]', end=' ')
 
 
 class Printer():
@@ -47,44 +45,29 @@ class Printer():
             console.set_color()
         else:
             print(''.join(msg))
-              
-    def printlist_append(self, dic, tag_time=False):
-        tag = False
-        dic_printcontrol = self.dic_user['print_control']
-        if dic[0] in dic_printcontrol.keys():
-            if dic_printcontrol[dic[0]] >= level(dic[2]):
-                tag = True
-                if dic[1] in dic_printcontrol.keys():
-                    tag = dic_printcontrol[dic[1]]
-        if tag:
-            if dic[1] == '弹幕':
-                list_msg, list_color = self.print_danmu_msg(dic[3])
-                self.clean_printlist([0, list_msg, list_color])
-                return
             
-            if isinstance(dic[3], list):
-                self.clean_printlist([timestamp(tag_time), [dic[3]]])
-            else:
-                self.clean_printlist([timestamp(tag_time), dic[3:]])
             
-    def clean_printlist(self, i):
-        if i[0] == 0:
-            if (self.dic_user['platform']['platform'] == 'ios_pythonista'):
-                self.concole_print(i[1], i[2])
-            else:
-                self.concole_print(i[1])
+    def print_words(self, list_msg, tag_time=False):
+        timestamp(tag_time)
+        for msg in list_msg:
+            print(msg)
+     
+    # 弹幕 礼物 。。。。type       
+    def print_danmu(self, dic_msg, type='normal'):
+        if not self.dic_user['print_control']['弹幕']:
+            return 
+        if (self.dic_user['platform']['platform'] == 'ios_pythonista'):
+            list_msg, list_color = self.print_danmu_msg(dic_msg)
+            self.concole_print(list_msg, list_color)
         else:
-            if i[0] is None:
-                pass
-            else:
-                print(''.join(['[', i[0], ']']), end=' ')
-                
-            if isinstance(i[1][0], list):
-                for j in i[1][0]:
-                    print(j)
-            else:
-                print(''.join(i[1]))
+            self.concole_print(list_msg)
+              
+    def print_warning(self, msg):
+        print(msg)
         
+    def print_error(self, msg):
+        print(msg)
+    
     def print_danmu_msg(self, dic):
         info = dic['info']
         # tmp = dic['info'][2][1] + ':' + dic['info'][1]

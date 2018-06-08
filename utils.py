@@ -81,7 +81,7 @@ async def fetch_medal(printer=True):
                                                            adjust_for_chinese(str(i['rank'])),
                                                            dic_worn[str(i['status'])]))
         if printer:
-            Printer().printlist_append(['join_lottery', '', 'user', printlist], True)
+            Printer().print_words(printlist, True)
         return
 
 async def send_danmu_msg_andriod(msg, roomId):

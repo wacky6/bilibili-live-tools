@@ -2,11 +2,7 @@
 platform = "others"
 
 [print_control]
-join_lottery = 0
-return_lotteryresult = 0
 danmu = 0
-普通送礼提示 = false
-弹幕 = false
 
 [task_control]
 # 清理即将过期礼物，请true之后一定要把紧随其后的room设置为真实房间号

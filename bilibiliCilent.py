@@ -26,7 +26,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
         return
     '''    
     if cmd == 'PREPARING':
-        Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器下播！将切换监听房间'], True)  
+        Printer().print_words([f'{area_id}分区检测器下播！将切换监听房间'], True)  
         return False  
     if cmd == 'SYS_GIFT':
         if 'giftId' in dic:
@@ -35,12 +35,12 @@ async def DanMuraffle(area_id, connect_roomid, messages):
                 text1 = dic['real_roomid']
                 text2 = dic['url']
                 giftId = dic['giftId']
-                Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
+                Printer().print_words(["检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
                 rafflehandler.Rafflehandler.Put2Queue((giftId, text1, text2), rafflehandler.handle_1_room_activity)
                 Statistics.append2pushed_raffle('活动', area_id=area_id)
                         
             elif dic['giftId'] == 39:
-                Printer().printlist_append(['join_lottery', '', 'user', "节奏风暴"])
+                Printer().print_words(["节奏风暴"], True)
                 temp = await bilibili.get_giftlist_of_storm(dic)
                 check = len(temp['data'])
                 if check != 0 and temp['data']['hasJoin'] != 1:
@@ -48,14 +48,14 @@ async def DanMuraffle(area_id, connect_roomid, messages):
                     json_response1 = await bilibili.get_gift_of_storm(id)
                     print(json_response1)
                 else:
-                    Printer().printlist_append(['join_lottery','','debug', [dic, "请联系开发者"]])
+                    Printer().print_words([dic, "请联系开发者"])
             else:
                 text1 = dic['real_roomid']
                 text2 = dic['url']
-                Printer().printlist_append(['join_lottery', '', 'debug', [dic, "请联系开发者"]])
+                Printer().print_words([dic, "请联系开发者"])
                 try:
                     giftId = dic['giftId']
-                    Printer().printlist_append(['join_lottery', '', 'user', "检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
+                    Printer().print_words(["检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
                     rafflehandler.Rafflehandler.Put2Queue((giftId, text1, text2), rafflehandler.handle_1_room_activity)
                     Statistics.append2pushed_raffle('活动', area_id=area_id)
                             
@@ -63,7 +63,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
                     pass
                 
         else:
-            Printer().printlist_append(['join_lottery', '普通送礼提示', 'user', ['普通送礼提示', dic['msg_text']]])
+            Printer().print_words(['普通送礼提示', dic['msg_text']])
         return
     if cmd == 'SYS_MSG':
         if 'real_roomid' in dic:
@@ -72,7 +72,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
                 real_roomid = dic['real_roomid']
                 # print(dic)
                 type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
-                Printer().printlist_append(['join_lottery', '小电视', 'user', f'{area_id}分区检测器检测到房间{real_roomid:^9}的{type_text}抽奖'], True)
+                Printer().print_words([f'{area_id}分区检测器检测到房间{real_roomid:^9}的{type_text}抽奖'], True)
                 # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
                 Statistics.append2pushed_raffle(type_text, area_id=area_id)
@@ -80,7 +80,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
             except:
                 print('请联系开发者', dic)
         else:
-            Printer().printlist_append(['join_lottery', '系统公告', 'user', dic['msg']])
+            Printer().print_words([dic['msg']])
 
     if cmd == 'GUARD_MSG':
         # print(dic)
@@ -89,7 +89,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
         if res is not None:
             # print(str(res.group()))
             name = str(res.group())
-            Printer().printlist_append(['join_lottery', '', 'user', f'{area_id}分区检测器检测到房间{name:^9}开通总督'], True)
+            Printer().print_words([f'{area_id}分区检测器检测到房间{name:^9}开通总督'], True)
             rafflehandler.Rafflehandler.Put2Queue((((name,), utils.find_live_user_roomid),), rafflehandler.handle_1_room_captain)
             Statistics.append2pushed_raffle('总督', area_id=area_id)
         
@@ -105,7 +105,7 @@ def printDanMu(area_id, messages):
     # print(cmd)
     if cmd == 'DANMU_MSG':
         # print(dic)
-        Printer().printlist_append(['danmu', '弹幕', 'user', dic])
+        Printer().print_danmu(dic)
         return          
                                                           
 
@@ -152,12 +152,12 @@ class bilibiliClient():
             return False
         if (await self.SendJoinChannel(self.roomid)):
             self.connected = True
-            Printer().printlist_append(['join_lottery', '', 'user', f'连接弹幕服务器{self.roomid}成功'], True)
+            Printer().print_words([f'连接弹幕服务器{self.roomid}成功'], True)
             # await self.ReceiveMessageLoop()
             return True
 
     async def HeartbeatLoop(self):
-        Printer().printlist_append(['join_lottery', '', 'user', '弹幕模块开始心跳（由于弹幕心跳间隔为30s，所以后续正常心跳不再提示）'], True)
+        Printer().print_words(['弹幕模块开始心跳（由于弹幕心跳间隔为30s，所以后续正常心跳不再提示）'], True)
 
         while self.connected:
             await self.SendSocketData(0, 16, ConfigLoader().dic_bilibili['_protocolversion'], 2, 1, "")

@@ -55,7 +55,7 @@ async def draw_lottery():
         
 async def run():
     while 1:
-        Printer().printlist_append(['join_lottery', '', 'user', "心跳"], True)
+        Printer().print_words(["心跳"], True)
         login.HandleExpire()
         await apppost_heartbeat()
         await pcpost_heartbeat()

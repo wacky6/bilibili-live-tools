@@ -17,7 +17,7 @@ async def Daily_bag():
     # no done code
     # print('Daily_bag', json_response)
     for i in json_response['data']['bag_list']:
-        Printer().printlist_append(['join_lottery', '', 'user', "# 获得-" + i['bag_name'] + "-成功"])
+        Printer().print_words(["# 获得-" + i['bag_name'] + "-成功"])
     await BiliTimer.append2list_jobs(Daily_bag, 21600)
 
 def CurrentTime():
@@ -29,7 +29,7 @@ async def DoSign():
     # -500 done
     temp = await bilibili.get_dosign()
     # print('DoSign', temp)
-    Printer().printlist_append(['join_lottery', '', 'user', "# 签到状态:", temp['msg']])
+    Printer().print_words([f'# 签到状态: {temp["msg"]}'])
     if temp['code'] == -500 and '已' in temp['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
         await BiliTimer.append2list_jobs(DoSign, sleeptime)
@@ -40,7 +40,7 @@ async def DoSign():
 async def Daily_Task():
     # -400 done/not yet
     json_response2 = await bilibili.get_dailytask()
-    Printer().printlist_append(['join_lottery', '', 'user', "# 双端观看直播:", json_response2["msg"]])
+    Printer().print_words([f'# 双端观看直播:  {json_response2["msg"]}'])
     # print('Daily_Task', json_response2)
     if json_response2['code'] == -400 and '已' in json_response2['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
@@ -52,12 +52,11 @@ async def Sign1Group(i1, i2):
     json_response = await bilibili.assign_group(i1, i2)
     if not json_response['code']:
         if (json_response['data']['status']) == 1:
-            Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 已应援过" % (i1)])
+            Printer().print_words(["# 应援团 %s 已应援过" % (i1)])
         if (json_response['data']['status']) == 0:
-            Printer().printlist_append(
-                ['join_lottery', '', 'user', "# 应援团 %s 应援成功,获得 %s 点亲密度" % (i1, json_response['data']['add_num'])])
+            Printer().print_words(["# 应援团 %s 应援成功,获得 %s 点亲密度" % (i1, json_response['data']['add_num'])])
     else:
-        Printer().printlist_append(['join_lottery', '', 'user', "# 应援团 %s 应援失败" % (i1)])
+        Printer().print_words(["# 应援团 %s 应援失败" % (i1)])
 
 # 应援团签到
 async def link_sign():
@@ -88,7 +87,7 @@ async def send_gift():
                 bagID = i[2]
                 await utils.send_gift_web(roomID, giftNum, bagID, giftID)
         if not sent:
-            Printer().printlist_append(['join_lottery', '', 'user', "# 没有将要过期的礼物~"])
+            Printer().print_words(["# 没有将要过期的礼物~"])
     await BiliTimer.append2list_jobs(send_gift, 21600)
 
 async def auto_send_gift():
@@ -124,7 +123,7 @@ async def auto_send_gift():
                 await utils.send_gift_web(roomid, gift_num, bag_id, gift_id)
                 calculate = calculate + score
                 left_score = left_score - score
-        Printer().printlist_append(['join_lottery', '', 'user', "# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
+        Printer().print_words(["# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
     await BiliTimer.append2list_jobs(auto_send_gift, 21600)
 
 async def doublegain_coin2silver():
@@ -140,8 +139,8 @@ async def sliver2coin():
         json_response1 = await bilibili.silver2coin_app()
         # -403 done
         json_response = await bilibili.silver2coin_web()
-        Printer().printlist_append(['join_lottery', '', 'user', "# ", json_response['msg']])
-        Printer().printlist_append(['join_lottery', '', 'user', "# ", json_response1['msg']])
+        Printer().print_words([f'#  {json_response["msg"]}'])
+        Printer().print_words([f'#  {json_response1["msg"]}'])
         if json_response['code'] == -403 and '只' in json_response['msg']:
             finish_web = True
         else:
