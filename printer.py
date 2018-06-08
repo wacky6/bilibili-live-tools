@@ -5,6 +5,7 @@ except ImportError:
 import webcolors
 from configloader import ConfigLoader
 import time
+import codecs
 
 
 # "#969696"
@@ -23,7 +24,9 @@ def level(str):
 
 def timestamp(tag_time):
     if tag_time:
-        print(f'[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))}]', end=' ')
+        str_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        print(f'[{str_time}]', end=' ')
+        return str_time
 
 
 class Printer():
@@ -54,15 +57,17 @@ class Printer():
      
     # 弹幕 礼物 。。。。type       
     def print_danmu(self, dic_msg, type='normal'):
-        if not self.dic_user['print_control']['弹幕']:
+        if not self.dic_user['print_control']['danmu']:
             return 
+        list_msg, list_color = self.print_danmu_msg(dic_msg)
         if (self.dic_user['platform']['platform'] == 'ios_pythonista'):
-            list_msg, list_color = self.print_danmu_msg(dic_msg)
             self.concole_print(list_msg, list_color)
         else:
             self.concole_print(list_msg)
               
     def print_warning(self, msg):
+        with codecs.open(r'bili.log', 'a', encoding='utf-8') as f:
+            f.write(f'{timestamp(True)} {msg}\n')
         print(msg)
         
     def print_error(self, msg):

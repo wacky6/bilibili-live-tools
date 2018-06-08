@@ -77,9 +77,9 @@ def preprocess_change_danmuji_roomid():
 def change_printer_dic_user():
     new_words = input('弹幕控制')
     if new_words == 'T':
-        Printer().dic_user['print_control']['弹幕'] = True
+        Printer().dic_user['print_control']['danmu'] = True
     else:
-        Printer().dic_user['print_control']['弹幕'] = False
+        Printer().dic_user['print_control']['danmu'] = False
         
         
 def preprocess_fetch_liveuser_info():

@@ -16,7 +16,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
     try:
         dic = json.loads(messages)
     except:
-        print(messages)
+        Printer().print_warning(messages)
         return
     cmd = dic['cmd']
     '''
@@ -99,7 +99,7 @@ def printDanMu(area_id, messages):
     try:
         dic = json.loads(messages)
     except:
-        print(messages)
+        Printer().print_warning(messages)
         return
     cmd = dic['cmd']
     # print(cmd)
@@ -272,7 +272,7 @@ class bilibiliClient():
                                 messages = remain_data.decode('utf-8')
                             except:
                                 self.connected = False
-                                print('风风光光刚回家', bytes_datas[len_read:len_read + len_data])
+                                Printer().print_warning(bytes_datas[len_read:len_read + len_data])
                             state = printDanMu(self.area_id, messages)
                         elif opt == 8:
                             pass
