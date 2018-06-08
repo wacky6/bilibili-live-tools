@@ -106,7 +106,7 @@ class Statistics:
                     elif json_response['data']['gift_id'] != '-1':
     
                         data = json_response['data']
-                        print(f'# 房间{inst.TV_id_list[0][0]:^9}小电视道具抽奖结果: {data["gift_name"]}X{data["gift_num"]}')
+                        print(f'# 房间{inst.TV_id_list[0][0]:^9}道具抽奖结果: {data["gift_name"]}X{data["gift_num"]}')
                         inst.add_to_result(data['gift_name'], int(data['gift_num']))
     
                         inst.delete_0st_TVlist()

@@ -215,8 +215,8 @@ async def fetch_user_info():
         bili_coins = userCoinIfo['bili_coins']
         print('# 用户名', uname)
         size = 100, 100
-        response_face = bilibili.request_load_img(userInfo['face'])
-        img = Image.open(BytesIO(response_face.content))
+        response_face = await bilibili.request_load_img(userInfo['face'])
+        img = Image.open(BytesIO(await response_face.read()))
         img.thumbnail(size)
         try:
             img.show()
@@ -369,8 +369,8 @@ async def fetch_liveuser_info(real_roomid):
             print('# 该主播暂时没有开通勋章')  # print(json_response_fan)
 
         size = 100, 100
-        response_face = bilibili.request_load_img(data['info']['face'])
-        img = Image.open(BytesIO(response_face.content))
+        response_face = await bilibili.request_load_img(data['info']['face'])
+        img = Image.open(BytesIO(await response_face.read()))
         img.thumbnail(size)
         try:
             img.show()

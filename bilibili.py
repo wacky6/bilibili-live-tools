@@ -335,8 +335,8 @@ class bilibili():
         return response
 
     @staticmethod
-    def request_load_img(url):
-        return requests.get(url)
+    async def request_load_img(url):
+        return await bilibili.instance.other_session.get(url)
 
     @staticmethod
     async def request_send_danmu_msg_web(msg, roomId):

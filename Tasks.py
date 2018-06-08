@@ -241,7 +241,7 @@ async def check(id):
         percent = 0
     print('目前已投票', voted)
     print('认为不违反规定的比例', percent)
-    vote = None
+    vote = 3
     if voted >= 400: 
         if percent >= 0.8:
             vote = 2
@@ -261,8 +261,6 @@ async def check(id):
     
                 
 async def vote_case(id, vote):
-    if vote is None:
-        vote = 3
     json_rsp = await bilibili().req_vote_case(id, vote)
     print(json_rsp)
     return True
