@@ -413,19 +413,18 @@ class bilibili():
             'Host': 'passport.bilibili.com',
             'cookie': "sid=hxt5szbb"
         }
-        s = requests.session()
-        url = "https://passport.bilibili.com/captcha"
-        res = s.get(url, headers=headers)
-        tmp1 = base64.b64encode(res.content)
-
-        captcha = cnn_captcha(tmp1)
-        temp_params = f'actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&captcha={captcha}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&password={password}&platform={inst.dic_bilibili["platform"]}&username={username}'
-        sign = inst.calc_sign(temp_params)
-        payload = f'{temp_params}&sign={sign}'
-        headers['Content-type'] = "application/x-www-form-urlencoded"
-        headers['cookie'] = "sid=hxt5szbb"
-        url = "https://passport.bilibili.com/api/v2/oauth2/login"
-        response = s.post(url, data=payload, headers=headers)
+        with requests.Session() as s:
+            url = "https://passport.bilibili.com/captcha"
+            res = s.get(url, headers=headers)
+            tmp1 = base64.b64encode(res.content)
+    
+            captcha = cnn_captcha(tmp1)
+            temp_params = f'actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&captcha={captcha}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&password={password}&platform={inst.dic_bilibili["platform"]}&username={username}'
+            sign = inst.calc_sign(temp_params)
+            payload = f'{temp_params}&sign={sign}'
+            headers['Content-type'] = "application/x-www-form-urlencoded"
+            url = "https://passport.bilibili.com/api/v2/oauth2/login"
+            response = s.post(url, data=payload, headers=headers)
         return response
 
     @staticmethod

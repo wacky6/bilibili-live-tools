@@ -49,7 +49,7 @@ def LoginWithPwd():
         return True
         
     except:
-        print("[{}] 登录失败,错误信息为:{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), response.json()['message']))
+        print("[{}] 登录失败,错误信息为:{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), response.json()))
         return False
 
 def login():    
