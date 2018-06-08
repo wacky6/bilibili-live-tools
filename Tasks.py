@@ -168,7 +168,7 @@ async def GetVideoExp(list_topvideo):
 
 async def GiveCoinTask(coin_remain, list_topvideo):
     while coin_remain > 0:
-        aid = list_topvideo[random.randint(0, 50)]
+        aid = random.choice(list_topvideo)
         rsp = await utils.GiveCoin2Av(aid, 1)
         if rsp is None:
             break
@@ -187,7 +187,10 @@ async def BiliMainTask():
         # print('当前网络不好，正在重试，请反馈开发者!!!!')
         print(sys.exc_info()[0], sys.exc_info()[1])
         return 
-    list_topvideo = await utils.GetTopVideoList()
+    if ConfigLoader().dic_user['task_control']['fetchrule'] == 'bilitop':
+        list_topvideo = await utils.GetTopVideoList()
+    else:
+        list_topvideo = await utils.fetch_uper_video(ConfigLoader().dic_user['task_control']['mid'])
     if (not login) or not watch_av:
         await GetVideoExp(list_topvideo)
     coin_sent = (num) / 10
