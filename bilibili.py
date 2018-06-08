@@ -115,7 +115,7 @@ class bilibili():
                 response = await self.other_session.get(url, headers=headers, data=data)
                 if response.status == 200:
                     json_response = await response.json(content_type=None)
-                    if isinstance(json_response, dict):
+                    if isinstance(json_response, dict) and 'code' in json_response:
                         tag = await replay_request(json_response['code'])
                         if tag:
                             continue
@@ -133,7 +133,7 @@ class bilibili():
                 response = await self.other_session.post(url, headers=headers, data=data)
                 if response.status == 200:
                     json_response = await response.json(content_type=None)
-                    if isinstance(json_response, dict):
+                    if isinstance(json_response, dict) and 'code' in json_response:
                         tag = await replay_request(json_response['code'])
                         if tag:
                             continue
@@ -740,6 +740,12 @@ class bilibili():
         json_rsp = await self.other_session_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
         return json_rsp
     
+    async def req_fetch_uper_video(self, mid, page):
+        url = f'https://space.bilibili.com/ajax/member/getSubmitVideos?mid={mid}&pagesize=100&page={page}'
+        json_rsp = await self.other_session_get(url)
+        return json_rsp
+        
+        
     async def req_fetch_av(self):
         text_tsp = await self.session_text_get('https://www.bilibili.com/ranking/all/0/0/1/')
         return text_tsp
