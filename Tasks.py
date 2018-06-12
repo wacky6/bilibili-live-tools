@@ -88,19 +88,19 @@ async def send_gift():
                 list_gift.append([giftID, giftNum, bagID])
         if list_gift:
             print('发现即将过期的礼物')
+            if ConfigLoader().dic_user['task_control']['clean_expiring_gift2all_medal']:  
+                print('正在投递其他勋章')      
+                list_medal = await utils.fetch_medal(printer=False)
+                list_gift = await full_intimate(list_gift, list_medal)
+                
+            print('正在清理过期礼物到指定房间')
+            for i in list_gift:
+                giftID = i[0]
+                giftNum = i[1]
+                bagID = i[2]
+                await utils.send_gift_web(roomID, giftNum, bagID, giftID)
         else:
             print('未发现即将过期的礼物')
-        if ConfigLoader().dic_user['task_control']['clean_expiring_gift2all_medal']:  
-            print('正在投递其他勋章')      
-            list_medal = await utils.fetch_medal(printer=False)
-            list_gift = await full_intimate(list_gift, list_medal)
-            
-        # print(123456, list_gift)
-        for i in list_gift:
-            giftID = i[0]
-            giftNum = i[1]
-            bagID = i[2]
-            await utils.send_gift_web(roomID, giftNum, bagID, giftID)
     await BiliTimer.append2list_jobs(send_gift, 21600)
 
 async def auto_send_gift():
@@ -124,7 +124,6 @@ async def auto_send_gift():
             left_time = i[3]
             if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
                 list_gift.append([gift_id, gift_num, bag_id])
-        print('正在清理过期礼物到指定房间')
         await full_intimate(list_gift, list_medal)
                 
                 
