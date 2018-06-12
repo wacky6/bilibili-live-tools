@@ -78,53 +78,82 @@ async def send_gift():
         sent = False
         roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
         time_set = ConfigLoader().dic_user['task_control']['set-expiring-time']
+        list_gift = []
         for i in argvs:
             left_time = i[3]
             if left_time is not None and 0 < int(left_time) < time_set:  # 剩余时间少于半天时自动送礼
-                sent = True
                 giftID = i[0]
                 giftNum = i[1]
                 bagID = i[2]
-                await utils.send_gift_web(roomID, giftNum, bagID, giftID)
-        if not sent:
-            Printer().print_words(["# 没有将要过期的礼物~"])
+                list_gift.append([giftID, giftNum, bagID])
+        if list_gift:
+            print('发现即将过期的礼物')
+        else:
+            print('未发现即将过期的礼物')
+        if ConfigLoader().dic_user['task_control']['clean_expiring_gift2all_medal']:  
+            print('正在投递其他勋章')      
+            list_medal = await utils.fetch_medal(printer=False)
+            list_gift = await full_intimate(list_gift, list_medal)
+            
+        # print(123456, list_gift)
+        for i in list_gift:
+            giftID = i[0]
+            giftNum = i[1]
+            bagID = i[2]
+            await utils.send_gift_web(roomID, giftNum, bagID, giftID)
     await BiliTimer.append2list_jobs(send_gift, 21600)
 
 async def auto_send_gift():
+    # await utils.WearingMedalInfo()
+    # return 
     if ConfigLoader().dic_user['task_control']['send2wearing-medal']:
-        a = await utils.WearingMedalInfo()
-        if a is None:
+        list_medal = await utils.WearingMedalInfo()
+        if list_medal is None:
             print('暂未佩戴任何勋章')
             await BiliTimer.append2list_jobs(auto_send_gift, 21600)
             return
-        json_res = await bilibili.gift_list()
-        temp_dic = {j['id']: (j['price'] / 100) for j in json_res['data']}
+        # print(list_medal)
+        print('正在投递当前佩戴勋章勋章')
         temp = await utils.fetch_bag_list(printer=False)
-        roomid = a[0]
-        today_feed = a[1]
-        day_limit = a[2]
-        left_score = int(day_limit) - int(today_feed)
-        calculate = 0
         # print(temp)
+        list_gift = []
         for i in temp:
             gift_id = int(i[0])
             gift_num = int(i[1])
             bag_id = int(i[2])
             left_time = i[3]
             if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
-                # print(gift_id, bag_id)
-                if (gift_num * temp_dic[gift_id] <= left_score):
-                    pass
-                elif left_score - temp_dic[gift_id] >= 0:
-                    gift_num = int((left_score) / (temp_dic[gift_id]))
-                else:
-                    continue
-                score = temp_dic[gift_id] * gift_num
-                await utils.send_gift_web(roomid, gift_num, bag_id, gift_id)
-                calculate = calculate + score
-                left_score = left_score - score
-        Printer().print_words(["# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
+                list_gift.append([gift_id, gift_num, bag_id])
+        print('正在清理过期礼物到指定房间')
+        await full_intimate(list_gift, list_medal)
+                
+                
+        # Printer().print_words(["# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
     await BiliTimer.append2list_jobs(auto_send_gift, 21600)
+
+async def full_intimate(list_gift, list_medal):
+    json_res = await bilibili.gift_list()
+    dic_gift = {j['id']: (j['price'] / 100) for j in json_res['data']}
+    for roomid, left_intimate, medal_name in list_medal:
+        calculate = 0
+        # print(list_gift)
+        for i in list_gift:
+            gift_id, gift_num, bag_id = i
+            # print(gift_id, bag_id)
+            if (gift_num * dic_gift[gift_id] <= left_intimate):
+                pass
+            elif left_intimate - dic_gift[gift_id] >= 0:
+                gift_num = int((left_intimate) / (dic_gift[gift_id]))
+            else:
+                continue
+            i[1] -= gift_num
+            score = dic_gift[gift_id] * gift_num
+            await utils.send_gift_web(roomid, gift_num, bag_id, gift_id)
+            calculate = calculate + score
+            left_intimate = left_intimate - score
+        Printer().print_words([f'# 对{medal_name}共送出亲密度为{int(calculate)}的礼物'])
+    return [i for i in list_gift if i[1]]
+
 
 async def doublegain_coin2silver():
     if ConfigLoader().dic_user['task_control']['doublegain_coin2silver']:

@@ -6,6 +6,7 @@ from PIL import Image
 from io import BytesIO
 import webbrowser
 import re
+from operator import itemgetter
 
 
 def adjust_for_chinese(str):
@@ -41,7 +42,7 @@ async def WearingMedalInfo():
         data = json_response['data']
         if data:
             # print(data['roominfo']['room_id'], data['today_feed'], data['day_limit'])
-            return data['roominfo']['room_id'], data['today_feed'], data['day_limit']
+            return [(data['roominfo']['room_id'],  int(data['day_limit']) - int(data['today_feed']), data['medal_name']), ]
         else:
             # print('暂无佩戴任何勋章')
             return
@@ -62,6 +63,7 @@ async def TitleInfo():
 
 async def fetch_medal(printer=True):
     printlist = []
+    list_medal = []
     if printer:
         printlist.append('查询勋章信息')
         printlist.append(
@@ -72,6 +74,7 @@ async def fetch_medal(printer=True):
     # print(json_response)
     if not json_response['code']:
         for i in json_response['data']['fansMedalList']:
+            list_medal.append((i['roomid'], int(i['dayLimit']) - int(i['todayFeed']), i['medal_name'], i['level']))
             if printer:
                 printlist.append(
                     '{} {} {:^14} {:^14} {} {:^6} '.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])),
@@ -82,7 +85,9 @@ async def fetch_medal(printer=True):
                                                            dic_worn[str(i['status'])]))
         if printer:
             Printer().print_words(printlist, True)
-        return
+        list_medal = [i[:3] for i in sorted(list_medal, key=itemgetter(3), reverse=True)]
+        # print(list_medal)
+        return list_medal
 
 async def send_danmu_msg_andriod(msg, roomId):
     json_response = await bilibili.request_send_danmu_msg_andriod(msg, roomId)
