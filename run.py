@@ -4,6 +4,7 @@ import LotteryResult
 import Tasks
 import connect
 from rafflehandler import Rafflehandler
+from rafflehandler import Delay_Joiner
 import asyncio
 from printer import Printer
 from statistics import Statistics
@@ -40,7 +41,7 @@ danmu_connection = connect.connect()
 
 
 bili_timer = BiliTimer()
-
+delay_timer = Delay_Joiner()
 
 console_thread = threading.Thread(target=biliconsole.controler)
 
@@ -50,10 +51,11 @@ tasks = [
     OnlineHeart.run(),
     Silver.run(),
     danmu_connection.run(),
-    LotteryResult.run(),
+    #LotteryResult.run(),
     rafflehandler.run(),
     biliconsole.Biliconsole.run(),
-    bili_timer.run()
+    bili_timer.run(),
+    delay_timer.run()
     
 ]
 try:

@@ -519,6 +519,20 @@ class bilibili():
             
         response = await inst.bili_section_post(url, data=payload, headers=inst.dic_bilibili['pcheaders'])
         return response
+        
+    @staticmethod
+    async def get_gift_of_TV_app(real_roomid, raffle_id, raffle_type):
+        inst = bilibili.instance
+        url = f"{base_url}/gift/v4/smalltv/getAward"
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}&raffleId={raffle_id}&roomid={real_roomid}&ts={CurrentTime()}&type={raffle_type}'
+        sign = inst.calc_sign(temp_params)
+        appheaders = inst.dic_bilibili['appheaders'].copy()
+        appheaders['Content-type'] = "application/x-www-form-urlencoded"
+        payload = f'{temp_params}&sign={sign}'
+        # print(payload)
+        response = await inst.bili_section_post(url, data=payload, headers=appheaders)
+        # print(response)
+        return response
 
     @staticmethod
     async def get_gift_of_captain(roomid, id):
