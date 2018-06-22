@@ -103,6 +103,9 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
             break
         elif code == -403:
             return True
+        elif code == -405:
+            print('没抢到。。。。。')
+            return False
         elif code != -401 and code != -403:
             print('00', json_response2)
         await asyncio.sleep(1)
