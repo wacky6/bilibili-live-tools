@@ -26,15 +26,12 @@ class Delay_Joiner:
     async def run(self):
         while True:
             i = await self.jobs.get()
-            print(i)
+            # print(i)
             currenttime = CurrentTime()
-            if i[0] < currenttime + 5:
-                await i[2]()
-            else:
-                sleeptime = i[0] - currenttime
-                # print('智能睡眠', sleeptime)
-                await asyncio.sleep(max(sleeptime, 0))
-                await i[2](*i[3])
+            sleeptime = i[0] - currenttime
+            # print('智能睡眠', sleeptime)
+            await asyncio.sleep(max(sleeptime, 0))
+            await i[2](*i[3])
       
     @staticmethod          
     async def append2list_jobs(func, time_expected, tuple_values):
