@@ -105,6 +105,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
             return True
         elif code == -405:
             print('没抢到。。。。。')
+            Printer().print_warning(raffleid)
             return False
         elif code != -401 and code != -403:
             print('00', json_response2)
@@ -187,8 +188,10 @@ async def handle_1_room_TV(real_roomid):
             raffle_id = j['raffleId']
             raffle_type = j['type']
             time_wanted = j['time_wait'] + current_time
-
-            list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
+            # 处理一些重复
+            if j['time_wait'] > 100:
+                list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
+            
             
 
             # print(raffle_id, raffle_type)
