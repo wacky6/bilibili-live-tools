@@ -13,17 +13,13 @@ import sys
 
 
 async def DanMuraffle(area_id, connect_roomid, messages):
-    try:
-        dic = json.loads(messages)
-    except:
-        Printer().print_warning(messages)
-        return
+    dic = json.loads(messages)
     cmd = dic['cmd']
     
     if cmd == 'PREPARING':
         Printer().print_words([f'{area_id}分区检测器下播！将切换监听房间'], True)
         return False
-    if cmd == 'SYS_GIFT':
+    elif cmd == 'SYS_GIFT':
         if 'giftId' in dic:
             if str(dic['giftId']) in bilibili.get_giftids_raffle_keys():
                 
@@ -55,43 +51,31 @@ async def DanMuraffle(area_id, connect_roomid, messages):
                     Statistics.append2pushed_raffle('活动', area_id=area_id)
                             
                 except:
-                    pass
+                    Printer().print_words([dic, "请联系开发者"])
                 
         else:
             Printer().print_words(['普通送礼提示', dic['msg_text']])
         return
-    if cmd == 'SYS_MSG':
+    elif cmd == 'SYS_MSG':
         if 'real_roomid' in dic:
-            try:
-                real_roomid = dic['real_roomid']
-                type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
-                Printer().print_words([f'{area_id}分区检测器检测到房间{real_roomid:^9}的{type_text}抽奖'], True)
-                rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
-                Statistics.append2pushed_raffle(type_text, area_id=area_id)
-                
-            except:
-                print('请联系开发者', dic)
-        else:
-            Printer().print_words([dic['msg']])
-
-        
-    if cmd == 'GUARD_MSG':
+            real_roomid = dic['real_roomid']
+            type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
+            Printer().print_words([f'{area_id}号检测到{real_roomid:^9}的{type_text}'], True)
+            rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
+            Statistics.append2pushed_raffle(type_text, area_id=area_id)
+            
+    elif cmd == 'GUARD_MSG':
         a = re.compile(r"(?<=在主播 )\S+(?= 的直播间开通了总督)")
         res = re.search(a, dic['msg'])
         if res is not None:
             name = str(res.group())
-            Printer().print_words([f'{area_id}分区检测器检测到房间{name:^9}开通总督'], True)
+            Printer().print_words([f'{area_id}号检测到{name:^9}的总督'], True)
             rafflehandler.Rafflehandler.Put2Queue((((name,), utils.find_live_user_roomid),), rafflehandler.handle_1_room_captain)
             Statistics.append2pushed_raffle('总督', area_id=area_id)
         
   
 def printDanMu(area_id, messages):
-
-    try:
-        dic = json.loads(messages)
-    except:
-        Printer().print_warning(messages)
-        return
+    dic = json.loads(messages)
     cmd = dic['cmd']
     # print(cmd)
     if cmd == 'DANMU_MSG':
@@ -149,7 +133,7 @@ class bilibiliClient():
     async def HeartbeatLoop(self):
         Printer().print_words(['弹幕模块开始心跳（由于弹幕心跳间隔为30s，所以后续正常心跳不再提示）'], True)
         while self.connected:
-            await self.SendSocketData(0, 16, ConfigLoader().dic_bilibili['_protocolversion'], 2, 1, "")
+            await self.SendSocketData(0, 16, ConfigLoader().dic_bilibili['_protocolversion'], 2, 1, '')
             await asyncio.sleep(30)
 
     async def SendJoinChannel(self, channelId):
@@ -162,9 +146,8 @@ class bilibiliClient():
         if not packetlength:
             packetlength = len(bytearr) + 16
         sendbytes = struct.pack('!IHHII', packetlength, magic, ver, action, param)
-        if len(bytearr) != 0:
+        if body:
             sendbytes = sendbytes + bytearr
-        # print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), sendbytes)
         try:
             await self.ws.send(sendbytes)
         except websockets.exceptions.ConnectionClosed:
@@ -177,10 +160,9 @@ class bilibiliClient():
             self.connected = False
 
     async def ReadSocketData(self):
-        bytes_data = b''
+        bytes_data = None
         try:
             bytes_data = await asyncio.wait_for(self.ws.recv(), timeout=35.0)
-            # print('hhhhh')
         except asyncio.TimeoutError:
             print('# 由于心跳包30s一次，但是发现35内没有收到任何包，说明已经悄悄失联了，主动断开')
             await self.ws.close()
@@ -211,66 +193,61 @@ class bilibiliClient():
                 if bytes_datas is None:
                     break
                 len_read = 0
-                while len_read < len(bytes_datas):
+                len_bytes_datas = len(bytes_datas)
+                while len_read != len_bytes_datas:
                     state = None
                     split_header = struct.unpack('!I2H2I', bytes_datas[len_read:16+len_read])
                     len_data, len_header, ver, opt, seq = split_header
                     remain_data = bytes_datas[len_read+16:len_read+len_data]
-        
-                    if len_data != 16:
-                        if opt == 3:
-                            num3, = struct.unpack('!I', remain_data)
-                            self._UserCount = num3
-                        elif opt == 5:
-                            try:
-                                messages = remain_data.decode('utf-8')
-                            except:
-                                self.connected = False
-                                print(bytes_datas[len_read:len_read + len_data])
-                            state = await DanMuraffle(self.area_id, self.roomid, messages)
-                        elif opt == 8:
-                            pass
-                        else:
-                            self.connected = False
-                            print(bytes_datas[len_read:len_read + len_data])
+                    # 人气值/心跳 3s间隔
+                    if opt == 3:
+                        self._UserCount, = struct.unpack('!I', remain_data)
+                    # cmd
+                    elif opt == 5:
+                        messages = remain_data.decode('utf-8')
+                        state = await DanMuraffle(self.area_id, self.roomid, messages)
+                    # 握手确认
+                    elif opt == 8:
+                        pass
+                    else:
+                        self.connected = False
+                        Printer().print_warning(bytes_datas[len_read:len_read + len_data])
                                 
                     if state is not None and not state:
                         return
                     len_read += len_data
+                    
         else:
             while self.connected:
                 bytes_datas = await self.ReadSocketData()
                 if bytes_datas is None:
                     break
                 len_read = 0
-                # print(bytes_datas)
-                while len_read < len(bytes_datas):
+                len_bytes_datas = len(bytes_datas)
+                while len_read != len_bytes_datas:
                     state = None
-                    split_header = struct.unpack('!I2H2I', bytes_datas[len_read:16 + len_read])
+                    split_header = struct.unpack('!I2H2I', bytes_datas[len_read:16+len_read])
                     len_data, len_header, ver, opt, seq = split_header
-                    remain_data = bytes_datas[len_read + 16:len_read + len_data]
-                    
-                    # print(split_header)
-                    if len_data != 16:
-                        if opt == 3:
-                            num3, = struct.unpack('!I', remain_data)
-                            self._UserCount = num3
-                        elif opt == 5:
-                            try:
-                                messages = remain_data.decode('utf-8')
-                            except:
-                                self.connected = False
-                                Printer().print_warning(bytes_datas[len_read:len_read + len_data])
-                            state = printDanMu(self.area_id, messages)
-                        elif opt == 8:
-                            pass
-                        else:
-                            self.connected = False
-                            print(bytes_datas[len_read:len_read + len_data])
+                    remain_data = bytes_datas[len_read+16:len_read+len_data]
+                    # 人气值/心跳 3s间隔
+                    if opt == 3:
+                        self._UserCount, = struct.unpack('!I', remain_data)
+                    # cmd
+                    elif opt == 5:
+                        messages = remain_data.decode('utf-8')
+                        state = printDanMu(self.area_id, messages)
+                    # 握手确认
+                    elif opt == 8:
+                        pass
+                    else:
+                        self.connected = False
+                        Printer().print_warning(bytes_datas[len_read:len_read + len_data])
                                 
                     if state is not None and not state:
                         return
                     len_read += len_data
+                  
+                    
                     
                
     
