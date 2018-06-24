@@ -19,12 +19,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
         Printer().print_warning(messages)
         return
     cmd = dic['cmd']
-    '''
-    if cmd == 'DANMU_MSG':
-        # print(dic)
-        Printer().printlist_append(['danmu', '弹幕', 'user', dic])
-        return
-    '''
+    
     if cmd == 'PREPARING':
         Printer().print_words([f'{area_id}分区检测器下播！将切换监听房间'], True)
         return False
@@ -68,12 +63,9 @@ async def DanMuraffle(area_id, connect_roomid, messages):
     if cmd == 'SYS_MSG':
         if 'real_roomid' in dic:
             try:
-                TV_url = dic['url']
                 real_roomid = dic['real_roomid']
-                # print(dic)
                 type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
                 Printer().print_words([f'{area_id}分区检测器检测到房间{real_roomid:^9}的{type_text}抽奖'], True)
-                # url = "https://api.live.bilibili.com/AppSmallTV/index?access_key=&actionKey=appkey&appkey=1d8b6e7d45233436&build=5230003&device=android&mobi_app=android&platform=android&roomid=939654&ts=1521734039&sign=4f85e1d3ce0e1a3acd46fcf9ca3cbeed"
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
                 Statistics.append2pushed_raffle(type_text, area_id=area_id)
                 
@@ -82,12 +74,11 @@ async def DanMuraffle(area_id, connect_roomid, messages):
         else:
             Printer().print_words([dic['msg']])
 
+        
     if cmd == 'GUARD_MSG':
-        # print(dic)
         a = re.compile(r"(?<=在主播 )\S+(?= 的直播间开通了总督)")
         res = re.search(a, dic['msg'])
         if res is not None:
-            # print(str(res.group()))
             name = str(res.group())
             Printer().print_words([f'{area_id}分区检测器检测到房间{name:^9}开通总督'], True)
             rafflehandler.Rafflehandler.Put2Queue((((name,), utils.find_live_user_roomid),), rafflehandler.handle_1_room_captain)
@@ -136,10 +127,9 @@ class bilibiliClient():
         
     async def CheckArea(self):
         while self.connected:
-            # await asyncio.sleep(300)
             area_id = await utils.FetchRoomArea(self.roomid)
             if area_id != self.area_id:
-                print(f'主播更换分区{self.area_id}为{area_id}，即将切换至新的有效分区(请反馈)')
+                print(f'{self.roomid}更换分区{self.area_id}为{area_id}，即将切换房间')
                 break
             await asyncio.sleep(300)
         
@@ -154,12 +144,10 @@ class bilibiliClient():
         if (await self.SendJoinChannel(self.roomid)):
             self.connected = True
             Printer().print_words([f'连接弹幕服务器{self.roomid}成功'], True)
-            # await self.ReceiveMessageLoop()
             return True
 
     async def HeartbeatLoop(self):
         Printer().print_words(['弹幕模块开始心跳（由于弹幕心跳间隔为30s，所以后续正常心跳不再提示）'], True)
-
         while self.connected:
             await self.SendSocketData(0, 16, ConfigLoader().dic_bilibili['_protocolversion'], 2, 1, "")
             await asyncio.sleep(30)
