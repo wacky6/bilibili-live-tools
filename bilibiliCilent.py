@@ -86,12 +86,11 @@ def printDanMu(area_id, messages):
 
 class bilibiliClient():
     
-    __slots__ = ('ws', 'connected', '_UserCount', 'roomid', 'raffle_handle', 'area_id')
+    __slots__ = ('ws', 'connected', 'roomid', 'raffle_handle', 'area_id')
 
     def __init__(self, roomid=None, area_id=None):
         self.ws = None
         self.connected = False
-        self._UserCount = 0
         if roomid is None:
             self.roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
             self.area_id = 0
@@ -131,23 +130,21 @@ class bilibiliClient():
             return True
 
     async def HeartbeatLoop(self):
-        Printer().print_words(['弹幕模块开始心跳（由于弹幕心跳间隔为30s，所以后续正常心跳不再提示）'], True)
+        Printer().print_words(['直播间弹幕心跳（由于该心跳间隔为30s，所以后续不再提示）'], True)
         while self.connected:
-            await self.SendSocketData(0, 16, ConfigLoader().dic_bilibili['_protocolversion'], 2, 1, '')
+            await self.SendSocketData(opt=2, body='')
             await asyncio.sleep(30)
 
     async def SendJoinChannel(self, channelId):
         body = f'{{"uid":0,"roomid":{channelId},"protover":1,"platform":"web","clientver":"1.3.3"}}'
-        await self.SendSocketData(0, 16, ConfigLoader().dic_bilibili['_protocolversion'], 7, 1, body)
+        await self.SendSocketData(opt=7, body=body)
         return True
 
-    async def SendSocketData(self, packetlength, magic, ver, action, param, body):
+    async def SendSocketData(self, opt, body, len_header=16, ver=1, seq=1):
         bytearr = body.encode('utf-8')
-        if not packetlength:
-            packetlength = len(bytearr) + 16
-        sendbytes = struct.pack('!IHHII', packetlength, magic, ver, action, param)
-        if body:
-            sendbytes = sendbytes + bytearr
+        len_data = len(bytearr) + len_header
+        sendbytes = struct.pack('!IHHII', len_data, len_header, ver, opt, seq)
+        sendbytes = sendbytes + bytearr
         try:
             await self.ws.send(sendbytes)
         except websockets.exceptions.ConnectionClosed:
@@ -201,7 +198,8 @@ class bilibiliClient():
                     remain_data = bytes_datas[len_read+16:len_read+len_data]
                     # 人气值/心跳 3s间隔
                     if opt == 3:
-                        self._UserCount, = struct.unpack('!I', remain_data)
+                        # self._UserCount, = struct.unpack('!I', remain_data)
+                        pass
                     # cmd
                     elif opt == 5:
                         messages = remain_data.decode('utf-8')
@@ -231,7 +229,8 @@ class bilibiliClient():
                     remain_data = bytes_datas[len_read+16:len_read+len_data]
                     # 人气值/心跳 3s间隔
                     if opt == 3:
-                        self._UserCount, = struct.unpack('!I', remain_data)
+                        # self._UserCount, = struct.unpack('!I', remain_data)
+                        pass
                     # cmd
                     elif opt == 5:
                         messages = remain_data.decode('utf-8')
