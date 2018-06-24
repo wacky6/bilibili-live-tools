@@ -1,4 +1,6 @@
-import subprocess, time, sys
+import subprocess
+import time
+import sys
 
 TIME = 3600
 CMD = "run.py"

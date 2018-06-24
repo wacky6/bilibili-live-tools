@@ -135,7 +135,7 @@ class Statistics:
     @staticmethod
     def append_to_TVlist(raffleid, real_roomid, time=''):
         inst = Statistics.instance
-        inst.TV_id_list.append((real_roomid,raffleid))
+        inst.TV_id_list.append((real_roomid, raffleid))
         # inst.TV_time_list.append(int(time)+int(CurrentTime()))
         # inst.TV_time_list.append(int(CurrentTime()))
         inst.append2joined_raffle('小电视(合计)')

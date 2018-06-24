@@ -51,7 +51,7 @@ tasks = [
     OnlineHeart.run(),
     Silver.run(),
     danmu_connection.run(),
-    #LotteryResult.run(),
+    # LotteryResult.run(),
     rafflehandler.run(),
     biliconsole.Biliconsole.run(),
     bili_timer.run(),

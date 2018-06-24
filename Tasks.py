@@ -20,6 +20,7 @@ async def Daily_bag():
         Printer().print_words(["# 获得-" + i['bag_name'] + "-成功"])
     await BiliTimer.append2list_jobs(Daily_bag, 21600)
 
+
 def CurrentTime():
     currenttime = str(int(time.mktime(datetime.datetime.now().timetuple())))
     return currenttime
@@ -88,8 +89,8 @@ async def send_gift():
                 list_gift.append([giftID, giftNum, bagID])
         if list_gift:
             print('发现即将过期的礼物')
-            if ConfigLoader().dic_user['task_control']['clean_expiring_gift2all_medal']:  
-                print('正在投递其他勋章')      
+            if ConfigLoader().dic_user['task_control']['clean_expiring_gift2all_medal']:
+                print('正在投递其他勋章')
                 list_medal = await utils.fetch_medal(printer=False)
                 list_gift = await full_intimate(list_gift, list_medal)
                 
@@ -105,7 +106,7 @@ async def send_gift():
 
 async def auto_send_gift():
     # await utils.WearingMedalInfo()
-    # return 
+    # return
     if ConfigLoader().dic_user['task_control']['send2wearing-medal']:
         list_medal = await utils.WearingMedalInfo()
         if list_medal is None:
@@ -125,7 +126,6 @@ async def auto_send_gift():
             if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
                 list_gift.append([gift_id, gift_num, bag_id])
         await full_intimate(list_gift, list_medal)
-                
                 
         # Printer().print_words(["# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
     await BiliTimer.append2list_jobs(auto_send_gift, 21600)
@@ -147,6 +147,7 @@ async def full_intimate(list_gift, list_medal):
                 continue
             i[1] -= gift_num
             score = dic_gift[gift_id] * gift_num
+            await asyncio.sleep(1.5)
             await utils.send_gift_web(roomid, gift_num, bag_id, gift_id)
             calculate = calculate + score
             left_intimate = left_intimate - score
@@ -211,10 +212,10 @@ async def GetVideoShareExp(list_topvideo):
 async def BiliMainTask():
     try:
         login, watch_av, num, share_av= await utils.GetRewardInfo()
-    except :
+    except:
         # print('当前网络不好，正在重试，请反馈开发者!!!!')
         print(sys.exc_info()[0], sys.exc_info()[1])
-        return 
+        return
     if ConfigLoader().dic_user['task_control']['fetchrule'] == 'bilitop':
         list_topvideo = await utils.GetTopVideoList()
     else:
@@ -272,17 +273,17 @@ async def check(id):
     print('目前已投票', voted)
     print('认为不违反规定的比例', percent)
     vote = 3
-    if voted >= 400: 
+    if voted >= 400:
         if percent >= 0.8:
             vote = 2
         elif percent <= 0.2:
             vote = 4
-    elif voted >= 150: 
+    elif voted >= 150:
         if percent >= 0.9:
             vote = 2
         elif percent <= 0.1:
             vote = 4
-    elif voted >= 50: 
+    elif voted >= 50:
         if percent >= 0.97:
             vote = 2
         elif percent <= 0.03:
@@ -305,7 +306,7 @@ async def judge():
             # await asyncio.sleep(1)
             break
         vote = await check(id)
-        await vote_case(id, vote)    
+        await vote_case(id, vote)
         print('投票结果', id, vote)
         list_result.append((id, vote))
         

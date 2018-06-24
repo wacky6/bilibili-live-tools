@@ -100,7 +100,8 @@ def process_watch_living_video():
         Biliconsole.append2list_console([[real_roomid], utils.watch_living_video])
         return
     print('仅支持ios')
-    
+
+        
 def InputGiveCoin2Av():
     video_id = input('请输入av号')
     num = input('输入数目')

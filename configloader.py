@@ -27,8 +27,8 @@ def load_bilibili(file):
         password = input("# 输入密码: ")
         dic_bilibili['account']['username'] = username
         dic_bilibili['account']['password'] = password
-        with open(file, 'w',encoding="utf-8") as f:
-            toml.dump(dic_bilibili, f)    
+        with open(file, 'w', encoding="utf-8") as f:
+            toml.dump(dic_bilibili, f)
             
     return dic_bilibili
     
@@ -55,7 +55,7 @@ def load_user(file):
             'debug': 1
         }
         之后抛弃
-    '''    
+    '''
     
     # print(dic_user)
             
@@ -89,7 +89,7 @@ class ConfigLoader():
             dic_bilibili = toml.load(f)
         for i in dic.keys():
             dic_bilibili['saved-session'][i] = dic[i]
-        with open(self.bilibilifile, 'w',encoding="utf-8") as f:
+        with open(self.bilibilifile, 'w', encoding="utf-8") as f:
             toml.dump(dic_bilibili, f)
         
         

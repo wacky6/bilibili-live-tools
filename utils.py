@@ -24,9 +24,11 @@ def adjust_for_chinese(str):
     md = f'{str[0]:^10}'
     return md.translate(full)
 
+
 def CurrentTime():
     currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
     return str(currenttime)
+
 
 def seconds_until_tomorrow():
     today = datetime.date.today()
@@ -429,7 +431,7 @@ async def fetch_uper_video(list_mid):
             json_rsp = await bilibili().req_fetch_uper_video(mid, page)
             # print(json_rsp)
             data = json_rsp['data']
-            list_av += [av['aid'] for av in data['vlist']] 
+            list_av += [av['aid'] for av in data['vlist']]
     # print(len(list_av), list_av)
     return list_av
 

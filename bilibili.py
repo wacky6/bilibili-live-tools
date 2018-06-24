@@ -512,8 +512,8 @@ class bilibili():
         url = f"{base_url}/gift/v3/smalltv/join"
         payload = {
             "roomid": real_roomid,
-            "raffleId": TV_raffleid, 
-            "type": "Gift", 
+            "raffleId": TV_raffleid,
+            "type": "Gift",
             "csrf_token": ''
             }
             
@@ -758,8 +758,7 @@ class bilibili():
         url = f'https://space.bilibili.com/ajax/member/getSubmitVideos?mid={mid}&pagesize=100&page={page}'
         json_rsp = await self.other_session_get(url)
         return json_rsp
-        
-        
+                
     async def req_fetch_av(self):
         text_tsp = await self.session_text_get('https://www.bilibili.com/ranking/all/0/0/1/')
         return text_tsp

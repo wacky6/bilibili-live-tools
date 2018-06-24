@@ -22,7 +22,7 @@ async def pcpost_heartbeat():
 
 
 async def heart_gift():
-    json_response =  await bilibili.heart_gift()
+    json_response = await bilibili.heart_gift()
     # print('heart_gift', json_response)
 
 

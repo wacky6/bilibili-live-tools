@@ -16,7 +16,7 @@ async def get_one(areaid):
     # 1 娱乐分区
     # 2 游戏分区
     # 3 手游分区
-    # 4 绘画分区 
+    # 4 绘画分区
     if areaid == 1:
         roomid = 23058
         # print(roomid)
@@ -38,6 +38,7 @@ async def get_one(areaid):
             print("检测到房间未开播，立即尝试重新获取")
     print(areaid, roomid)
     return roomid
+
 
 class connect():
     __slots__ = ('danmuji')
@@ -78,13 +79,12 @@ class connect():
                 print('# 当前网络不稳定，为避免频繁不必要尝试，将自动在5秒后重试')
                 await asyncio.sleep(5)
     
-    @staticmethod        
+    @staticmethod
     async def reconnect(roomid):
         ConfigLoader().dic_user['other_control']['default_monitor_roomid'] = roomid
         print('已经切换roomid')
         if connect.instance.danmuji is not None:
             await connect.instance.danmuji.close_connection()
-        
         
         
 class RaffleConnect():

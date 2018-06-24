@@ -49,16 +49,15 @@ class Printer():
         else:
             print(''.join(msg))
             
-            
     def print_words(self, list_msg, tag_time=False):
         timestamp(tag_time)
         for msg in list_msg:
             print(msg)
      
-    # 弹幕 礼物 。。。。type       
+    # 弹幕 礼物 。。。。type
     def print_danmu(self, dic_msg, type='normal'):
         if not self.dic_user['print_control']['danmu']:
-            return 
+            return
         list_msg, list_color = self.print_danmu_msg(dic_msg)
         if (self.dic_user['platform']['platform'] == 'ios_pythonista'):
             self.concole_print(list_msg, list_color)

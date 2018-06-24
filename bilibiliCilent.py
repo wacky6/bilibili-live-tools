@@ -24,10 +24,10 @@ async def DanMuraffle(area_id, connect_roomid, messages):
         # print(dic)
         Printer().printlist_append(['danmu', '弹幕', 'user', dic])
         return
-    '''    
+    '''
     if cmd == 'PREPARING':
-        Printer().print_words([f'{area_id}分区检测器下播！将切换监听房间'], True)  
-        return False  
+        Printer().print_words([f'{area_id}分区检测器下播！将切换监听房间'], True)
+        return False
     if cmd == 'SYS_GIFT':
         if 'giftId' in dic:
             if str(dic['giftId']) in bilibili.get_giftids_raffle_keys():
@@ -106,7 +106,7 @@ def printDanMu(area_id, messages):
     if cmd == 'DANMU_MSG':
         # print(dic)
         Printer().print_danmu(dic)
-        return          
+        return
                                                           
 
 class bilibiliClient():
@@ -126,11 +126,11 @@ class bilibiliClient():
             self.area_id = area_id
             self.raffle_handle = True
 
-    # 待确认    
+    # 待确认
     async def close_connection(self):
-        try: 
+        try:
             await self.ws.close()
-        except :
+        except:
             print('请联系开发者', sys.exc_info()[0], sys.exc_info()[1])
         self.connected = False
         
@@ -150,6 +150,7 @@ class bilibiliClient():
             print("# 连接无法建立，请检查本地网络状况")
             print(sys.exc_info()[0], sys.exc_info()[1])
             return False
+        # print('测试点')
         if (await self.SendJoinChannel(self.roomid)):
             self.connected = True
             Printer().print_words([f'连接弹幕服务器{self.roomid}成功'], True)
@@ -179,10 +180,10 @@ class bilibiliClient():
         try:
             await self.ws.send(sendbytes)
         except websockets.exceptions.ConnectionClosed:
-              print("# 主动关闭或者远端主动关闭.")
-              await self.ws.close()
-              self.connected = False
-              return None
+            print("# 主动关闭或者远端主动关闭.")
+            await self.ws.close()
+            self.connected = False
+            return None
         except:
             print(sys.exc_info()[0], sys.exc_info()[1])
             self.connected = False
@@ -193,29 +194,28 @@ class bilibiliClient():
             bytes_data = await asyncio.wait_for(self.ws.recv(), timeout=35.0)
             # print('hhhhh')
         except asyncio.TimeoutError:
-              print('# 由于心跳包30s一次，但是发现35内没有收到任何包，说明已经悄悄失联了，主动断开')
-              await self.ws.close()  
-              self.connected = False
-              return None
+            print('# 由于心跳包30s一次，但是发现35内没有收到任何包，说明已经悄悄失联了，主动断开')
+            await self.ws.close()
+            self.connected = False
+            return None
         except websockets.exceptions.ConnectionClosed:
-              print("# 主动关闭或者远端主动关闭")
-              await self.ws.close()
-              await self.ws.close()  
-              self.connected = False
-              return None
+            print("# 主动关闭或者远端主动关闭")
+            await self.ws.close()
+            await self.ws.close()
+            self.connected = False
+            return None
         except:
-            #websockets.exceptions.ConnectionClosed'>
+            # websockets.exceptions.ConnectionClosed'>
             print(sys.exc_info()[0], sys.exc_info()[1])
             print('请联系开发者')
             await self.ws.close()
             self.connected = False
             return None
-        # print(tmp) 
+        # print(tmp)
            
-        # print('测试0', bytes_data)                    
+        # print('测试0', bytes_data)
         return bytes_data
     
-                    
     async def ReceiveMessageLoop(self):
         if self.raffle_handle:
             while self.connected:
@@ -247,7 +247,7 @@ class bilibiliClient():
                             print(bytes_datas[len_read:len_read + len_data])
                                 
                     if state is not None and not state:
-                        return       
+                        return
                     len_read += len_data
         else:
             while self.connected:
@@ -281,8 +281,8 @@ class bilibiliClient():
                             print(bytes_datas[len_read:len_read + len_data])
                                 
                     if state is not None and not state:
-                        return       
-                    len_read += len_data 
+                        return
+                    len_read += len_data
                     
                
     

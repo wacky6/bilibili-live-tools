@@ -52,7 +52,8 @@ def LoginWithPwd():
         print("[{}] 登录失败,错误信息为:{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), response.json()))
         return False
 
-def login():    
+
+def login():
     if ConfigLoader().dic_bilibili['saved-session']['cookie']:
         bilibili.load_session(ConfigLoader().dic_bilibili['saved-session'])
         return HandleExpire()
@@ -106,7 +107,8 @@ def RefreshToken():
         return True
     print('联系作者(token刷新失败，cookie过期)', json_response)
     return False
-    
+
+        
 def HandleExpire():
     if not check_token():
         if not RefreshToken():

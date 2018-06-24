@@ -33,7 +33,7 @@ class Delay_Joiner:
             await asyncio.sleep(max(sleeptime, 0))
             await i[2](*i[3])
       
-    @staticmethod          
+    @staticmethod
     async def append2list_jobs(func, time_expected, tuple_values):
         await Delay_Joiner.instance.jobs.put((time_expected, func.__name__, func, tuple_values))
         # print('添加任务', time_expected, func.__name__, func, tuple_values)
@@ -64,7 +64,7 @@ class Rafflehandler:
                 
             # print('过滤完毕')
             # if len(list_raffle) != len(list_raffle0):
-                # print('过滤机制起作用')
+            # print('过滤机制起作用')
             
             tasklist = []
             for i in list_raffle:
@@ -110,7 +110,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
         elif code != -401 and code != -403:
             print('00', json_response2)
         await asyncio.sleep(1)
-    #json_response2 = await bilibili.get_gift_of_TV(real_roomid, raffleid)
+    # json_response2 = await bilibili.get_gift_of_TV(real_roomid, raffleid)
     data = json_response2['data']
     Statistics.append_to_TVlist(raffleid, real_roomid)
     Statistics.add_to_result(data['gift_name'], int(data['gift_num']))
@@ -192,8 +192,6 @@ async def handle_1_room_TV(real_roomid):
             if j['time_wait'] > 100:
                 list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
             
-            
-
             # print(raffle_id, raffle_type)
         num_available = len(list_available_raffleid)
         # print(list_available_raffleid)

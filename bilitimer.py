@@ -8,6 +8,7 @@ def CurrentTime():
     currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
     return currenttime
 
+
 class BiliTimer:
     __slots__ = ('jobs',)
     instance = None
@@ -31,7 +32,7 @@ class BiliTimer:
                 await asyncio.sleep(max(sleeptime, 0))
                 await i[2]()
       
-    @staticmethod          
+    @staticmethod
     async def append2list_jobs(func, delay):
         await BiliTimer.instance.jobs.put((CurrentTime() + delay, func.__name__, func))
         # print('添加任务')
