@@ -55,12 +55,9 @@ class connect():
             print('# 正在启动弹幕姬')
             time_start = int(utils.CurrentTime())
             self.danmuji = bilibiliClient()
-            task_connect = asyncio.ensure_future(self.danmuji.connectServer())
-            connect_results = await asyncio.gather(task_connect)
+            connect_results = await self.danmuji.connectServer()
             # print(connect_results)
-            if all(connect_results):
-                pass
-            else:
+            if not connect_results:
                 continue
             task_main = asyncio.ensure_future(self.danmuji.ReceiveMessageLoop())
             task_heartbeat = asyncio.ensure_future(self.danmuji.HeartbeatLoop())
@@ -99,12 +96,9 @@ class RaffleConnect():
             print('# 正在启动弹幕姬')
             time_start = int(utils.CurrentTime())
             self.danmuji = bilibiliClient(self.roomid, self.areaid)
-            task_connect = asyncio.ensure_future(self.danmuji.connectServer())
-            connect_results = await asyncio.gather(task_connect)
+            connect_results = await self.danmuji.connectServer()
             # print(connect_results)
-            if all(connect_results):
-                pass
-            else:
+            if not connect_results:
                 continue
             task_main = asyncio.ensure_future(self.danmuji.ReceiveMessageLoop())
             task_heartbeat = asyncio.ensure_future(self.danmuji.HeartbeatLoop())

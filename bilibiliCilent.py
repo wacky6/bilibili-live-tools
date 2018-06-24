@@ -126,11 +126,11 @@ class bilibiliClient():
         # print('测试点')
         if (await self.SendJoinChannel(self.roomid)):
             self.connected = True
-            Printer().print_words([f'连接弹幕服务器{self.roomid}成功'], True)
+            Printer().print_words([f'已连接{self.area_id}号弹幕服务器({self.roomid})'], True)
             return True
 
     async def HeartbeatLoop(self):
-        Printer().print_words(['直播间弹幕心跳（由于该心跳间隔为30s，所以后续不再提示）'], True)
+        Printer().print_words(['直播间弹幕心跳（该心跳间隔30s，后续不再提示）'], True)
         while self.connected:
             await self.SendSocketData(opt=2, body='')
             await asyncio.sleep(30)
