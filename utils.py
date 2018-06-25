@@ -384,7 +384,7 @@ async def fetch_liveuser_info(real_roomid):
         except:
             pass
 
-async def check_room_true(roomid):
+async def enter_room(roomid):
     json_response = await bilibili.request_check_room(roomid)
 
     if not json_response['code']:
@@ -396,6 +396,7 @@ async def check_room_true(roomid):
             Printer().print_words([f'抽奖脚本检测到房间{roomid:^9}为异常房间'], True)
             return False
         else:
+            await bilibili.post_watching_history(roomid)
             return True
 
 async def GiveCoin2Av(video_id, num):

@@ -122,6 +122,7 @@ async def handle_1_captain_raffle(num, roomid, raffleid):
     json_response2 = await bilibili.get_gift_of_captain(roomid, raffleid)
     if not json_response2['code']:
         print("# 获取到房间 %s 的总督奖励: " %(roomid), json_response2['data']['message'])
+        print(json_response2)
         Statistics.append_to_captainlist()
     else:
         print(json_response2)
@@ -154,26 +155,22 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
                 
 async def handle_1_room_TV(real_roomid):
     await asyncio.sleep(random.uniform(0.5, 1.5))
-    result = await utils.check_room_true(real_roomid)
+    result = await utils.enter_room(real_roomid)
     if result:
-        # print(True)
-        await bilibili.post_watching_history(real_roomid)
         json_response = await bilibili.get_giftlist_of_TV(real_roomid)
         current_time = CurrentTime()
         # print(json_response['data']['list'])
         checklen = json_response['data']['list']
         list_available_raffleid = []
         for j in checklen:
-            # await asyncio.sleep(random.uniform(0.5, 1))
-            # resttime = j['dtime']
             raffle_id = j['raffleId']
             raffle_type = j['type']
             time_wanted = j['time_wait'] + current_time
             # 处理一些重复
             if j['time_wait'] > 100:
+                # print(raffle_id)
                 list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
             
-            # print(raffle_id, raffle_type)
         num_available = len(list_available_raffleid)
         # print(list_available_raffleid)
         for raffle_id, raffle_type, time_wanted in list_available_raffleid:
@@ -181,10 +178,8 @@ async def handle_1_room_TV(real_roomid):
 
 async def handle_1_room_activity(giftId, text1, text2):
     await asyncio.sleep(random.uniform(0.5, 1.5))
-    result = await utils.check_room_true(text1)
+    result = await utils.enter_room(text1)
     if result:
-        # print(True)
-        await bilibili.post_watching_history(text1)
         json_response = await bilibili.get_giftlist_of_events(text1)
         checklen = json_response['data']
         list_available_raffleid = []
@@ -208,15 +203,12 @@ async def handle_1_room_activity(giftId, text1, text2):
 
 async def handle_1_room_captain(roomid):
     await asyncio.sleep(random.uniform(0.5, 1.5))
-    result = await utils.check_room_true(roomid)
+    result = await utils.enter_room(roomid)
     if result:
-        await bilibili.post_watching_history(roomid)
-        num = 0
         while True:
             json_response1 = await bilibili.get_giftlist_of_captain(roomid)
-            # print(json_response1)
-            num = len(json_response1['data']['guard'])
-            if not num:
+            print(json_response1['data']['guard'])
+            if not json_response1['data']['guard']:
                 await asyncio.sleep(5)
             else:
                 break
