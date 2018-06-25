@@ -392,8 +392,11 @@ async def check_room_true(roomid):
         param1 = data['is_hidden']
         param2 = data['is_locked']
         param3 = data['encrypted']
-        # print(param1, param2, param3)
-        return param1, param2, param3
+        if any((param1, param2, param3)):
+            Printer().print_words([f'抽奖脚本检测到房间{roomid:^9}为异常房间'], True)
+            return False
+        else:
+            return True
 
 async def GiveCoin2Av(video_id, num):
     if num not in (1, 2):

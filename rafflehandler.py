@@ -93,9 +93,7 @@ class Rafflehandler:
         print('目前TV任务队列状况', Rafflehandler.instance.queue_raffle.qsize())
         
 
-async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
-    # print('参与', raffleid)
-    
+async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):    
     while True:
         json_response2 = await bilibili.get_gift_of_TV_app(real_roomid, raffleid, raffle_type)
         code = json_response2['code']
@@ -110,7 +108,6 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
         elif code != -401 and code != -403:
             print('00', json_response2)
         await asyncio.sleep(1)
-    # json_response2 = await bilibili.get_gift_of_TV(real_roomid, raffleid)
     data = json_response2['data']
     Statistics.append_to_TVlist(raffleid, real_roomid)
     Statistics.add_to_result(data['gift_name'], int(data['gift_num']))
@@ -118,20 +115,6 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
     # Printer().print_words([f'# 道具抽奖状态: {json_response2["msg"]}'])
     print(f'# 房间{real_roomid:^9}网页端活动抽奖结果: {data["gift_name"]}X{data["gift_num"]}')
     return True
-    # -400不存在
-    # -500繁忙
-    # gift_name': '辣条', 'gift_num'
-    '''
-    if not json_response2['code']:
-        Statistics.append_to_TVlist(raffleid, real_roomid)
-        return True
-    elif json_response2['code'] == -500:
-        print('# -500繁忙，稍后重试')
-        return False
-    else:
-        print(json_response2)
-        return True
-    '''
  
                
 async def handle_1_captain_raffle(num, roomid, raffleid):
@@ -172,9 +155,7 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
 async def handle_1_room_TV(real_roomid):
     await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.check_room_true(real_roomid)
-    if True in result:
-        Printer().print_words([f'WARNING:检测到房间{real_roomid:^9}的钓鱼操作'], True)
-    else:
+    if result:
         # print(True)
         await bilibili.post_watching_history(real_roomid)
         json_response = await bilibili.get_giftlist_of_TV(real_roomid)
@@ -201,9 +182,7 @@ async def handle_1_room_TV(real_roomid):
 async def handle_1_room_activity(giftId, text1, text2):
     await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.check_room_true(text1)
-    if True in result:
-        Printer().print_words([f'WARNING:检测到房间{text1:^9}的钓鱼操作'], True)
-    else:
+    if result:
         # print(True)
         await bilibili.post_watching_history(text1)
         json_response = await bilibili.get_giftlist_of_events(text1)
@@ -230,10 +209,7 @@ async def handle_1_room_activity(giftId, text1, text2):
 async def handle_1_room_captain(roomid):
     await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.check_room_true(roomid)
-    if True in result:
-        Printer().print_words([f'WARNING:检测到房间{roomid:^9}的钓鱼操作'], True)
-    else:
-        # print(True)
+    if result:
         await bilibili.post_watching_history(roomid)
         num = 0
         while True:
