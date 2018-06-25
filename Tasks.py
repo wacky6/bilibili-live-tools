@@ -1,6 +1,4 @@
 from bilibili import bilibili
-import datetime
-import time
 import asyncio
 from configloader import ConfigLoader
 import utils
@@ -21,10 +19,6 @@ async def Daily_bag():
     await BiliTimer.append2list_jobs(Daily_bag, 21600)
 
 
-def CurrentTime():
-    currenttime = str(int(time.mktime(datetime.datetime.now().timetuple())))
-    return currenttime
-
 # 签到功能
 async def DoSign():
     # -500 done
@@ -33,9 +27,9 @@ async def DoSign():
     Printer().print_words([f'# 签到状态: {temp["msg"]}'])
     if temp['code'] == -500 and '已' in temp['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
-        await BiliTimer.append2list_jobs(DoSign, sleeptime)
     else:
-        await BiliTimer.append2list_jobs(DoSign, 350)
+        sleeptime = 350
+    await BiliTimer.append2list_jobs(DoSign, sleeptime)
 
 # 领取每日任务奖励
 async def Daily_Task():
@@ -47,17 +41,18 @@ async def Daily_Task():
         sleeptime = (utils.seconds_until_tomorrow() + 300)
         await BiliTimer.append2list_jobs(Daily_Task, sleeptime)
     else:
-        await BiliTimer.append2list_jobs(Daily_Task, 350)
+        sleeptime = 350
+    await BiliTimer.append2list_jobs(Daily_Task, sleeptime)
 
 async def Sign1Group(i1, i2):
     json_response = await bilibili.assign_group(i1, i2)
     if not json_response['code']:
         if (json_response['data']['status']) == 1:
-            Printer().print_words(["# 应援团 %s 已应援过" % (i1)])
+            Printer().print_words([f'# 应援团 {i1} 已应援过'])
         if (json_response['data']['status']) == 0:
-            Printer().print_words(["# 应援团 %s 应援成功,获得 %s 点亲密度" % (i1, json_response['data']['add_num'])])
+            Printer().print_words([f'# 应援团 {i1} 应援成功,获得 {json_response["data"]["add_num"]} 点亲密度'])
     else:
-        Printer().print_words(["# 应援团 %s 应援失败" % (i1)])
+        Printer().print_words([f'# 应援团 {i1} 应援失败'])
 
 # 应援团签到
 async def link_sign():
@@ -76,17 +71,13 @@ async def send_gift():
     if ConfigLoader().dic_user['task_control']['clean-expiring-gift']:
         argvs = await utils.fetch_bag_list(printer=False)
         # print(argvs)
-        sent = False
         roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
         time_set = ConfigLoader().dic_user['task_control']['set-expiring-time']
         list_gift = []
         for i in argvs:
             left_time = i[3]
             if left_time is not None and 0 < int(left_time) < time_set:  # 剩余时间少于半天时自动送礼
-                giftID = i[0]
-                giftNum = i[1]
-                bagID = i[2]
-                list_gift.append([giftID, giftNum, bagID])
+                list_gift.append(i[:3])
         if list_gift:
             print('发现即将过期的礼物')
             if ConfigLoader().dic_user['task_control']['clean_expiring_gift2all_medal']:
@@ -120,11 +111,9 @@ async def auto_send_gift():
         list_gift = []
         for i in temp:
             gift_id = int(i[0])
-            gift_num = int(i[1])
-            bag_id = int(i[2])
             left_time = i[3]
             if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
-                list_gift.append([gift_id, gift_num, bag_id])
+                list_gift.append(i[:3])
         await full_intimate(list_gift, list_medal)
                 
         # Printer().print_words(["# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
@@ -239,7 +228,7 @@ async def fetch_case():
         return id
     # 25008 真给力 , 移交众裁的举报案件已经被处理完
     # 25014 有时有时……
-    if temp['code'] == 25014 or 25008:
+    if temp['code'] == 25014 or temp['code'] == 25008:
         return
 
 
@@ -258,7 +247,6 @@ async def check(id):
         # print(match[0])
         temp = match[0]
     temp = json.loads(temp)
-    print(temp)
     # print(temp['data']['originUrl'])
     data = temp['data']
     print(data['originContent'])
