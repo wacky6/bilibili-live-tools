@@ -9,34 +9,28 @@ import random
      
 async def check_room_state(roomid):
     json_rsp = await bilibili.req_room_init(roomid)
-    state = json_rsp['data']['live_status']
-    return state
+    return json_rsp['data']['live_status']
 
 async def get_one(areaid):
-    # 1 娱乐分区
-    # 2 游戏分区
-    # 3 手游分区
-    # 4 绘画分区
+    # 1 娱乐分区, 2 游戏分区, 3 手游分区, 4 绘画分区
     if areaid == 1:
         roomid = 23058
-        # print(roomid)
         state = await check_room_state(roomid)
         if state == 1:
-            print(areaid, roomid)
+            Printer().print_words([f'{areaid}分区检测器目标房间{roomid}'], True)
             return roomid
             
     while True:
         json_rsp = await bilibili.req_realroomid(areaid)
         data = json_rsp['data']
         roomid = random.choice(data)['roomid']
-        # print(roomid)
         state = await check_room_state(roomid)
         if state == 1:
-            # print('ok')
             break
         else:
-            print("检测到房间未开播，立即尝试重新获取")
-    print(areaid, roomid)
+            print(state)
+            Printer().print_words([f'房间{roomid}未开播{state}，立即尝试重新获取'], True)
+    Printer().print_words([f'{areaid}分区检测器目标房间{roomid}'], True)
     return roomid
 
 
@@ -52,7 +46,7 @@ class connect():
         
     async def run(self):
         while True:
-            print('# 正在启动弹幕姬')
+            print('# 正在启动直播监控弹幕姬')
             time_start = int(utils.CurrentTime())
             self.danmuji = bilibiliClient()
             connect_results = await self.danmuji.connectServer()
@@ -93,7 +87,7 @@ class RaffleConnect():
     async def run(self):
         while True:
             self.roomid = await get_one(self.areaid)
-            print('# 正在启动弹幕姬')
+            print('# 正在启动抽奖监控弹幕姬')
             time_start = int(utils.CurrentTime())
             self.danmuji = bilibiliClient(self.roomid, self.areaid)
             connect_results = await self.danmuji.connectServer()

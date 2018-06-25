@@ -4,25 +4,20 @@ import toml
 
 # "#969696"
 def hex_to_rgb_percent(hex_str):
-    color = webcolors.hex_to_rgb_percent(hex_str)
-    
+    color = webcolors.hex_to_rgb_percent(hex_str)    
     return [float(i.strip('%'))/100.0 for i in color]
 
 
 # "255 255 255"
 def rgb_to_percent(rgb_list):
-    # print(rgb_list)
-    color = webcolors.rgb_to_rgb_percent(rgb_list)
-    
+    color = webcolors.rgb_to_rgb_percent(rgb_list)    
     return [float(i.strip('%'))/100.0 for i in color]
 
     
 def load_bilibili(file):
     with open(file, encoding="utf-8") as f:
         dic_bilibili = toml.load(f)
-    if dic_bilibili['account']['username']:
-        pass
-    else:
+    if not dic_bilibili['account']['username']:
         username = input("# 输入帐号: ")
         password = input("# 输入密码: ")
         dic_bilibili['account']['username'] = username
@@ -49,16 +44,6 @@ def load_color(file):
 def load_user(file):
     with open(file, encoding="utf-8") as f:
         dic_user = toml.load(f)
-    '''
-    dictionary = {
-            'user': 0,
-            'debug': 1
-        }
-        之后抛弃
-    '''
-    
-    # print(dic_user)
-            
     return dic_user
     
     
@@ -84,7 +69,6 @@ class ConfigLoader():
         return cls.instance
     
     def write2bilibili(self, dic):
-        # print(dic)
         with open(self.bilibilifile, encoding="utf-8") as f:
             dic_bilibili = toml.load(f)
         for i in dic.keys():
