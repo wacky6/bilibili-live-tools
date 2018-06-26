@@ -12,12 +12,11 @@ import re
 import sys
 
 
-async def DanMuraffle(area_id, connect_roomid, messages):
-    dic = json.loads(messages)
+async def DanMuraffle(area_id, connect_roomid, dic):
     cmd = dic['cmd']
     
     if cmd == 'PREPARING':
-        Printer().print_words([f'{area_id}分区检测器下播！将切换监听房间'], True)
+        Printer().print_words([f'{area_id}号弹幕监控房间下播({connect_roomid})'], True)
         return False
     elif cmd == 'SYS_GIFT':
         if 'giftId' in dic:
@@ -60,7 +59,7 @@ async def DanMuraffle(area_id, connect_roomid, messages):
         if 'real_roomid' in dic:
             real_roomid = dic['real_roomid']
             type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
-            Printer().print_words([f'{area_id}号检测到{real_roomid:^9}的{type_text}'], True)
+            Printer().print_words([f'{area_id}号弹幕监控检测到{real_roomid:^9}的{type_text}'], True)
             rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
             Statistics.append2pushed_raffle(type_text, area_id=area_id)
             
@@ -69,13 +68,12 @@ async def DanMuraffle(area_id, connect_roomid, messages):
         res = re.search(a, dic['msg'])
         if res is not None:
             name = str(res.group())
-            Printer().print_words([f'{area_id}号检测到{name:^9}的总督'], True)
+            Printer().print_words([f'{area_id}号弹幕监控检测到{name:^9}的总督'], True)
             rafflehandler.Rafflehandler.Put2Queue((((name,), utils.find_live_user_roomid),), rafflehandler.handle_1_room_captain)
             Statistics.append2pushed_raffle('总督', area_id=area_id)
         
   
-def printDanMu(area_id, messages):
-    dic = json.loads(messages)
+def printDanMu(dic):
     cmd = dic['cmd']
     # print(cmd)
     if cmd == 'DANMU_MSG':
@@ -123,14 +121,13 @@ class bilibiliClient():
             print("# 连接无法建立，请检查本地网络状况")
             print(sys.exc_info()[0], sys.exc_info()[1])
             return False
-        # print('测试点')
+        Printer().print_words([f'{self.area_id}号弹幕监控已连接b站服务器'], True)
         if (await self.SendJoinChannel(self.roomid)):
             self.connected = True
-            Printer().print_words([f'已连接{self.area_id}号弹幕服务器({self.roomid})'], True)
             return True
 
     async def HeartbeatLoop(self):
-        Printer().print_words(['直播间弹幕心跳（该心跳间隔30s，后续不再提示）'], True)
+        Printer().print_words([f'{self.area_id}号弹幕监控开始心跳（心跳间隔30s，后续不再提示）'], True)
         while self.connected:
             await self.SendSocketData(opt=2, body='')
             await asyncio.sleep(30)
@@ -203,10 +200,11 @@ class bilibiliClient():
                     # cmd
                     elif opt == 5:
                         messages = remain_data.decode('utf-8')
-                        state = await DanMuraffle(self.area_id, self.roomid, messages)
+                        dic = json.loads(messages)
+                        state = await DanMuraffle(self.area_id, self.roomid, dic)
                     # 握手确认
                     elif opt == 8:
-                        pass
+                        Printer().print_words([f'{self.area_id}号弹幕监控进入房间（{self.roomid}）'], True)
                     else:
                         self.connected = False
                         Printer().print_warning(bytes_datas[len_read:len_read + len_data])
@@ -234,10 +232,11 @@ class bilibiliClient():
                     # cmd
                     elif opt == 5:
                         messages = remain_data.decode('utf-8')
-                        state = printDanMu(self.area_id, messages)
+                        dic = json.loads(messages)
+                        state = printDanMu(dic)
                     # 握手确认
                     elif opt == 8:
-                        pass
+                        Printer().print_words([f'{self.area_id}号弹幕监控进入房间（{self.roomid}）'], True)
                     else:
                         self.connected = False
                         Printer().print_warning(bytes_datas[len_read:len_read + len_data])
