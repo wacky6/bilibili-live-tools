@@ -102,19 +102,19 @@ class Printer():
                 list_color.append(self.dic_color['user-level']['ul' + str(info[4][0])])
                 list_msg.append('UL' + str(info[4][0]) + ' ')
         try:
-            if info[2][7] != '':
+            if info[2][7]:
                 list_color.append(hex_to_rgb_percent(info[2][7]))
-                list_msg.append(info[2][1])
+                list_msg.append(info[2][1] + ':')
             else:
-                list_msg.append(info[2][1])
-                list_color.append([])
+                list_msg.append(info[2][1] + ':')
+                list_color.append(self.dic_color['others']['default_name'])
             # print(info)
         except:
             print("# 小电视降临本直播间")
-            list_msg.append(info[2][1])
-            list_color.append([])
+            list_msg.append(info[2][1] + ':')
+            list_color.append(self.dic_color['others']['default_name'])
             
-        list_msg.append(':' + info[1])
+        list_msg.append(info[1])
         list_color.append([])
         return list_msg, list_color
             
