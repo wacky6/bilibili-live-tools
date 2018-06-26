@@ -72,7 +72,7 @@ def logout():
 def check_token():
     response = bilibili.request_check_token()
     json_response = response.json()
-    if not json_response['code'] and json_response['data'].get('mid', ''):
+    if not json_response['code'] and 'mid' in json_response['data']:
         print('token有效期检查: 仍有效')
         # print(json_response)
         return True

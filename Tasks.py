@@ -199,12 +199,7 @@ async def GetVideoShareExp(list_topvideo):
     await bilibili().DailyVideoShare(aid)
 
 async def BiliMainTask():
-    try:
-        login, watch_av, num, share_av= await utils.GetRewardInfo()
-    except:
-        # print('当前网络不好，正在重试，请反馈开发者!!!!')
-        print(sys.exc_info()[0], sys.exc_info()[1])
-        return
+    login, watch_av, num, share_av= await utils.GetRewardInfo()
     if ConfigLoader().dic_user['task_control']['fetchrule'] == 'bilitop':
         list_topvideo = await utils.GetTopVideoList()
     else:

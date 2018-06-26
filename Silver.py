@@ -21,10 +21,9 @@ async def GetAward():
     silver_time = await time_start()
     if silver_time is not None:
         timestart, timeend = silver_time
-    else:
-        return
-    json_response = await bilibili.get_silver(timestart, timeend)
-    return json_response
+        json_response = await bilibili.get_silver(timestart, timeend)
+        return json_response
+    
 
 async def run():
     while True:
