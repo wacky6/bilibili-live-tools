@@ -5,7 +5,6 @@ import utils
 from printer import Printer
 from bilitimer import BiliTimer
 import random
-import sys
 import re
 import json
 
@@ -199,7 +198,7 @@ async def GetVideoShareExp(list_topvideo):
     await bilibili().DailyVideoShare(aid)
 
 async def BiliMainTask():
-    login, watch_av, num, share_av= await utils.GetRewardInfo()
+    login, watch_av, num, share_av = await utils.GetRewardInfo()
     if ConfigLoader().dic_user['task_control']['fetchrule'] == 'bilitop':
         list_topvideo = await utils.GetTopVideoList()
     else:
@@ -221,10 +220,6 @@ async def fetch_case():
     if not temp['code']:
         id = temp['data']['id']
         return id
-    # 25008 真给力 , 移交众裁的举报案件已经被处理完
-    # 25014 有时有时……
-    if temp['code'] == 25014 or temp['code'] == 25008:
-        return
 
 
 async def check(id):
@@ -281,7 +276,8 @@ async def vote_case(id, vote):
  
                
 async def judge():
-    list_result = []
+    num_case = 0
+    num_voted = 0
     while True:
         id = await fetch_case()
         if id is None:
@@ -291,11 +287,14 @@ async def judge():
         vote = await check(id)
         await vote_case(id, vote)
         print('投票结果', id, vote)
-        list_result.append((id, vote))
+        num_case += 1
+        if vote != 3:
+            num_voted += 1
         
         print('______________________________')
         # await asyncio.sleep(1)
-    print(list_result, f'共{len(list_result)}案例')
+    
+    Printer().print_words([f'风纪委员会共{num_case}件案例，其中有效投票{num_voted}件'], True)
     await BiliTimer.append2list_jobs(judge, 3600)
         
 
