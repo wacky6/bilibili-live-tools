@@ -122,7 +122,7 @@ async def handle_1_captain_raffle(num, roomid, raffleid):
     json_response2 = await bilibili.get_gift_of_captain(roomid, raffleid)
     if not json_response2['code']:
         print("# 获取到房间 %s 的总督奖励: " %(roomid), json_response2['data']['message'])
-        print(json_response2)
+        # print(json_response2)
         Statistics.append_to_captainlist()
     else:
         print(json_response2)
@@ -207,7 +207,7 @@ async def handle_1_room_captain(roomid):
     if result:
         while True:
             json_response1 = await bilibili.get_giftlist_of_captain(roomid)
-            print(json_response1['data']['guard'])
+            # print(json_response1['data']['guard'])
             if not json_response1['data']['guard']:
                 await asyncio.sleep(5)
             else:
