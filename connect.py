@@ -17,7 +17,7 @@ async def get_one(areaid):
         roomid = 23058
         state = await check_room_state(roomid)
         if state == 1:
-            Printer().print_words([f'{areaid}分区检测器目标房间{roomid}'], True)
+            Printer().print_words([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
             return roomid
             
     while True:
@@ -26,12 +26,8 @@ async def get_one(areaid):
         roomid = random.choice(data)['roomid']
         state = await check_room_state(roomid)
         if state == 1:
-            break
-        else:
-            print(state)
-            Printer().print_words([f'房间{roomid}未开播{state}，立即尝试重新获取'], True)
-    Printer().print_words([f'{areaid}分区检测器目标房间{roomid}'], True)
-    return roomid
+            Printer().print_words([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
+            return roomid
 
 
 class connect():
