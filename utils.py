@@ -91,11 +91,6 @@ async def fetch_medal(printer=True):
         # print(list_medal)
         return list_medal
 
-async def send_danmu_msg_andriod(msg, roomId):
-    json_response = await bilibili.request_send_danmu_msg_andriod(msg, roomId)
-    # print('ggghhhjj')
-    print(json_response)
-
 async def send_danmu_msg_web(msg, roomId):
     json_response = await bilibili.request_send_danmu_msg_web(msg, roomId)
     print(json_response)

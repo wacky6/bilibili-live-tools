@@ -4,9 +4,8 @@ from printer import Printer
 import asyncio
 
 
-# 领瓜子时判断领取周期的参数
-async def time_start():
-
+# 领取银瓜子
+async def GetAward():
     temp = await bilibili.get_time_about_silver()
     # print (temp['code'])    #宝箱领完返回的code为-10017
     if temp['code'] == -10017:
@@ -14,14 +13,7 @@ async def time_start():
     else:
         time_start = temp['data']['time_start']
         time_end = temp['data']['time_end']
-        return str(time_start), str(time_end)
-
-# 领取银瓜子
-async def GetAward():
-    silver_time = await time_start()
-    if silver_time is not None:
-        timestart, timeend = silver_time
-        json_response = await bilibili.get_silver(timestart, timeend)
+        json_response = await bilibili.get_silver(time_start, time_end)
         return json_response
     
 
