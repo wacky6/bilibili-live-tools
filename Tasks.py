@@ -46,9 +46,9 @@ async def Daily_Task():
 async def Sign1Group(i1, i2):
     json_response = await bilibili.assign_group(i1, i2)
     if not json_response['code']:
-        if (json_response['data']['status']) == 1:
+        if json_response['data']['status']:
             Printer().print_words([f'# 应援团 {i1} 已应援过'])
-        if (json_response['data']['status']) == 0:
+        else:
             Printer().print_words([f'# 应援团 {i1} 应援成功,获得 {json_response["data"]["add_num"]} 点亲密度'])
     else:
         Printer().print_words([f'# 应援团 {i1} 应援失败'])
@@ -214,13 +214,6 @@ async def BiliMainTask():
     # b站傻逼有记录延迟，3点左右成功率高一点
     await BiliTimer.append2list_jobs(BiliMainTask, utils.seconds_until_tomorrow() + 10800)
 
-    
-async def fetch_case():
-    temp = await bilibili().req_fetch_case()
-    if not temp['code']:
-        id = temp['data']['id']
-        return id
-
 
 async def check(id):
     # 3放弃
@@ -232,11 +225,7 @@ async def check(id):
         
     pattern = re.compile(r'\((.+)\)')
     match = pattern.findall(text_rsp)
-    if match:
-        # 使用Match获得分组信息
-        # print(match[0])
-        temp = match[0]
-    temp = json.loads(temp)
+    temp = json.loads(match[0])
     # print(temp['data']['originUrl'])
     data = temp['data']
     print(data['originContent'])
@@ -267,26 +256,23 @@ async def check(id):
         elif percent <= 0.03:
             vote = 4
     return vote
-    
-                
-async def vote_case(id, vote):
-    json_rsp = await bilibili().req_vote_case(id, vote)
-    print(json_rsp)
-    return True
  
                
 async def judge():
     num_case = 0
     num_voted = 0
     while True:
-        id = await fetch_case()
-        if id is None:
+        temp = await bilibili().req_fetch_case()
+        if not temp['code']:
+            id = temp['data']['id']
+        else:
             print('本次未获取到案件')
             # await asyncio.sleep(1)
             break
         vote = await check(id)
-        await vote_case(id, vote)
-        print('投票结果', id, vote)
+        print('投票决策', id, vote)
+        json_rsp = await bilibili().req_vote_case(id, vote)
+        print(json_rsp)
         num_case += 1
         if vote != 3:
             num_voted += 1
@@ -294,7 +280,7 @@ async def judge():
         print('______________________________')
         # await asyncio.sleep(1)
     
-    Printer().print_words([f'风纪委员会共{num_case}件案例，其中有效投票{num_voted}件'], True)
+    Printer().print_words([f'风纪委员会共获取{num_case}件案例，其中有效投票{num_voted}件'], True)
     await BiliTimer.append2list_jobs(judge, 3600)
         
 
