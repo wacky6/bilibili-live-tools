@@ -8,22 +8,14 @@ import login
 
 def CurrentTime():
     currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
-    return str(currenttime)
+    return currenttime
 
 
-async def apppost_heartbeat():
+async def heartbeat():
     json_response = await bilibili.apppost_heartbeat()
-    # print('apppost_heartbeat', json_response)
-
-
-async def pcpost_heartbeat():
     json_response = await bilibili.pcpost_heartbeat()
-    # print('pcpost_heartbeat', json_response)
-
-
-async def heart_gift():
     json_response = await bilibili.heart_gift()
-    # print('heart_gift', json_response)
+    # print('pcpost_heartbeat', json_response)
 
 
 # 因为休眠时间差不多,所以放到这里,此为实验性功能
@@ -57,9 +49,7 @@ async def run():
     while 1:
         Printer().print_words(["心跳"], True)
         login.HandleExpire()
-        await apppost_heartbeat()
-        await pcpost_heartbeat()
-        await heart_gift()
+        await heartbeat()
         await draw_lottery()
         await asyncio.sleep(300)
 
