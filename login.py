@@ -26,9 +26,10 @@ def LoginWithPwd():
     response = bilibili.normal_login(username, password)
     while response.json()['code'] == -105:
         response = bilibili.login_with_captcha(username, password)
-    try:
-        # print(response.json())
-        data = response.json()['data']
+    json_rsp = response.json()
+    # print(json_rsp)
+    if not json_rsp['code'] and not json_rsp['data']['status']:
+        data = json_rsp['data']
         access_key = data['token_info']['access_token']
         refresh_token = data['token_info']['refresh_token']
         cookie = data['cookie_info']['cookies']
@@ -48,8 +49,8 @@ def LoginWithPwd():
         print("[{}] {}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '密码登陆成功'))
         return True
         
-    except:
-        print("[{}] 登录失败,错误信息为:{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), response.json()))
+    else:
+        print("[{}] 登录失败,错误信息为:{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), json_rsp))
         return False
 
 
