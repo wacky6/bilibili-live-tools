@@ -47,7 +47,7 @@ async def draw_lottery():
         
 async def run():
     while 1:
-        Printer().print_words(["心跳"], True)
+        Printer().info(["心跳"], True)
         login.HandleExpire()
         await heartbeat()
         await draw_lottery()
