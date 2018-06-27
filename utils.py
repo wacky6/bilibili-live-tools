@@ -86,7 +86,7 @@ async def fetch_medal(printer=True):
                                                            adjust_for_chinese(str(i['rank'])),
                                                            dic_worn[str(i['status'])]))
         if printer:
-            Printer().print_words(printlist, True)
+            Printer().info(printlist, True)
         list_medal = [i[:3] for i in sorted(list_medal, key=itemgetter(3), reverse=True)]
         # print(list_medal)
         return list_medal
@@ -388,7 +388,7 @@ async def enter_room(roomid):
         param2 = data['is_locked']
         param3 = data['encrypted']
         if any((param1, param2, param3)):
-            Printer().print_words([f'抽奖脚本检测到房间{roomid:^9}为异常房间'], True)
+            Printer().info([f'抽奖脚本检测到房间{roomid:^9}为异常房间'], True)
             return False
         else:
             await bilibili.post_watching_history(roomid)

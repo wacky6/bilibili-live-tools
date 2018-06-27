@@ -14,7 +14,7 @@ async def Daily_bag():
     # no done code
     # print('Daily_bag', json_response)
     for i in json_response['data']['bag_list']:
-        Printer().print_words(["# 获得-" + i['bag_name'] + "-成功"])
+        Printer().info(["# 获得-" + i['bag_name'] + "-成功"])
     await BiliTimer.append2list_jobs(Daily_bag, 21600)
 
 
@@ -23,7 +23,7 @@ async def DoSign():
     # -500 done
     temp = await bilibili.get_dosign()
     # print('DoSign', temp)
-    Printer().print_words([f'# 签到状态: {temp["msg"]}'])
+    Printer().info([f'# 签到状态: {temp["msg"]}'])
     if temp['code'] == -500 and '已' in temp['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
     else:
@@ -34,7 +34,7 @@ async def DoSign():
 async def Daily_Task():
     # -400 done/not yet
     json_response2 = await bilibili.get_dailytask()
-    Printer().print_words([f'# 双端观看直播:  {json_response2["msg"]}'])
+    Printer().info([f'# 双端观看直播:  {json_response2["msg"]}'])
     # print('Daily_Task', json_response2)
     if json_response2['code'] == -400 and '已' in json_response2['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
@@ -47,11 +47,11 @@ async def Sign1Group(i1, i2):
     json_response = await bilibili.assign_group(i1, i2)
     if not json_response['code']:
         if json_response['data']['status']:
-            Printer().print_words([f'# 应援团 {i1} 已应援过'])
+            Printer().info([f'# 应援团 {i1} 已应援过'])
         else:
-            Printer().print_words([f'# 应援团 {i1} 应援成功,获得 {json_response["data"]["add_num"]} 点亲密度'])
+            Printer().info([f'# 应援团 {i1} 应援成功,获得 {json_response["data"]["add_num"]} 点亲密度'])
     else:
-        Printer().print_words([f'# 应援团 {i1} 应援失败'])
+        Printer().info([f'# 应援团 {i1} 应援失败'])
 
 # 应援团签到
 async def link_sign():
@@ -115,7 +115,7 @@ async def auto_send_gift():
                 list_gift.append(i[:3])
         await full_intimate(list_gift, list_medal)
                 
-        # Printer().print_words(["# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
+        # Printer().info(["# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
     await BiliTimer.append2list_jobs(auto_send_gift, 21600)
 
 async def full_intimate(list_gift, list_medal):
@@ -139,7 +139,7 @@ async def full_intimate(list_gift, list_medal):
             await utils.send_gift_web(roomid, gift_num, bag_id, gift_id)
             calculate = calculate + score
             left_intimate = left_intimate - score
-        Printer().print_words([f'# 对{medal_name}共送出亲密度为{int(calculate)}的礼物'])
+        Printer().info([f'# 对{medal_name}共送出亲密度为{int(calculate)}的礼物'])
     return [i for i in list_gift if i[1]]
 
 
@@ -156,8 +156,8 @@ async def sliver2coin():
         json_response1 = await bilibili.silver2coin_app()
         # -403 done
         json_response = await bilibili.silver2coin_web()
-        Printer().print_words([f'#  {json_response["msg"]}'])
-        Printer().print_words([f'#  {json_response1["msg"]}'])
+        Printer().info([f'#  {json_response["msg"]}'])
+        Printer().info([f'#  {json_response1["msg"]}'])
         if json_response['code'] == -403 and '只' in json_response['msg']:
             finish_web = True
         else:
@@ -280,7 +280,7 @@ async def judge():
         print('______________________________')
         # await asyncio.sleep(1)
     
-    Printer().print_words([f'风纪委员会共获取{num_case}件案例，其中有效投票{num_voted}件'], True)
+    Printer().info([f'风纪委员会共获取{num_case}件案例，其中有效投票{num_voted}件'], True)
     await BiliTimer.append2list_jobs(judge, 3600)
         
 

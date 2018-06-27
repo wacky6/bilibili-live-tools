@@ -27,6 +27,9 @@ def timestamp(tag_time):
         str_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
         print(f'[{str_time}]', end=' ')
         return str_time
+    else:
+        # print('    ', end='')
+        pass
 
 
 class Printer():
@@ -49,7 +52,7 @@ class Printer():
         else:
             print(''.join(msg))
             
-    def print_words(self, list_msg, tag_time=False):
+    def info(self, list_msg, tag_time=False):
         timestamp(tag_time)
         for msg in list_msg:
             print(msg)
@@ -64,12 +67,12 @@ class Printer():
         else:
             self.concole_print(list_msg)
               
-    def print_warning(self, msg):
+    def warn(self, msg):
         with codecs.open(r'bili.log', 'a', encoding='utf-8') as f:
             f.write(f'{timestamp(True)} {msg}\n')
         print(msg)
         
-    def print_error(self, msg):
+    def error(self, msg):
         print(msg)
     
     def print_danmu_msg(self, dic):
