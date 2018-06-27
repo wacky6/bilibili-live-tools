@@ -38,7 +38,6 @@ async def Daily_Task():
     # print('Daily_Task', json_response2)
     if json_response2['code'] == -400 and '已' in json_response2['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
-        await BiliTimer.append2list_jobs(Daily_Task, sleeptime)
     else:
         sleeptime = 350
     await BiliTimer.append2list_jobs(Daily_Task, sleeptime)
