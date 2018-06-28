@@ -1,7 +1,7 @@
 import asyncio
 import utils
 from bilibiliCilent import bilibiliClient
-from printer import Printer
+import printer
 from bilibili import bilibili
 from configloader import ConfigLoader
 import random
@@ -17,7 +17,7 @@ async def get_one(areaid):
         roomid = 23058
         state = await check_room_state(roomid)
         if state == 1:
-            Printer().info([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
+            printer.info([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
             return roomid
             
     while True:
@@ -26,7 +26,7 @@ async def get_one(areaid):
         roomid = random.choice(data)['roomid']
         state = await check_room_state(roomid)
         if state == 1:
-            Printer().info([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
+            printer.info([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
             return roomid
 
 

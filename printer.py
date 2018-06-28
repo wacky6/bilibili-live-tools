@@ -32,6 +32,22 @@ def timestamp(tag_time):
         pass
 
 
+def info(list_msg, tag_time=False):
+    timestamp(tag_time)
+    for msg in list_msg:
+        print(msg)
+        
+
+def warn(msg):
+    with codecs.open(r'bili.log', 'a', encoding='utf-8') as f:
+        f.write(f'{timestamp(True)} {msg}\n')
+    print(msg)
+
+        
+def error(msg):
+    print(msg)
+    
+
 class Printer():
     instance = None
 
@@ -51,12 +67,7 @@ class Printer():
             console.set_color()
         else:
             print(''.join(msg))
-            
-    def info(self, list_msg, tag_time=False):
-        timestamp(tag_time)
-        for msg in list_msg:
-            print(msg)
-     
+             
     # 弹幕 礼物 。。。。type
     def print_danmu(self, dic_msg, type='normal'):
         if not self.dic_user['print_control']['danmu']:
@@ -66,14 +77,6 @@ class Printer():
             self.concole_print(list_msg, list_color)
         else:
             self.concole_print(list_msg)
-              
-    def warn(self, msg):
-        with codecs.open(r'bili.log', 'a', encoding='utf-8') as f:
-            f.write(f'{timestamp(True)} {msg}\n')
-        print(msg)
-        
-    def error(self, msg):
-        print(msg)
     
     def print_danmu_msg(self, dic):
         info = dic['info']

@@ -1,5 +1,6 @@
 from bilibili import bilibili
 from statistics import Statistics
+import printer
 from printer import Printer
 import rafflehandler
 from configloader import ConfigLoader
@@ -16,7 +17,7 @@ async def DanMuraffle(area_id, connect_roomid, dic):
     cmd = dic['cmd']
     
     if cmd == 'PREPARING':
-        Printer().info([f'{area_id}号弹幕监控房间下播({connect_roomid})'], True)
+        printer.info([f'{area_id}号弹幕监控房间下播({connect_roomid})'], True)
         return False
     elif cmd == 'SYS_GIFT':
         if 'giftId' in dic:
@@ -25,12 +26,12 @@ async def DanMuraffle(area_id, connect_roomid, dic):
                 text1 = dic['real_roomid']
                 text2 = dic['url']
                 giftId = dic['giftId']
-                Printer().info(["检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
+                printer.info(["检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
                 rafflehandler.Rafflehandler.Put2Queue((giftId, text1, text2), rafflehandler.handle_1_room_activity)
                 Statistics.append2pushed_raffle('活动', area_id=area_id)
                         
             elif dic['giftId'] == 39:
-                Printer().info(["节奏风暴"], True)
+                printer.info(["节奏风暴"], True)
                 temp = await bilibili.get_giftlist_of_storm(dic)
                 check = len(temp['data'])
                 if check != 0 and temp['data']['hasJoin'] != 1:
@@ -38,28 +39,28 @@ async def DanMuraffle(area_id, connect_roomid, dic):
                     json_response1 = await bilibili.get_gift_of_storm(id)
                     print(json_response1)
                 else:
-                    Printer().info([dic, "请联系开发者"])
+                    printer.info([dic, "请联系开发者"])
             else:
                 text1 = dic['real_roomid']
                 text2 = dic['url']
-                Printer().info([dic, "请联系开发者"])
+                printer.info([dic, "请联系开发者"])
                 try:
                     giftId = dic['giftId']
-                    Printer().info(["检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
+                    printer.info(["检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
                     rafflehandler.Rafflehandler.Put2Queue((giftId, text1, text2), rafflehandler.handle_1_room_activity)
                     Statistics.append2pushed_raffle('活动', area_id=area_id)
                             
                 except:
-                    Printer().info([dic, "请联系开发者"])
+                    printer.info([dic, "请联系开发者"])
                 
         else:
-            Printer().info(['普通送礼提示', dic['msg_text']])
+            printer.info(['普通送礼提示', dic['msg_text']])
         return
     elif cmd == 'SYS_MSG':
         if 'real_roomid' in dic:
             real_roomid = dic['real_roomid']
             type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
-            Printer().info([f'{area_id}号弹幕监控检测到{real_roomid:^9}的{type_text}'], True)
+            printer.info([f'{area_id}号弹幕监控检测到{real_roomid:^9}的{type_text}'], True)
             rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
             Statistics.append2pushed_raffle(type_text, area_id=area_id)
             
@@ -68,7 +69,7 @@ async def DanMuraffle(area_id, connect_roomid, dic):
         res = re.search(a, dic['msg'])
         if res is not None:
             name = str(res.group())
-            Printer().info([f'{area_id}号弹幕监控检测到{name:^9}的总督'], True)
+            printer.info([f'{area_id}号弹幕监控检测到{name:^9}的总督'], True)
             rafflehandler.Rafflehandler.Put2Queue((((name,), utils.find_live_user_roomid),), rafflehandler.handle_1_room_captain)
             Statistics.append2pushed_raffle('总督', area_id=area_id)
         
@@ -121,13 +122,13 @@ class bilibiliClient():
             print("# 连接无法建立，请检查本地网络状况")
             print(sys.exc_info()[0], sys.exc_info()[1])
             return False
-        Printer().info([f'{self.area_id}号弹幕监控已连接b站服务器'], True)
+        printer.info([f'{self.area_id}号弹幕监控已连接b站服务器'], True)
         if (await self.SendJoinChannel(self.roomid)):
             self.connected = True
             return True
 
     async def HeartbeatLoop(self):
-        Printer().info([f'{self.area_id}号弹幕监控开始心跳（心跳间隔30s，后续不再提示）'], True)
+        printer.info([f'{self.area_id}号弹幕监控开始心跳（心跳间隔30s，后续不再提示）'], True)
         while self.connected:
             await self.SendSocketData(opt=2, body='')
             await asyncio.sleep(30)
@@ -204,10 +205,10 @@ class bilibiliClient():
                         state = await DanMuraffle(self.area_id, self.roomid, dic)
                     # 握手确认
                     elif opt == 8:
-                        Printer().info([f'{self.area_id}号弹幕监控进入房间（{self.roomid}）'], True)
+                        printer.info([f'{self.area_id}号弹幕监控进入房间（{self.roomid}）'], True)
                     else:
                         self.connected = False
-                        Printer().warn(bytes_datas[len_read:len_read + len_data])
+                        printer.warn(bytes_datas[len_read:len_read + len_data])
                                 
                     if state is not None and not state:
                         return
@@ -236,10 +237,10 @@ class bilibiliClient():
                         state = printDanMu(dic)
                     # 握手确认
                     elif opt == 8:
-                        Printer().info([f'{self.area_id}号弹幕监控进入房间（{self.roomid}）'], True)
+                        printer.info([f'{self.area_id}号弹幕监控进入房间（{self.roomid}）'], True)
                     else:
                         self.connected = False
-                        Printer().warn(bytes_datas[len_read:len_read + len_data])
+                        printer.warn(bytes_datas[len_read:len_read + len_data])
                                 
                     if state is not None and not state:
                         return

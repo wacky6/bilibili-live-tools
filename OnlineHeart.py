@@ -2,7 +2,7 @@ from bilibili import bilibili
 import time
 import datetime
 import asyncio
-from printer import Printer
+import printer
 import login
 
 
@@ -47,7 +47,7 @@ async def draw_lottery():
         
 async def run():
     while 1:
-        Printer().info(["心跳"], True)
+        printer.info(["心跳"], True)
         login.HandleExpire()
         await heartbeat()
         await draw_lottery()

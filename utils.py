@@ -1,5 +1,5 @@
 from bilibili import bilibili
-from printer import Printer
+import printer
 import time
 import datetime
 from PIL import Image
@@ -63,21 +63,22 @@ async def TitleInfo():
                 max = '-'
             print(i['activity'], i['score'], max)
 
-async def fetch_medal(printer=True):
+async def fetch_medal(show=True):
     printlist = []
     list_medal = []
-    if printer:
+    if show:
         printlist.append('查询勋章信息')
         printlist.append(
             '{} {} {:^12} {:^10} {} {:^6} '.format(adjust_for_chinese('勋章'), adjust_for_chinese('主播昵称'), '亲密度',
                                                    '今日的亲密度', adjust_for_chinese('排名'), '勋章状态'))
+    print(2333)
     dic_worn = {'1': '正在佩戴', '0': '待机状态'}
     json_response = await bilibili.request_fetchmedal()
     # print(json_response)
     if not json_response['code']:
         for i in json_response['data']['fansMedalList']:
             list_medal.append((i['roomid'], int(i['dayLimit']) - int(i['todayFeed']), i['medal_name'], i['level']))
-            if printer:
+            if show:
                 printlist.append(
                     '{} {} {:^14} {:^14} {} {:^6} '.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])),
                                                            adjust_for_chinese(i['anchorInfo']['uname']),
@@ -85,10 +86,10 @@ async def fetch_medal(printer=True):
                                                            str(i['todayFeed']) + '/' + str(i['dayLimit']),
                                                            adjust_for_chinese(str(i['rank'])),
                                                            dic_worn[str(i['status'])]))
-        if printer:
-            Printer().info(printlist, True)
+        if show:
+            printer.info(printlist, True)
         list_medal = [i[:3] for i in sorted(list_medal, key=itemgetter(3), reverse=True)]
-        # print(list_medal)
+        print(list_medal)
         return list_medal
 
 async def send_danmu_msg_web(msg, roomId):
@@ -241,11 +242,11 @@ async def fetch_user_info():
         print(process_bar)
         print('# 等级榜', user_level_rank)
 
-async def fetch_bag_list(verbose=False, bagid=None, printer=True):
+async def fetch_bag_list(verbose=False, bagid=None, show=True):
     json_response = await bilibili.request_fetch_bag_list()
     gift_list = []
     # print(json_response)
-    if printer:
+    if show:
         print('[{}] 查询可用礼物'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))))
     for i in json_response['data']['list']:
         bag_id = i['bag_id']
@@ -265,7 +266,7 @@ async def fetch_bag_list(verbose=False, bagid=None, printer=True):
         else:
             if verbose:
                 print(f'# 编号为{bag_id}的{gift_name:^3}X{gift_num:^4} (在{left_days:^6}天后过期)')
-            elif printer:
+            elif show:
                 print(f'# {gift_name:^3}X{gift_num:^4} (在{left_days:^6}天后过期)')
 
         gift_list.append([gift_id, gift_num, bag_id, left_time])
@@ -388,7 +389,7 @@ async def enter_room(roomid):
         param2 = data['is_locked']
         param3 = data['encrypted']
         if any((param1, param2, param3)):
-            Printer().info([f'抽奖脚本检测到房间{roomid:^9}为异常房间'], True)
+            printer.info([f'抽奖脚本检测到房间{roomid:^9}为异常房间'], True)
             return False
         else:
             await bilibili.post_watching_history(roomid)

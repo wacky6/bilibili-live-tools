@@ -1,6 +1,6 @@
 from bilibili import bilibili
 from statistics import Statistics
-from printer import Printer
+import printer
 import utils
 import asyncio
 import datetime
@@ -103,7 +103,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
             return True
         elif code == -405:
             print('没抢到。。。。。')
-            Printer().warn(raffleid)
+            printer.warn(raffleid)
             return False
         elif code != -401 and code != -403:
             print('00', json_response2)
@@ -111,9 +111,9 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
     data = json_response2['data']
     Statistics.append_to_TVlist(raffleid, real_roomid)
     Statistics.add_to_result(data['gift_name'], int(data['gift_num']))
-    Printer().info([f'参与了房间{real_roomid:^9}的道具抽奖'], True)
-    # Printer().info([f'# 道具抽奖状态: {json_response2["msg"]}'])
-    Printer().info([f'# 房间{real_roomid:^9}网页端活动抽奖结果: {data["gift_name"]}X{data["gift_num"]}'])
+    printer.info([f'参与了房间{real_roomid:^9}的道具抽奖'], True)
+    # printer.info([f'# 道具抽奖状态: {json_response2["msg"]}'])
+    printer.info([f'# 房间{real_roomid:^9}网页端活动抽奖结果: {data["gift_name"]}X{data["gift_num"]}'])
     return True
  
                
@@ -135,16 +135,16 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
     json_response1 = await bilibili.get_gift_of_events_app(text1, text2, raffleid)
     json_pc_response = await bilibili.get_gift_of_events_web(text1, text2, raffleid)
     
-    Printer().info([f'参与了房间{text1:^9}的{bilibili.get_giftids_raffle(str(giftId))}活动抽奖'], True)
+    printer.info([f'参与了房间{text1:^9}的{bilibili.get_giftids_raffle(str(giftId))}活动抽奖'], True)
 
     if not json_response1['code']:
-        Printer().info([f'# 移动端活动抽奖结果: {json_response1["data"]["gift_desc"]}'])
+        printer.info([f'# 移动端活动抽奖结果: {json_response1["data"]["gift_desc"]}'])
         Statistics.add_to_result(*(json_response1['data']['gift_desc'].split('X')))
     else:
         print(json_response1)
-        Printer().info([f'# 移动端活动抽奖结果: {json_response1}'])
+        printer.info([f'# 移动端活动抽奖结果: {json_response1}'])
         
-    Printer().info(
+    printer.info(
             [f'# 网页端活动抽奖状态:  {json_pc_response}'])
     if not json_pc_response['code']:
         Statistics.append_to_activitylist(raffleid, text1)
