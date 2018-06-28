@@ -388,6 +388,7 @@ async def enter_room(roomid):
         param3 = data['encrypted']
         if any((param1, param2, param3)):
             printer.info([f'抽奖脚本检测到房间{roomid:^9}为异常房间'], True)
+            printer.warn(f'抽奖脚本检测到房间{roomid:^9}为异常房间')
             return False
         else:
             await bilibili.post_watching_history(roomid)
