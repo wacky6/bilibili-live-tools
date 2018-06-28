@@ -694,7 +694,7 @@ class bilibili():
 
     @staticmethod
     async def gift_list():
-        url = f"{base_url}/gift/v2/live/room_gift_list?roomid=2721650&area_v2_id=86"
+        url = f"{base_url}/gift/v3/live/gift_config"
         res = await bilibili.instance.bili_section_get(url)
         return res
         
