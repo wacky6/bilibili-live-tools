@@ -9,7 +9,7 @@ danmu = false
 clean-expiring-gift = false
 # 单位秒
 set-expiring-time = 43200
-# 对过期礼物是否先投递到其他勋章(安装勋章等级投递)，之后会剩余的清理掉roomid里面
+# 对过期礼物是否先投递到其他勋章(按照勋章等级投递)，之后会剩余的清理掉roomid里面
 clean_expiring_gift2all_medal = false
 clean-expiring-gift2room = 0
 
