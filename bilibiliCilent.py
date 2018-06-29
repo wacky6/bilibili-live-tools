@@ -123,7 +123,8 @@ class bilibiliClient():
             print(sys.exc_info()[0], sys.exc_info()[1])
             return False
         printer.info([f'{self.area_id}号弹幕监控已连接b站服务器'], True)
-        if (await self.SendJoinChannel(self.roomid)):
+        body = f'{{"uid":0,"roomid":{self.roomid},"protover":1,"platform":"web","clientver":"1.3.3"}}'
+        if (await self.SendSocketData(opt=7, body=body)):
             self.connected = True
             return True
         else:
@@ -136,10 +137,6 @@ class bilibiliClient():
                 self.connected = False
                 return
             await asyncio.sleep(30)
-
-    async def SendJoinChannel(self, channelId):
-        body = f'{{"uid":0,"roomid":{channelId},"protover":1,"platform":"web","clientver":"1.3.3"}}'
-        return (await self.SendSocketData(opt=7, body=body))
 
     async def SendSocketData(self, opt, body, len_header=16, ver=1, seq=1):
         remain_data = body.encode('utf-8')
