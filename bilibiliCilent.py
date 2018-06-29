@@ -111,8 +111,8 @@ class bilibiliClient():
         while self.connected:
             area_id = await utils.FetchRoomArea(self.roomid)
             if area_id != self.area_id:
-                print(f'{self.roomid}更换分区{self.area_id}为{area_id}，即将切换房间')
-                break
+                printer.info([f'{self.roomid}更换分区{self.area_id}为{area_id}，即将切换房间'], True)
+                return
             await asyncio.sleep(300)
         
     async def connectServer(self):
@@ -126,33 +126,38 @@ class bilibiliClient():
         if (await self.SendJoinChannel(self.roomid)):
             self.connected = True
             return True
+        else:
+            return False
 
     async def HeartbeatLoop(self):
         printer.info([f'{self.area_id}号弹幕监控开始心跳（心跳间隔30s，后续不再提示）'], True)
         while self.connected:
-            await self.SendSocketData(opt=2, body='')
+            if not (await self.SendSocketData(opt=2, body='')):
+                self.connected = False
+                return
             await asyncio.sleep(30)
 
     async def SendJoinChannel(self, channelId):
         body = f'{{"uid":0,"roomid":{channelId},"protover":1,"platform":"web","clientver":"1.3.3"}}'
-        await self.SendSocketData(opt=7, body=body)
-        return True
+        return (await self.SendSocketData(opt=7, body=body))
 
     async def SendSocketData(self, opt, body, len_header=16, ver=1, seq=1):
-        bytearr = body.encode('utf-8')
-        len_data = len(bytearr) + len_header
-        sendbytes = struct.pack('!IHHII', len_data, len_header, ver, opt, seq)
-        sendbytes = sendbytes + bytearr
+        remain_data = body.encode('utf-8')
+        len_data = len(remain_data) + len_header
+        header = struct.pack('!I2H2I', len_data, len_header, ver, opt, seq)
+        data = header + remain_data
         try:
-            await self.ws.send(sendbytes)
+            await self.ws.send(data)
         except websockets.exceptions.ConnectionClosed:
             print("# 主动关闭或者远端主动关闭.")
             await self.ws.close()
             self.connected = False
-            return None
+            return False
         except:
             print(sys.exc_info()[0], sys.exc_info()[1])
             self.connected = False
+            return False
+        return True
 
     async def ReadSocketData(self):
         bytes_data = None
