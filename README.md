@@ -4,7 +4,9 @@
 yjqiang分支是一个次分支，特别感谢主分支所有参与者的基础奠定
 
 docker使用 https://github.com/Muromi-Rikka/bilibili-live-tools-docker
+
 pythonista3(ios) https://www.jianshu.com/p/669e63b5ec2b
+
 依赖包 https://github.com/yjqiang/bilibili-live-tools/blob/master/requirements.txt
 
 目前已完成：
@@ -50,7 +52,13 @@ version 2.0
       token refresh and save cookie 
       Queue队列
       其他细节的改变   
-      
+
+version 2.1
+------
+      更新api
+      v4小电视更新
+      支持风纪委员会
+      其他修改
         
 
 
