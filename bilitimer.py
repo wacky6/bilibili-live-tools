@@ -24,13 +24,19 @@ class BiliTimer:
         while True:
             i = await self.jobs.get()
             currenttime = CurrentTime()
-            if i[0] < currenttime + 5:
-                await i[2]()
-            else:
-                sleeptime = i[0] - currenttime
-                # print('智能睡眠', sleeptime)
-                await asyncio.sleep(max(sleeptime, 0))
-                await i[2]()
+            sleeptime = i[0] - currenttime
+            print('智能睡眠', sleeptime)
+            await asyncio.sleep(max(sleeptime, 0))
+            try:
+                bytes_data = await asyncio.wait_for(i[2](), timeout=5.0)
+            except asyncio.TimeoutError:
+                printer.warn(i[1])
+                printer.warn('timeout')
+            except:
+                # websockets.exceptions.ConnectionClosed'>
+                print(sys.exc_info()[0], sys.exc_info()[1])
+                printer.warn(i[1])
+                printer.warn('!!!!')
       
     @staticmethod
     async def append2list_jobs(func, delay):

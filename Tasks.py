@@ -12,7 +12,7 @@ import json
 async def Daily_bag():
     json_response = await bilibili.get_dailybag()
     # no done code
-    # print('Daily_bag', json_response)
+    printer.warn(json_response)
     for i in json_response['data']['bag_list']:
         printer.info(["# 获得-" + i['bag_name'] + "-成功"])
     await BiliTimer.append2list_jobs(Daily_bag, 21600)
@@ -22,7 +22,7 @@ async def Daily_bag():
 async def DoSign():
     # -500 done
     temp = await bilibili.get_dosign()
-    # print('DoSign', temp)
+    printer.warn(temp)
     printer.info([f'# 签到状态: {temp["msg"]}'])
     if temp['code'] == -500 and '已' in temp['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
@@ -34,8 +34,8 @@ async def DoSign():
 async def Daily_Task():
     # -400 done/not yet
     json_response2 = await bilibili.get_dailytask()
+    printer.warn(json_response2)
     printer.info([f'# 双端观看直播:  {json_response2["msg"]}'])
-    # print('Daily_Task', json_response2)
     if json_response2['code'] == -400 and '已' in json_response2['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
     else:
@@ -55,6 +55,7 @@ async def Sign1Group(i1, i2):
 # 应援团签到
 async def link_sign():
     json_rsp = await bilibili.get_grouplist()
+    printer.warn(json_rsp)
     list_check = json_rsp['data']['list']
     id_list = ((i['group_id'], i['owner_uid']) for i in list_check)
     if list_check:
@@ -68,7 +69,7 @@ async def link_sign():
 async def send_gift():
     if ConfigLoader().dic_user['task_control']['clean-expiring-gift']:
         argvs = await utils.fetch_bag_list(show=False)
-        # print(argvs)
+        printer.warn(argvs)
         roomID = ConfigLoader().dic_user['task_control']['clean-expiring-gift2room']
         time_set = ConfigLoader().dic_user['task_control']['set-expiring-time']
         list_gift = []
