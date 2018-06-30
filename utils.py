@@ -448,6 +448,8 @@ async def GetRewardInfo(show=True):
     level_info = json_rsp["level_info"]
     current_exp = level_info['current_exp']
     next_exp = level_info['next_exp']
+    if next_exp == -1:
+        next_exp = current_exp
     print(f'# 主站等级值 {level_info["current_level"]}')
     print(f'# 主站经验值 {level_info["current_exp"]}')
     print(f'# 主站剩余值 {- current_exp + next_exp}')
