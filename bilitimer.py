@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import time
 import Tasks
+import printer
 
 
 def CurrentTime():
