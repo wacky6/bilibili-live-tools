@@ -206,7 +206,7 @@ async def handle_1_room_captain(roomid):
             json_response1 = await bilibili.get_giftlist_of_captain(roomid)
             # print(json_response1['data']['guard'])
             if not json_response1['data']['guard']:
-                await asyncio.sleep(5)
+                await asyncio.sleep(1)
             else:
                 break
             
