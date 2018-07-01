@@ -29,7 +29,7 @@ class BiliTimer:
             print('智能睡眠', sleeptime)
             await asyncio.sleep(max(sleeptime, 0))
             try:
-                bytes_data = await asyncio.wait_for(i[2](), timeout=5.0)
+                bytes_data = await asyncio.wait_for(i[2](), timeout=15.0)
             except asyncio.TimeoutError:
                 printer.warn(i[1])
                 printer.warn('timeout')

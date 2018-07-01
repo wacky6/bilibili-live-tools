@@ -57,7 +57,7 @@ class Rafflehandler:
     async def run(self):
         while True:
             raffle = await self.queue_raffle.get()
-            await asyncio.sleep(3)
+            await asyncio.sleep(5)
             list_raffle0 = [self.queue_raffle.get_nowait() for i in range(self.queue_raffle.qsize())]
             list_raffle0.append(raffle)
             list_raffle = list(set(list_raffle0))
@@ -154,7 +154,6 @@ async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
 
                 
 async def handle_1_room_TV(real_roomid):
-    await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.enter_room(real_roomid)
     if result:
         json_response = await bilibili.get_giftlist_of_TV(real_roomid)
@@ -167,7 +166,7 @@ async def handle_1_room_TV(real_roomid):
             raffle_type = j['type']
             time_wanted = j['time_wait'] + current_time
             # 处理一些重复
-            if j['time_wait'] > 100:
+            if j['time_wait'] > 105:
                 # print(raffle_id)
                 list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
             
@@ -177,7 +176,6 @@ async def handle_1_room_TV(real_roomid):
             await Delay_Joiner.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, real_roomid, raffle_id, raffle_type))
 
 async def handle_1_room_activity(giftId, text1, text2):
-    await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.enter_room(text1)
     if result:
         json_response = await bilibili.get_giftlist_of_events(text1)
@@ -202,7 +200,6 @@ async def handle_1_room_activity(giftId, text1, text2):
             
 
 async def handle_1_room_captain(roomid):
-    await asyncio.sleep(random.uniform(0.5, 1.5))
     result = await utils.enter_room(roomid)
     if result:
         while True:
