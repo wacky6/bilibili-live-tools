@@ -273,7 +273,7 @@ class bilibili():
     async def request_check_room(roomid):
         inst = bilibili.instance
         url = f"{base_url}/room/v1/Room/room_init?id={roomid}"
-        response = await inst.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
+        response = await inst.bili_section_get(url)
         return response
 
     @staticmethod
