@@ -57,7 +57,7 @@ class Rafflehandler:
     async def run(self):
         while True:
             raffle = await self.queue_raffle.get()
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
             list_raffle0 = [self.queue_raffle.get_nowait() for i in range(self.queue_raffle.qsize())]
             list_raffle0.append(raffle)
             list_raffle = list(set(list_raffle0))
@@ -129,27 +129,27 @@ async def handle_1_captain_raffle(num, roomid, raffleid):
     return True
  
                                        
-async def handle_1_activity_raffle(num, giftId, text1, text2, raffleid):
+async def handle_1_activity_raffle(num, text1, raffleid):
     # print('参与')
-    await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
-    json_response1 = await bilibili.get_gift_of_events_app(text1, text2, raffleid)
-    json_pc_response = await bilibili.get_gift_of_events_web(text1, text2, raffleid)
-    
-    printer.info([f'参与了房间{text1:^9}的{bilibili.get_giftids_raffle(str(giftId))}活动抽奖'], True)
+    # await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
+    json_response1 = await bilibili.get_gift_of_events_app(text1, raffleid)
+    # json_pc_response = await bilibili.get_gift_of_events_web(text1, text2, raffleid)
+    # print(json_response1)
+    printer.info([f'参与了房间{text1:^9}的活动抽奖'], True)
 
     if not json_response1['code']:
         printer.info([f'# 移动端活动抽奖结果: {json_response1["data"]["gift_desc"]}'])
         Statistics.add_to_result(*(json_response1['data']['gift_desc'].split('X')))
     else:
-        print(json_response1)
+        # print(json_response1)
         printer.info([f'# 移动端活动抽奖结果: {json_response1}'])
         
-    printer.info(
-            [f'# 网页端活动抽奖状态:  {json_pc_response}'])
-    if not json_pc_response['code']:
-        Statistics.append_to_activitylist(raffleid, text1)
-    else:
-        print(json_pc_response)
+    #printer.info(
+            #[f'# 网页端活动抽奖状态:  {json_pc_response}'])
+    #if not json_pc_response['code']:
+    #    Statistics.append_to_activitylist(raffleid, text1)
+    #else:
+    #    print(json_pc_response)
     return True
 
                 
@@ -167,7 +167,7 @@ async def handle_1_room_TV(real_roomid):
             time_wanted = j['time_wait'] + current_time
             # 处理一些重复
             if j['time_wait'] > 105:
-                # print(raffle_id)
+                print(raffle_id)
                 list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
             
         num_available = len(list_available_raffleid)
@@ -175,28 +175,30 @@ async def handle_1_room_TV(real_roomid):
         for raffle_id, raffle_type, time_wanted in list_available_raffleid:
             await Delay_Joiner.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, real_roomid, raffle_id, raffle_type))
 
-async def handle_1_room_activity(giftId, text1, text2):
+async def handle_1_room_activity(text1):
     result = await utils.enter_room(text1)
     if result:
         json_response = await bilibili.get_giftlist_of_events(text1)
-        checklen = json_response['data']
+        # print(json_response)
+        checklen = json_response['data']['lotteryInfo']
         list_available_raffleid = []
         for j in checklen:
             # await asyncio.sleep(random.uniform(0.5, 1))
-            resttime = j['time']
-            raffleid = j['raffleId']
-            if Statistics.check_activitylist(text1, raffleid):
-                list_available_raffleid.append(raffleid)
+            # resttime = j['time']
+            raffleid = j['eventType']
+            #if Statistics.check_activitylist(text1, raffleid):
+            list_available_raffleid.append(raffleid)
         tasklist = []
         num_available = len(list_available_raffleid)
+        # print(list_available_raffleid)
         for raffleid in list_available_raffleid:
-            task = asyncio.ensure_future(handle_1_activity_raffle(num_available, giftId, text1, text2, raffleid))
+            task = asyncio.ensure_future(handle_1_activity_raffle(num_available, text1, raffleid))
             tasklist.append(task)
         if tasklist:
             raffle_results = await asyncio.gather(*tasklist)
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
-                Rafflehandler.Put2Queue((giftId, text1, text2), handle_1_room_activity)
+                Rafflehandler.Put2Queue((text1), handle_1_room_activity)
             
 
 async def handle_1_room_captain(roomid):

@@ -490,15 +490,15 @@ class bilibili():
         return pc_response
 
     @staticmethod
-    async def get_gift_of_events_app(text1, text2, raffleid):
+    async def get_gift_of_events_app(text1, raffleid):
         inst = bilibili.instance
         headers = {
             'Accept': 'application/json, text/plain, */*',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
             'cookie': inst.dic_bilibili['cookie'],
-            'referer': text2
+            #'referer': text2
         }
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&event_type=flower_rain-{raffleid}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&room_id={text1}&ts={CurrentTime()}'
+        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&event_type={raffleid}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&room_id={text1}&ts={CurrentTime()}'
         # params = temp_params + inst.dic_bilibili['app_secret']
         sign = inst.calc_sign(temp_params)
         true_url = f'{base_url}/YunYing/roomEvent?{temp_params}&sign={sign}'
@@ -545,8 +545,11 @@ class bilibili():
     @staticmethod
     async def get_giftlist_of_events(text1):
         inst = bilibili.instance
-        url = f'{base_url}/activity/v1/Raffle/check?roomid={text1}'
-        response = await bilibili.instance.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
+        # url = f'{base_url}/activity/v1/Raffle/check?roomid={text1}'
+        temp_params = f'{base_url}/activity/v1/Common/mobileRoomInfo?access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}&roomid={text1}&ts={CurrentTime()}'
+        sign = inst.calc_sign(temp_params)
+        url = f'{base_url}/activity/v1/Common/mobileRoomInfo?{temp_params}&sign={sign}'
+        response = await bilibili.instance.bili_section_get(url, headers=inst.dic_bilibili['appheaders'])
         return response
 
     @staticmethod
