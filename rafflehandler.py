@@ -57,7 +57,7 @@ class Rafflehandler:
     async def run(self):
         while True:
             raffle = await self.queue_raffle.get()
-            await asyncio.sleep(3)
+            await asyncio.sleep(1)
             list_raffle0 = [self.queue_raffle.get_nowait() for i in range(self.queue_raffle.qsize())]
             list_raffle0.append(raffle)
             list_raffle = list(set(list_raffle0))
