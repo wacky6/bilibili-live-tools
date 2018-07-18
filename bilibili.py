@@ -9,6 +9,7 @@ import base64
 import aiohttp
 import asyncio
 import random
+import json
 
 reload(sys)
 
@@ -96,7 +97,9 @@ class bilibili():
             try:
                 response = await self.bili_section.post(url, headers=headers, data=data)
                 if response.status == 200:
-                    json_response = await response.json(content_type=None)
+                    # json_response = await response.json(content_type=None)
+                    data = await response.read()
+                    json_response = json.loads(data)
                     if isinstance(json_response, dict):
                         tag = await replay_request(json_response['code'])
                         if tag:
@@ -114,7 +117,9 @@ class bilibili():
             try:
                 response = await self.other_session.get(url, headers=headers, data=data)
                 if response.status == 200:
-                    json_response = await response.json(content_type=None)
+                    # json_response = await response.json(content_type=None)
+                    data = await response.read()
+                    json_response = json.loads(data)
                     if isinstance(json_response, dict) and 'code' in json_response:
                         tag = await replay_request(json_response['code'])
                         if tag:
@@ -132,7 +137,9 @@ class bilibili():
             try:
                 response = await self.other_session.post(url, headers=headers, data=data)
                 if response.status == 200:
-                    json_response = await response.json(content_type=None)
+                    # json_response = await response.json(content_type=None)
+                    data = await response.read()
+                    json_response = json.loads(data)
                     if isinstance(json_response, dict) and 'code' in json_response:
                         tag = await replay_request(json_response['code'])
                         if tag:
@@ -150,7 +157,9 @@ class bilibili():
             try:
                 response = await self.bili_section.get(url, headers=headers, data=data)
                 if response.status == 200:
-                    json_response = await response.json(content_type=None)
+                    # json_response = await response.json(content_type=None)
+                    data = await response.read()
+                    json_response = json.loads(data)
                     if isinstance(json_response, dict):
                         tag = await replay_request(json_response['code'])
                         if tag:
