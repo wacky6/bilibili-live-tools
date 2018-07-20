@@ -105,8 +105,9 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
             print('没抢到。。。。。')
             printer.warn(raffleid)
             return False
-        elif code == 400:
+        elif code == 400: 
             print(json_response2)
+            return
             tasklist = []
             for i in range(60):
                 task = asyncio.ensure_future(handle_1_TV_raffle_black(num, real_roomid, raffleid, raffle_type))

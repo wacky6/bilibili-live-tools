@@ -42,6 +42,9 @@ async def run():
         elif not json_rsp['code']:
             printer.info(["# 打开了宝箱"])
         elif json_rsp['code'] == 400:
+            print('小黑屋')
+            await asyncio.sleep(3600)
+            continue
             print('小黑屋, 暴力测试中')
             tasklist = []
             for i in range(60):
