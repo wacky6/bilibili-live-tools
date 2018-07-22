@@ -59,7 +59,7 @@ async def DanMuraffle(area_id, connect_roomid, dic):
     elif cmd == 'SYS_MSG':
         if 'real_roomid' in dic:
             real_roomid = dic['real_roomid']
-            type_text = (dic['msg'].split(':?')[-1]).split('，')[0].replace('一个', '')
+            type_text = (dic['msg'].split(':?')[-1]).split('，')[0][2:]
             printer.info([f'{area_id}号弹幕监控检测到{real_roomid:^9}的{type_text}'], True)
             rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
             rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_activity)

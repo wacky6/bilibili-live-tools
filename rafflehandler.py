@@ -45,19 +45,20 @@ class Delay_Joiner:
         
         
 class Rafflehandler:
-    __slots__ = ('queue_raffle',)
+    __slots__ = ('queue_raffle', 'list_raffle_id')
     instance = None
 
     def __new__(cls, *args, **kw):
         if not cls.instance:
             cls.instance = super(Rafflehandler, cls).__new__(cls, *args, **kw)
             cls.instance.queue_raffle = asyncio.Queue()
+            cls.instance.list_raffle_id = []
         return cls.instance
         
     async def run(self):
         while True:
             raffle = await self.queue_raffle.get()
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.5)
             list_raffle0 = [self.queue_raffle.get_nowait() for i in range(self.queue_raffle.qsize())]
             list_raffle0.append(raffle)
             list_raffle = list(set(list_raffle0))
@@ -91,6 +92,13 @@ class Rafflehandler:
     @staticmethod
     def getlist():
         print('目前TV任务队列状况', Rafflehandler.instance.queue_raffle.qsize())
+        
+    def add2raffle_id(self, raffle_id):
+        self.list_raffle_id.append(raffle_id)
+        print(self.list_raffle_id)
+    
+    def check_duplicate(self, raffle_id):
+        return (raffle_id in self.list_raffle_id)
         
 
 async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
@@ -184,9 +192,10 @@ async def handle_1_room_TV(real_roomid):
             raffle_type = j['type']
             time_wanted = j['time_wait'] + current_time
             # 处理一些重复
-            if j['time_wait'] > 105:
+            if not Rafflehandler().check_duplicate(raffle_id):
                 print(raffle_id)
                 list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
+                Rafflehandler().add2raffle_id(raffle_id)
             
         num_available = len(list_available_raffleid)
         # print(list_available_raffleid)
