@@ -28,9 +28,20 @@ class Delay_Joiner:
             i = await self.jobs.get()
             # print(i)
             currenttime = CurrentTime()
-            sleeptime = i[0] - currenttime
-            # print('智能睡眠', sleeptime)
-            await asyncio.sleep(max(sleeptime, 0))
+            sleeptime = max(i[0] - currenttime, 0)
+            # print('智能睡眠中', sleeptime/2)
+            await asyncio.sleep(sleeptime / 2)
+            if not self.jobs.empty():
+                i1 = self.jobs.get_nowait()
+                if i1[0] < i[0] - 10:
+                    self.jobs.put_nowait(i1)
+                    self.jobs.put_nowait(i)
+                    # printer.warn(f'{i1}    {i}   机制成功')
+                    continue
+                else:
+                    self.jobs.put_nowait(i1)
+            await asyncio.sleep(sleeptime / 2)
+            # printer.info([f'{i}  准备'], True)        
             await i[2](*i[3])
       
     @staticmethod
