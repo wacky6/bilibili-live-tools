@@ -86,11 +86,12 @@ def printDanMu(dic):
 
 class bilibiliClient():
     
-    __slots__ = ('ws', 'connected', 'roomid', 'raffle_handle', 'area_id')
+    __slots__ = ('ws', 'connected', 'roomid', 'raffle_handle', 'area_id', 'structer')
 
     def __init__(self, roomid=None, area_id=None):
         self.ws = None
         self.connected = False
+        self.structer = struct.Struct('!I2H2I')
         if roomid is None:
             self.roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
             self.area_id = 0
@@ -106,15 +107,20 @@ class bilibiliClient():
             await self.ws.close()
         except:
             print('请联系开发者', sys.exc_info()[0], sys.exc_info()[1])
+        printer.info([f'{self.area_id}号弹幕收尾模块状态{self.ws.closed}'], True)
         self.connected = False
         
     async def CheckArea(self):
-        while self.connected:
-            area_id = await utils.FetchRoomArea(self.roomid)
-            if area_id != self.area_id:
-                printer.info([f'{self.roomid}更换分区{self.area_id}为{area_id}，即将切换房间'], True)
-                return
-            await asyncio.sleep(300)
+        try:
+            while self.connected:
+                area_id = await asyncio.shield(utils.FetchRoomArea(self.roomid))
+                if area_id != self.area_id:
+                    printer.info([f'{self.roomid}更换分区{self.area_id}为{area_id}，即将切换房间'], True)
+                    return
+                await asyncio.sleep(300)
+        except asyncio.CancelledError:
+            printer.info([f'{self.area_id}号弹幕监控分区检测模块主动取消'], True)
+            self.connected = False
         
     async def connectServer(self):
         try:
@@ -133,22 +139,29 @@ class bilibiliClient():
 
     async def HeartbeatLoop(self):
         printer.info([f'{self.area_id}号弹幕监控开始心跳（心跳间隔30s，后续不再提示）'], True)
-        while self.connected:
-            if not (await self.SendSocketData(opt=2, body='')):
-                self.connected = False
-                return
-            await asyncio.sleep(30)
+        try:
+            while self.connected:
+                if not (await self.SendSocketData(opt=2, body='')):
+                    self.connected = False
+                    return
+                await asyncio.sleep(30)
+        except asyncio.CancelledError:
+            printer.info([f'{self.area_id}号弹幕监控心跳模块主动取消'], True)
+            self.connected = False
 
     async def SendSocketData(self, opt, body, len_header=16, ver=1, seq=1):
         remain_data = body.encode('utf-8')
         len_data = len(remain_data) + len_header
-        header = struct.pack('!I2H2I', len_data, len_header, ver, opt, seq)
+        header = self.structer.pack(len_data, len_header, ver, opt, seq)
         data = header + remain_data
         try:
             await self.ws.send(data)
         except websockets.exceptions.ConnectionClosed:
             print("# 主动关闭或者远端主动关闭.")
-            await self.ws.close()
+            self.connected = False
+            return False
+        except asyncio.CancelledError:
+            printer.info([f'{self.area_id}号弹幕监控发送模块主动取消'], True)
             self.connected = False
             return False
         except:
@@ -163,20 +176,16 @@ class bilibiliClient():
             bytes_data = await asyncio.wait_for(self.ws.recv(), timeout=35.0)
         except asyncio.TimeoutError:
             print('# 由于心跳包30s一次，但是发现35内没有收到任何包，说明已经悄悄失联了，主动断开')
-            await self.ws.close()
             self.connected = False
             return None
         except websockets.exceptions.ConnectionClosed:
             print("# 主动关闭或者远端主动关闭")
-            await self.ws.close()
-            await self.ws.close()
             self.connected = False
             return None
         except:
             # websockets.exceptions.ConnectionClosed'>
             print(sys.exc_info()[0], sys.exc_info()[1])
             print('请联系开发者')
-            await self.ws.close()
             self.connected = False
             return None
         # print(tmp)
@@ -186,7 +195,7 @@ class bilibiliClient():
     
     async def ReceiveMessageLoop(self):
         if self.raffle_handle:
-            while self.connected:
+            while True:
                 bytes_datas = await self.ReadSocketData()
                 if bytes_datas is None:
                     break
@@ -194,7 +203,7 @@ class bilibiliClient():
                 len_bytes_datas = len(bytes_datas)
                 while len_read != len_bytes_datas:
                     state = None
-                    split_header = struct.unpack('!I2H2I', bytes_datas[len_read:16+len_read])
+                    split_header = self.structer.unpack(bytes_datas[len_read:16+len_read])
                     len_data, len_header, ver, opt, seq = split_header
                     remain_data = bytes_datas[len_read+16:len_read+len_data]
                     # 人气值/心跳 3s间隔
@@ -218,7 +227,7 @@ class bilibiliClient():
                     len_read += len_data
                     
         else:
-            while self.connected:
+            while True:
                 bytes_datas = await self.ReadSocketData()
                 if bytes_datas is None:
                     break
@@ -226,12 +235,13 @@ class bilibiliClient():
                 len_bytes_datas = len(bytes_datas)
                 while len_read != len_bytes_datas:
                     state = None
-                    split_header = struct.unpack('!I2H2I', bytes_datas[len_read:16+len_read])
+                    split_header = self.structer.unpack(bytes_datas[len_read:16+len_read])
                     len_data, len_header, ver, opt, seq = split_header
                     remain_data = bytes_datas[len_read+16:len_read+len_data]
                     # 人气值/心跳 3s间隔
                     if opt == 3:
-                        # self._UserCount, = struct.unpack('!I', remain_data)
+                        # _UserCount, = struct.unpack('!I', remain_data)
+                        # print('心跳信息', _UserCount)
                         pass
                     # cmd
                     elif opt == 5:
