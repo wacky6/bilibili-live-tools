@@ -111,7 +111,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
             return True
         elif code == -405:
             print('没抢到。。。。。')
-            printer.warn(raffleid)
+            printer.warn(f'{raffleid}  {raffle_type}')
             return False
         elif code == 400: 
             print(json_response2)
