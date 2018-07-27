@@ -792,7 +792,11 @@ class bilibili():
         
     async def req_fetch_case(self):
         url = 'http://api.bilibili.com/x/credit/jury/caseObtain'
-        json_rsp = await self.other_session_post(url, headers=self.dic_bilibili['pcheaders'])
+        payload = {
+            "jsonp": "jsonp",
+            "csrf": ConfigLoader().dic_bilibili['csrf']
+        }
+        json_rsp = await self.other_session_post(url, headers=self.dic_bilibili['pcheaders'], data=payload)
         return json_rsp
         
     async def req_check_voted(self, id):
