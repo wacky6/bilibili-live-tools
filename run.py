@@ -41,7 +41,7 @@ danmu_connection = connect.connect()
 
 
 bili_timer = BiliTimer()
-delay_timer = Delay_Joiner()
+delay_timer = Delay_Joiner(loop)
 
 console_thread = threading.Thread(target=biliconsole.controler)
 
