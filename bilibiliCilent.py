@@ -86,12 +86,12 @@ def printDanMu(dic):
 
 class bilibiliClient():
     
-    __slots__ = ('ws', 'connected', 'roomid', 'raffle_handle', 'area_id', 'structer')
+    __slots__ = ('ws', 'connected', 'roomid', 'raffle_handle', 'area_id')
+    structer = struct.Struct('!I2H2I')
 
     def __init__(self, roomid=None, area_id=None):
         self.ws = None
         self.connected = False
-        self.structer = struct.Struct('!I2H2I')
         if roomid is None:
             self.roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
             self.area_id = 0
