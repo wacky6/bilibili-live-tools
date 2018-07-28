@@ -14,39 +14,28 @@ def CurrentTime():
 
 
 class Delay_Joiner:
-    __slots__ = ('jobs',)
+    __slots__ = ('jobs', 'loop')
     instance = None
 
-    def __new__(cls, *args, **kw):
+    def __new__(cls, loop=None):
         if not cls.instance:
-            cls.instance = super(Delay_Joiner, cls).__new__(cls, *args, **kw)
-            cls.instance.jobs = asyncio.PriorityQueue()
+            cls.instance = super(Delay_Joiner, cls).__new__(cls)
+            cls.instance.loop = loop
+            cls.instance.jobs = asyncio.Queue()
         return cls.instance
         
     async def run(self):
         while True:
             i = await self.jobs.get()
-            # print(i)
-            currenttime = CurrentTime()
-            sleeptime = max(i[0] - currenttime, 0)
-            # print('智能睡眠中', sleeptime/2)
-            await asyncio.sleep(sleeptime / 2)
-            if not self.jobs.empty():
-                i1 = self.jobs.get_nowait()
-                if i1[0] < i[0] - 10:
-                    self.jobs.put_nowait(i1)
-                    self.jobs.put_nowait(i)
-                    # printer.warn(f'{i1}    {i}   机制成功')
-                    continue
-                else:
-                    self.jobs.put_nowait(i1)
-            await asyncio.sleep(sleeptime / 2)
-            # printer.info([f'{i}  准备'], True)        
-            await i[2](*i[3])
+            print(i, '一级')   
+            await i[0](*i[1])
       
     @staticmethod
-    async def append2list_jobs(func, time_expected, tuple_values):
-        await Delay_Joiner.instance.jobs.put((time_expected, func.__name__, func, tuple_values))
+    def append2list_jobs(func, time_expected, tuple_values):
+        inst = Delay_Joiner.instance
+        current_time = CurrentTime()
+        value = (func, tuple_values)
+        inst.loop.call_later(time_expected-current_time, inst.jobs.put_nowait, value)
         # print('添加任务', time_expected, func.__name__, func, tuple_values)
         return
         
@@ -122,7 +111,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
             return True
         elif code == -405:
             print('没抢到。。。。。')
-            printer.warn(f'{raffleid}  {raffle_type}')
+            printer.warn(f'{raffleid}  {raffle_type} {num}')
             return False
         elif code == 400: 
             print(json_response2)
@@ -211,7 +200,7 @@ async def handle_1_room_TV(real_roomid):
         num_available = len(list_available_raffleid)
         # print(list_available_raffleid)
         for raffle_id, raffle_type, time_wanted in list_available_raffleid:
-            await Delay_Joiner.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, real_roomid, raffle_id, raffle_type))
+            Delay_Joiner.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, real_roomid, raffle_id, raffle_type))
 
 async def handle_1_room_activity(text1):
     result = await utils.enter_room(text1)
