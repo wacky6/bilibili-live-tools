@@ -15,7 +15,7 @@ async def Daily_bag():
     printer.warn(json_response)
     for i in json_response['data']['bag_list']:
         printer.info(["# 获得-" + i['bag_name'] + "-成功"])
-    await BiliTimer.append2list_jobs(Daily_bag, 21600)
+    BiliTimer.call_after(Daily_bag, 21600)
 
 
 # 签到功能
@@ -28,7 +28,7 @@ async def DoSign():
         sleeptime = (utils.seconds_until_tomorrow() + 300)
     else:
         sleeptime = 350
-    await BiliTimer.append2list_jobs(DoSign, sleeptime)
+    BiliTimer.call_after(DoSign, sleeptime)
 
 # 领取每日任务奖励
 async def Daily_Task():
@@ -40,7 +40,7 @@ async def Daily_Task():
         sleeptime = (utils.seconds_until_tomorrow() + 300)
     else:
         sleeptime = 350
-    await BiliTimer.append2list_jobs(Daily_Task, sleeptime)
+    BiliTimer.call_after(Daily_Task, sleeptime)
 
 async def Sign1Group(i1, i2):
     json_response = await bilibili.assign_group(i1, i2)
@@ -64,7 +64,7 @@ async def link_sign():
             task = asyncio.ensure_future(Sign1Group(i1, i2))
             tasklist.append(task)
         results = await asyncio.gather(*tasklist)
-    await BiliTimer.append2list_jobs(link_sign, 21600)
+    BiliTimer.call_after(link_sign, 21600)
 
 async def send_gift():
     if ConfigLoader().dic_user['task_control']['clean-expiring-gift']:
@@ -92,7 +92,7 @@ async def send_gift():
                 await utils.send_gift_web(roomID, giftNum, bagID, giftID)
         else:
             print('未发现即将过期的礼物')
-    await BiliTimer.append2list_jobs(send_gift, 21600)
+    BiliTimer.call_after(send_gift, 21600)
 
 async def auto_send_gift():
     # await utils.WearingMedalInfo()
@@ -102,7 +102,7 @@ async def auto_send_gift():
         list_medal = await utils.WearingMedalInfo()
         if not list_medal:
             print('暂未佩戴任何勋章')
-            # await BiliTimer.append2list_jobs(auto_send_gift, 21600)
+            # BiliTimer.call_after(auto_send_gift, 21600)
     if ConfigLoader().dic_user['task_control']['send2medal']:
         list_medal += await utils.fetch_medal(False, ConfigLoader().dic_user['task_control']['send2medal'])
     # print(list_medal)    
@@ -118,7 +118,7 @@ async def auto_send_gift():
     await full_intimate(list_gift, list_medal)
             
     # printer.info(["# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
-    await BiliTimer.append2list_jobs(auto_send_gift, 21600)
+    BiliTimer.call_after(auto_send_gift, 21600)
 
 async def full_intimate(list_gift, list_medal):
     json_res = await bilibili.gift_list()
@@ -150,7 +150,7 @@ async def doublegain_coin2silver():
         json_response0 = await bilibili.request_doublegain_coin2silver()
         json_response1 = await bilibili.request_doublegain_coin2silver()
         print(json_response0['msg'], json_response1['msg'])
-    await BiliTimer.append2list_jobs(doublegain_coin2silver, 21600)
+    BiliTimer.call_after(doublegain_coin2silver, 21600)
 
 async def sliver2coin():
     if ConfigLoader().dic_user['task_control']['silver2coin']:
@@ -171,13 +171,13 @@ async def sliver2coin():
             finish_app = False
         if finish_app and finish_web:
             sleeptime = (utils.seconds_until_tomorrow() + 300)
-            await BiliTimer.append2list_jobs(sliver2coin, sleeptime)
+            BiliTimer.call_after(sliver2coin, sleeptime)
             return
         else:
-            await BiliTimer.append2list_jobs(sliver2coin, 350)
+            BiliTimer.call_after(sliver2coin, 350)
             return
 
-    await BiliTimer.append2list_jobs(sliver2coin, 21600)
+    BiliTimer.call_after(sliver2coin, 21600)
 
 async def GetVideoExp(list_topvideo):
     print('开始获取视频观看经验')
@@ -214,7 +214,7 @@ async def BiliMainTask():
     if not share_av:
         await GetVideoShareExp(list_topvideo)
     # b站傻逼有记录延迟，3点左右成功率高一点
-    await BiliTimer.append2list_jobs(BiliMainTask, utils.seconds_until_tomorrow() + 10800)
+    BiliTimer.call_after(BiliMainTask, utils.seconds_until_tomorrow() + 10800)
 
 
 async def check(id):
@@ -283,18 +283,18 @@ async def judge():
         # await asyncio.sleep(1)
     
     printer.info([f'风纪委员会共获取{num_case}件案例，其中有效投票{num_voted}件'], True)
-    await BiliTimer.append2list_jobs(judge, 3600)
+    BiliTimer.call_after(judge, 3600)
         
 
-async def init():
-    await BiliTimer.append2list_jobs(sliver2coin, 0)
-    await BiliTimer.append2list_jobs(doublegain_coin2silver, 0)
-    await BiliTimer.append2list_jobs(DoSign, 0)
-    await BiliTimer.append2list_jobs(Daily_bag, 0)
-    await BiliTimer.append2list_jobs(Daily_Task, 0)
-    await BiliTimer.append2list_jobs(link_sign, 0)
-    await BiliTimer.append2list_jobs(send_gift, 0)
-    await BiliTimer.append2list_jobs(auto_send_gift, 0)
-    await BiliTimer.append2list_jobs(BiliMainTask, 0)
-    await BiliTimer.append2list_jobs(judge, 0)
+def init():
+    BiliTimer.call_after(sliver2coin, 0)
+    BiliTimer.call_after(doublegain_coin2silver, 0)
+    BiliTimer.call_after(DoSign, 0)
+    BiliTimer.call_after(Daily_bag, 0)
+    BiliTimer.call_after(Daily_Task, 0)
+    BiliTimer.call_after(link_sign, 0)
+    BiliTimer.call_after(send_gift, 0)
+    BiliTimer.call_after(auto_send_gift, 0)
+    BiliTimer.call_after(BiliMainTask, 0)
+    BiliTimer.call_after(judge, 0)
     

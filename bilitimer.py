@@ -11,38 +11,39 @@ def CurrentTime():
 
 
 class BiliTimer:
-    __slots__ = ('jobs',)
+    __slots__ = ('jobs', 'loop')
     instance = None
 
-    def __new__(cls, *args, **kw):
+    def __new__(cls, loop=None):
         if not cls.instance:
-            cls.instance = super(BiliTimer, cls).__new__(cls, *args, **kw)
-            cls.instance.jobs = asyncio.PriorityQueue()
+            cls.instance = super(BiliTimer, cls).__new__(cls)
+            cls.instance.loop = loop
+            cls.instance.jobs = asyncio.Queue()
         return cls.instance
         
     async def run(self):
-        await Tasks.init()
+        Tasks.init()
         while True:
             i = await self.jobs.get()
-            currenttime = CurrentTime()
-            sleeptime = i[0] - currenttime
-            print('智能睡眠', sleeptime)
-            await asyncio.sleep(max(sleeptime, 0))
-            try:
-                bytes_data = await asyncio.wait_for(i[2](), timeout=15.0)
-            except asyncio.TimeoutError:
-                printer.warn(i[1])
-                printer.warn('timeout')
-            except:
-                # websockets.exceptions.ConnectionClosed'>
-                print(sys.exc_info()[0], sys.exc_info()[1])
-                printer.warn(i[1])
-                printer.warn('!!!!')
+            print(i, '一级')   
+            await i[0](*i[1])
       
     @staticmethod
-    async def append2list_jobs(func, delay):
-        await BiliTimer.instance.jobs.put((CurrentTime() + delay, func.__name__, func))
+    def call_after(func, delay):
+        inst = BiliTimer.instance
+        value = (func, ())
+        inst.loop.call_later(delay, inst.jobs.put_nowait, value)
+        # print('添加任务', time_expected, func.__name__, func, tuple_values)
         # print('添加任务')
+        return
+        
+    @staticmethod
+    def append2list_jobs(func, time_expected, tuple_values):
+        inst = BiliTimer.instance
+        current_time = CurrentTime()
+        value = (func, tuple_values)
+        inst.loop.call_later(time_expected-current_time, inst.jobs.put_nowait, value)
+        # print('添加任务', time_expected, func.__name__, func, tuple_values)
         return
         
     @staticmethod

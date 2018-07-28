@@ -6,44 +6,13 @@ import asyncio
 import datetime
 import time
 import random
+from bilitimer import BiliTimer
 
 
 def CurrentTime():
     currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
     return currenttime
 
-
-class Delay_Joiner:
-    __slots__ = ('jobs', 'loop')
-    instance = None
-
-    def __new__(cls, loop=None):
-        if not cls.instance:
-            cls.instance = super(Delay_Joiner, cls).__new__(cls)
-            cls.instance.loop = loop
-            cls.instance.jobs = asyncio.Queue()
-        return cls.instance
-        
-    async def run(self):
-        while True:
-            i = await self.jobs.get()
-            print(i, '一级')   
-            await i[0](*i[1])
-      
-    @staticmethod
-    def append2list_jobs(func, time_expected, tuple_values):
-        inst = Delay_Joiner.instance
-        current_time = CurrentTime()
-        value = (func, tuple_values)
-        inst.loop.call_later(time_expected-current_time, inst.jobs.put_nowait, value)
-        # print('添加任务', time_expected, func.__name__, func, tuple_values)
-        return
-        
-    @staticmethod
-    def getresult():
-        print('数目', Delay_Joiner.instance.jobs.qsize())
-        
-        
 class Rafflehandler:
     __slots__ = ('queue_raffle', 'list_raffle_id')
     instance = None
@@ -200,7 +169,7 @@ async def handle_1_room_TV(real_roomid):
         num_available = len(list_available_raffleid)
         # print(list_available_raffleid)
         for raffle_id, raffle_type, time_wanted in list_available_raffleid:
-            Delay_Joiner.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, real_roomid, raffle_id, raffle_type))
+            BiliTimer.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, real_roomid, raffle_id, raffle_type))
 
 async def handle_1_room_activity(text1):
     result = await utils.enter_room(text1)
