@@ -3,7 +3,8 @@
 
 yjqiang分支是一个次分支，特别感谢主分支所有参与者的基础奠定
 
-docker使用 https://github.com/Muromi-Rikka/bilibili-live-tools-docker
+docker使用 https://github.com/Muromi-Rikka/bilibili-live-tools-docker  
+docker使用  https://github.com/zsnmwy/bilibili-live-tools-docker
 
 pythonista3(ios) https://www.jianshu.com/p/669e63b5ec2b
 
@@ -60,7 +61,12 @@ version 2.1
       更新api
       v4小电视更新
       支持风纪委员会
-      其他修改
+      其他修改  
+
+version 2.1
+------
+      更新wiki  
+      调整bilitimer
         
 
 
