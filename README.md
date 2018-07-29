@@ -63,10 +63,15 @@ version 2.1
       支持风纪委员会
       其他修改  
 
-version 2.1
+version 2.2
 ------
       更新wiki  
-      调整bilitimer
+      调整bilitimer,改善漏抽问题  
+      弹幕重连机制修复  
+      实物抽奖机制优化
+    
+      
+
         
 
 
