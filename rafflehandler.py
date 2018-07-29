@@ -64,7 +64,10 @@ class Rafflehandler:
         
     def add2raffle_id(self, raffle_id):
         self.list_raffle_id.append(raffle_id)
-        print(self.list_raffle_id)
+        if len(self.list_raffle_id) > 150:
+            # print(self.list_raffle_id)
+            del self.list_raffle_id[:75]
+            # print(self.list_raffle_id)
     
     def check_duplicate(self, raffle_id):
         return (raffle_id in self.list_raffle_id)
