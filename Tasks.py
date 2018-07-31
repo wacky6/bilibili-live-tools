@@ -259,7 +259,7 @@ async def check(id):
         elif percent <= 0.03:
             vote = 4
     # 抬一手        
-    if vote == 3 and voted > 450:
+    if vote == 3 and voted >= 450:
         vote = 2
     return vote, status
  
