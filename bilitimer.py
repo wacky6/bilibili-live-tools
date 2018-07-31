@@ -25,7 +25,7 @@ class BiliTimer:
         Tasks.init()
         while True:
             i = await self.jobs.get()  
-            await i[0](*i[1])
+            asyncio.ensure_future(i[0](*i[1]))
       
     @staticmethod
     def call_after(func, delay):

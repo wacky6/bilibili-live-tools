@@ -234,6 +234,7 @@ async def check(id):
     votebreak = data['voteBreak']
     voteDelete = data['voteDelete']
     voteRule = data['voteRule']
+    status = data['status']
     voted = votebreak+voteDelete+voteRule
     if voted:
         percent = voteRule / voted
@@ -257,7 +258,10 @@ async def check(id):
             vote = 2
         elif percent <= 0.03:
             vote = 4
-    return vote
+    # 抬一手        
+    if vote == 3 and voted > 450:
+        vote = 2
+    return vote, status
  
                
 async def judge():
@@ -271,12 +275,18 @@ async def judge():
             print('本次未获取到案件')
             # await asyncio.sleep(1)
             break
-        vote = await check(id)
-        print('投票决策', id, vote)
-        json_rsp = await bilibili().req_vote_case(id, vote)
-        print(json_rsp)
         num_case += 1
-        if vote != 3:
+        vote, status = await check(id)
+        while vote == 3 and status == 1:
+            printer.info([f'本次获取到的案件{id}暂时无法判定，在30s后重新尝试'], True)
+            await asyncio.sleep(30)
+            vote, status = await check(id)
+        if status != 1:
+            print('超时失败，请联系作者')
+        else:
+            print('投票决策', id, vote)
+            json_rsp = await bilibili().req_vote_case(id, vote)
+            print(json_rsp)
             num_voted += 1
         
         print('______________________________')
