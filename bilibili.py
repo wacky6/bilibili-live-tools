@@ -37,6 +37,10 @@ async def replay_request(code):
         print('b站炸了，暂停所有请求1.5s后重试，请耐心等待')
         await asyncio.sleep(1.5)
         return True
+    if code == 3:
+        print('api错误，稍后重试，请反馈给作者')
+        await asyncio.sleep(1)
+        return True
     if code == 0:
         return False
     else:
