@@ -69,8 +69,8 @@ async def fetch_medal(show=True, list_wanted_medal=[]):
     if show:
         printlist.append('查询勋章信息')
         printlist.append(
-            '{} {} {:^12} {:^10} {} {:^6} '.format(adjust_for_chinese('勋章'), adjust_for_chinese('主播昵称'), '亲密度',
-                                                   '今日的亲密度', adjust_for_chinese('排名'), '勋章状态'))
+            '{} {} {:^12} {:^10} {} {:^6} {}'.format(adjust_for_chinese('勋章'), adjust_for_chinese('主播昵称'), '亲密度',
+                                                   '今日的亲密度', adjust_for_chinese('排名'), '勋章状态', '房间号码'))
     dic_worn = {'1': '正在佩戴', '0': '待机状态'}
     json_response = await bilibili.request_fetchmedal()
     # print(json_response)
@@ -79,12 +79,12 @@ async def fetch_medal(show=True, list_wanted_medal=[]):
             list_medal.append((i['roomid'], int(i['dayLimit']) - int(i['todayFeed']), i['medal_name'], i['level']))
             if show:
                 printlist.append(
-                    '{} {} {:^14} {:^14} {} {:^6} '.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])),
+                    '{} {} {:^14} {:^14} {} {:^6} {:^9}'.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])),
                                                            adjust_for_chinese(i['anchorInfo']['uname']),
                                                            str(i['intimacy']) + '/' + str(i['next_intimacy']),
                                                            str(i['todayFeed']) + '/' + str(i['dayLimit']),
                                                            adjust_for_chinese(str(i['rank'])),
-                                                           dic_worn[str(i['status'])]))
+                                                           dic_worn[str(i['status'])], i['roomid']))
         if show:
             printer.info(printlist, True)
         if list_wanted_medal:
