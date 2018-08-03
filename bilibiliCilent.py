@@ -15,12 +15,11 @@ import sys
 
 class bilibiliClient():
     
-    __slots__ = ('ws', 'connected', 'roomid', 'area_id', 'loop_func')
+    __slots__ = ('ws', 'roomid', 'area_id', 'loop_func')
     structer = struct.Struct('!I2H2I')
 
     def __init__(self, roomid=None, area_id=None):
         self.ws = None
-        self.connected = False
         if roomid is None:
             self.roomid = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
             self.area_id = 0
@@ -37,11 +36,10 @@ class bilibiliClient():
         except:
             print('请联系开发者', sys.exc_info()[0], sys.exc_info()[1])
         printer.info([f'{self.area_id}号弹幕收尾模块状态{self.ws.closed}'], True)
-        self.connected = False
         
     async def CheckArea(self):
         try:
-            while self.connected:
+            while True:
                 area_id = await asyncio.shield(utils.FetchRoomArea(self.roomid))
                 if area_id != self.area_id:
                     printer.info([f'{self.roomid}更换分区{self.area_id}为{area_id}，即将切换房间'], True)
@@ -49,7 +47,6 @@ class bilibiliClient():
                 await asyncio.sleep(300)
         except asyncio.CancelledError:
             printer.info([f'{self.area_id}号弹幕监控分区检测模块主动取消'], True)
-            self.connected = False
         
     async def connectServer(self):
         try:
@@ -61,7 +58,6 @@ class bilibiliClient():
         printer.info([f'{self.area_id}号弹幕监控已连接b站服务器'], True)
         body = f'{{"uid":0,"roomid":{self.roomid},"protover":1,"platform":"web","clientver":"1.3.3"}}'
         if (await self.SendSocketData(opt=7, body=body)):
-            self.connected = True
             return True
         else:
             return False
@@ -69,14 +65,12 @@ class bilibiliClient():
     async def HeartbeatLoop(self):
         printer.info([f'{self.area_id}号弹幕监控开始心跳（心跳间隔30s，后续不再提示）'], True)
         try:
-            while self.connected:
+            while True:
                 if not (await self.SendSocketData(opt=2, body='')):
-                    self.connected = False
                     return
                 await asyncio.sleep(30)
         except asyncio.CancelledError:
             printer.info([f'{self.area_id}号弹幕监控心跳模块主动取消'], True)
-            self.connected = False
 
     async def SendSocketData(self, opt, body, len_header=16, ver=1, seq=1):
         remain_data = body.encode('utf-8')
@@ -87,15 +81,12 @@ class bilibiliClient():
             await self.ws.send(data)
         except websockets.exceptions.ConnectionClosed:
             print("# 主动关闭或者远端主动关闭.")
-            self.connected = False
             return False
         except asyncio.CancelledError:
             printer.info([f'{self.area_id}号弹幕监控发送模块主动取消'], True)
-            self.connected = False
             return False
         except:
             print(sys.exc_info()[0], sys.exc_info()[1])
-            self.connected = False
             return False
         return True
 
@@ -105,17 +96,14 @@ class bilibiliClient():
             bytes_data = await asyncio.wait_for(self.ws.recv(), timeout=35.0)
         except asyncio.TimeoutError:
             print('# 由于心跳包30s一次，但是发现35内没有收到任何包，说明已经悄悄失联了，主动断开')
-            self.connected = False
             return None
         except websockets.exceptions.ConnectionClosed:
             print("# 主动关闭或者远端主动关闭")
-            self.connected = False
             return None
         except:
             # websockets.exceptions.ConnectionClosed'>
             print(sys.exc_info()[0], sys.exc_info()[1])
             print('请联系开发者')
-            self.connected = False
             return None
         # print(tmp)
            
@@ -147,7 +135,6 @@ class bilibiliClient():
                 elif opt == 8:
                     printer.info([f'{self.area_id}号弹幕监控进入房间（{self.roomid}）'], True)
                 else:
-                    self.connected = False
                     printer.warn(bytes_datas[len_read:len_read + len_data])
                             
                 if state is not None and not state:

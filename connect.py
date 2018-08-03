@@ -53,7 +53,6 @@ class connect():
             task_heartbeat = asyncio.ensure_future(self.danmuji.HeartbeatLoop())
             finished, pending = await asyncio.wait([task_main, task_heartbeat], return_when=asyncio.FIRST_COMPLETED)
             print('主弹幕姬异常或主动断开，正在处理剩余信息')
-            self.danmuji.connected = False
             time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
@@ -94,7 +93,6 @@ class RaffleConnect():
             task_checkarea = asyncio.ensure_future(self.danmuji.CheckArea())
             finished, pending = await asyncio.wait([task_main, task_heartbeat, task_checkarea], return_when=asyncio.FIRST_COMPLETED)
             printer.info([f'{self.areaid}号弹幕姬异常或主动断开，正在处理剩余信息'], True)
-            self.danmuji.connected = False
             time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
