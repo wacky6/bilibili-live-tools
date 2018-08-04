@@ -81,9 +81,7 @@ class bilibili():
 
     def calc_sign(self, str):
         str = f'{str}{self.dic_bilibili["app_secret"]}'
-        hash = hashlib.md5()
-        hash.update(str.encode('utf-8'))
-        sign = hash.hexdigest()
+        sign = hashlib.md5(str.encode('utf-8')).hexdigest()
         return sign
 
     @staticmethod
