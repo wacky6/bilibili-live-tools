@@ -58,10 +58,7 @@ class bilibiliClient():
             return False
         printer.info([f'{self.area_id}号弹幕监控已连接b站服务器'], True)
         body = f'{{"uid":0,"roomid":{self.roomid},"protover":1,"platform":"web","clientver":"1.3.3"}}'
-        if (await self.SendSocketData(opt=7, body=body)):
-            return True
-        else:
-            return False
+        return (await self.SendSocketData(opt=7, body=body))
 
     async def HeartbeatLoop(self):
         printer.info([f'{self.area_id}号弹幕监控开始心跳（心跳间隔30s，后续不再提示）'], True)
