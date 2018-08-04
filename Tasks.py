@@ -160,7 +160,7 @@ async def sliver2coin():
         json_response = await bilibili.silver2coin_web()
         printer.info([f'#  {json_response["msg"]}'])
         printer.info([f'#  {json_response1["msg"]}'])
-        if json_response['code'] == 403 and '只' in json_response['msg']:
+        if json_response['code'] == 403 and '最多' in json_response['msg']:
             finish_web = True
         else:
             finish_web = False
