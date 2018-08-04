@@ -260,8 +260,12 @@ class bilibili():
     @staticmethod
     async def silver2coin_web():
         inst = bilibili.instance
-        url = f"{base_url}/exchange/silver2coin"
-        response = await inst.bili_section_post(url, headers=inst.dic_bilibili['pcheaders'])
+        url = f"{base_url}/pay/v1/Exchange/silver2coin"
+        data = {
+            "platform": 'pc',
+            "csrf_token": inst.dic_bilibili['csrf']
+        }
+        response = await inst.bili_section_post(url, headers=inst.dic_bilibili['pcheaders'], data=data)
         return response
 
     @staticmethod
