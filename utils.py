@@ -76,9 +76,10 @@ async def fetch_medal(show=True, list_wanted_medal=[]):
     # print(json_response)
     if not json_response['code']:
         for i in json_response['data']['fansMedalList']:
-            list_medal.append((i['roomid'], int(i['dayLimit']) - int(i['todayFeed']), i['medal_name'], i['level']))
-            if show:
-                printlist.append(
+            if 'roomid' in i:
+                list_medal.append((i['roomid'], int(i['dayLimit']) - int(i['todayFeed']), i['medal_name'], i['level']))
+                if show:
+                    printlist.append(
                     '{} {} {:^14} {:^14} {} {:^6} {:^9}'.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])),
                                                            adjust_for_chinese(i['anchorInfo']['uname']),
                                                            str(i['intimacy']) + '/' + str(i['next_intimacy']),
