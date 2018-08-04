@@ -158,16 +158,7 @@ class bilibiliClient():
             return False
         elif cmd == 'SYS_GIFT':
             if 'giftId' in dic:
-                if str(dic['giftId']) in bilibili.get_giftids_raffle_keys():
-                    
-                    text1 = dic['real_roomid']
-                    text2 = dic['url']
-                    giftId = dic['giftId']
-                    printer.info(["检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
-                    rafflehandler.Rafflehandler.Put2Queue((giftId, text1, text2), rafflehandler.handle_1_room_activity)
-                    Statistics.append2pushed_raffle('活动', area_id=self.area_id)
-                            
-                elif dic['giftId'] == 39:
+                if dic['giftId'] == 39:
                     printer.info(["节奏风暴"], True)
                     temp = await bilibili.get_giftlist_of_storm(dic)
                     check = len(temp['data'])

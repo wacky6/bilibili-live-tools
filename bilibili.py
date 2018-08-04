@@ -580,14 +580,6 @@ class bilibili():
         return response1
 
     @staticmethod
-    def get_giftids_raffle():
-        return bilibili.instance.dic_bilibili['giftids_raffle'][str]
-
-    @staticmethod
-    def get_giftids_raffle_keys():
-        return bilibili.instance.dic_bilibili['giftids_raffle'].keys()
-
-    @staticmethod
     async def get_activity_result(activity_roomid, activity_raffleid):
         inst = bilibili.instance
         url = f"{base_url}/activity/v1/Raffle/notice?roomid={activity_roomid}&raffleId={activity_raffleid}"

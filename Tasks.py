@@ -242,7 +242,7 @@ async def check(id):
         percent = 0
     print('目前已投票', voted)
     print('认为不违反规定的比例', percent)
-    vote = 3
+    vote = None
     if voted >= 400:
         if percent >= 0.8:
             vote = 2
@@ -259,9 +259,9 @@ async def check(id):
         elif percent <= 0.03:
             vote = 4
     # 抬一手        
-    if vote == 3 and voted >= 450:
+    if vote is None and voted >= 450:
         vote = 2
-    return vote, status
+    return vote, status, voted
  
                
 async def judge():
@@ -276,11 +276,17 @@ async def judge():
             # await asyncio.sleep(1)
             break
         num_case += 1
-        vote, status = await check(id)
-        while vote == 3 and status == 1:
-            printer.info([f'本次获取到的案件{id}暂时无法判定，在30s后重新尝试'], True)
-            await asyncio.sleep(30)
-            vote, status = await check(id)
+        while True:
+            vote, status, voted = await check(id)
+            if vote is None and status == 1:                
+                if voted < 300:
+                    printer.info([f'本次获取到的案件{id}暂时无法判定，在180s后重新尝试'], True)
+                    await asyncio.sleep(180)
+                else:
+                    printer.info([f'本次获取到的案件{id}暂时无法判定，在60s后重新尝试'], True)
+                    await asyncio.sleep(60)
+            else:
+                break
         if status != 1:
             print('超时失败，请联系作者')
         else:
