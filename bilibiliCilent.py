@@ -50,7 +50,8 @@ class bilibiliClient():
         
     async def connectServer(self):
         try:
-            self.ws = await websockets.connect('wss://broadcastlv.chat.bilibili.com/sub', timeout=3)
+            url = 'wss://broadcastlv.chat.bilibili.com/sub'
+            self.ws = await asyncio.wait_for(websockets.connect(url), timeout=3)
         except:
             print("# 连接无法建立，请检查本地网络状况")
             print(sys.exc_info()[0], sys.exc_info()[1])
