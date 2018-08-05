@@ -78,7 +78,9 @@ async def send_gift():
             if left_time is not None and 0 < int(left_time) < time_set:  # 剩余时间少于半天时自动送礼
                 list_gift.append(i[:3])
         if list_gift:
-            print('发现即将过期的礼物')
+            print('发现即将过期的礼物', list_gift)
+            if(len(list_gift) > 5):
+                printer.warn(f'过期礼物{list_gift}')
             if ConfigLoader().dic_user['task_control']['clean_expiring_gift2all_medal']:
                 print('正在投递其他勋章')
                 list_medal = await utils.fetch_medal(show=False)
@@ -155,21 +157,17 @@ async def doublegain_coin2silver():
 async def sliver2coin():
     if ConfigLoader().dic_user['task_control']['silver2coin']:
         # 403 done
-        json_response1 = await bilibili.silver2coin_app()
-        # -403 done
+        # json_response1 = await bilibili.silver2coin_app()
+        
         json_response = await bilibili.silver2coin_web()
         printer.info([f'#  {json_response["msg"]}'])
-        printer.info([f'#  {json_response1["msg"]}'])
+        
         if json_response['code'] == 403 and '最多' in json_response['msg']:
             finish_web = True
         else:
             finish_web = False
 
-        if json_response1['code'] == 403 and '最多' in json_response1['msg']:
-            finish_app = True
-        else:
-            finish_app = False
-        if finish_app and finish_web:
+        if finish_web:
             sleeptime = (utils.seconds_until_tomorrow() + 300)
             BiliTimer.call_after(sliver2coin, sleeptime)
             return
