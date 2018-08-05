@@ -10,6 +10,8 @@ import aiohttp
 import asyncio
 import random
 import json
+from PIL import Image
+from io import BytesIO
 
 reload(sys)
 
@@ -23,12 +25,21 @@ def randomint():
     return ''.join(str(random.choice(range(10))) for _ in range(17))
 
 
-def cnn_captcha(img):
+def cnn_captcha(content):
+    img = base64.b64encode(content)
     url = "http://101.236.6.31:8080/code"
     data = {"image": img}
     rsp = requests.post(url, data=data)
     captcha = rsp.text
     print(f'此次登录出现验证码,识别结果为{captcha}')
+    return captcha
+ 
+       
+def input_captcha(content):
+    img = Image.open(BytesIO(content))
+    # img.thumbnail(size)
+    img.show()
+    captcha = input('手动输入验证码')
     return captcha
 
 
@@ -52,7 +63,7 @@ base_url = 'https://api.live.bilibili.com'
 
 
 class bilibili():
-    __slots__ = ('dic_bilibili', 'bili_session', 'app_params', 'var_other_session')
+    __slots__ = ('dic_bilibili', 'bili_session', 'app_params', 'var_other_session', 'var_login_session')
     instance = None
 
     def __new__(cls, *args, **kw):
@@ -62,6 +73,7 @@ class bilibili():
             dic_bilibili = ConfigLoader().dic_bilibili
             cls.instance.bili_session = None
             cls.instance.var_other_session = None
+            cls.instance.var_login_session = None
             cls.instance.app_params = f'actionKey={dic_bilibili["actionKey"]}&appkey={dic_bilibili["appkey"]}&build={dic_bilibili["build"]}&device={dic_bilibili["device"]}&mobi_app={dic_bilibili["mobi_app"]}&platform={dic_bilibili["platform"]}'
         return cls.instance
 
@@ -78,6 +90,13 @@ class bilibili():
             self.var_other_session = aiohttp.ClientSession()
             # print(0)
         return self.var_other_session
+        
+    @property
+    def login_session(self):
+        if self.var_login_session is None:
+            self.var_login_session = requests.Session()
+            # print(0)
+        return self.var_login_session
 
     def calc_sign(self, str):
         str = f'{str}{self.dic_bilibili["app_secret"]}'
@@ -93,6 +112,34 @@ class bilibili():
             if i == 'cookie':
                 inst.dic_bilibili['pcheaders']['cookie'] = dic[i]
                 inst.dic_bilibili['appheaders']['cookie'] = dic[i]
+                
+    def login_session_post(self, url, headers=None, data=None):
+        while True:
+            try:
+                # print(self.login_session.cookies, url)
+                response = self.login_session.post(url, headers=headers, data=data)
+                if response.status_code == requests.codes.ok:
+                    return response
+                elif requests.codes.ok == 403:
+                    print('403频繁')
+            except:
+                # print('当前网络不好，正在重试，请反馈开发者!!!!')
+                print(sys.exc_info()[0], sys.exc_info()[1])
+                continue
+    
+    def login_session_get(self, url, headers=None, data=None):
+        while True:
+            try:
+                # print(self.login_session.cookies, url)
+                response = self.login_session.get(url, headers=headers, data=data)
+                if response.status_code == requests.codes.ok:
+                    return response
+                elif requests.codes.ok == 403:
+                    print('403频繁')
+            except:
+                # print('当前网络不好，正在重试，请反馈开发者!!!!')
+                print(sys.exc_info()[0], sys.exc_info()[1])
+                continue
 
     async def bili_section_post(self, url, headers=None, data=None):
         while True:
@@ -233,7 +280,7 @@ class bilibili():
     def request_logout():
         inst = bilibili.instance
         url = 'https://passport.bilibili.com/login?act=exit'
-        response = requests.get(url, headers=inst.dic_bilibili['pcheaders'])
+        response = inst.login_session_get(url, headers=inst.dic_bilibili['pcheaders'])
         return response
 
     # 1:900兑换
@@ -404,7 +451,7 @@ class bilibili():
         temp_params = f'appkey={inst.dic_bilibili["appkey"]}'
         sign = inst.calc_sign(temp_params)
         params = {'appkey': inst.dic_bilibili['appkey'], 'sign': sign}
-        response = requests.post(url, data=params)
+        response = inst.login_session_post(url, data=params)
         return response
 
     @staticmethod
@@ -416,7 +463,7 @@ class bilibili():
         sign = inst.calc_sign(temp_params)
         headers = {"Content-type": "application/x-www-form-urlencoded"}
         payload = f'appkey={inst.dic_bilibili["appkey"]}&password={password}&username={username}&sign={sign}'
-        response = requests.post(url, data=payload, headers=headers)
+        response = inst.login_session_post(url, data=payload, headers=headers)
         return response
 
     @staticmethod
@@ -426,20 +473,19 @@ class bilibili():
             'Accept': 'application/json, text/plain, */*',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
             'Host': 'passport.bilibili.com',
-            'cookie': "sid=hxt5szbb"
+            # 'cookie': "sid=hxt5szbb"
         }
-        with requests.Session() as s:
-            url = "https://passport.bilibili.com/captcha"
-            res = s.get(url, headers=headers)
-            tmp1 = base64.b64encode(res.content)
-    
-            captcha = cnn_captcha(tmp1)
-            temp_params = f'actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&captcha={captcha}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&password={password}&platform={inst.dic_bilibili["platform"]}&username={username}'
-            sign = inst.calc_sign(temp_params)
-            payload = f'{temp_params}&sign={sign}'
-            headers['Content-type'] = "application/x-www-form-urlencoded"
-            url = "https://passport.bilibili.com/api/v2/oauth2/login"
-            response = s.post(url, data=payload, headers=headers)
+        # with requests.Session() as s:
+        url = "https://passport.bilibili.com/captcha"
+        res = inst.login_session_get(url, headers=headers)
+
+        captcha = input_captcha(res.content)
+        temp_params = f'actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&captcha={captcha}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&password={password}&platform={inst.dic_bilibili["platform"]}&username={username}'
+        sign = inst.calc_sign(temp_params)
+        payload = f'{temp_params}&sign={sign}'
+        headers['Content-type'] = "application/x-www-form-urlencoded"
+        url = "https://passport.bilibili.com/api/v2/oauth2/login"
+        response = inst.login_session_post(url, data=payload, headers=headers)
         return response
 
     @staticmethod
@@ -450,7 +496,7 @@ class bilibili():
         params = ('&'.join(sorted(list_url.split('&') + list_cookie)))
         sign = inst.calc_sign(params)
         true_url = f'https://passport.bilibili.com/api/v2/oauth2/info?{params}&sign={sign}'
-        response1 = requests.get(true_url, headers=inst.dic_bilibili['appheaders'])
+        response1 = inst.login_session_get(true_url, headers=inst.dic_bilibili['appheaders'])
         return response1
 
     @staticmethod
@@ -465,7 +511,7 @@ class bilibili():
         url = f'https://passport.bilibili.com/api/v2/oauth2/refresh_token'
         appheaders = inst.dic_bilibili['appheaders'].copy()
         appheaders['Content-type'] = "application/x-www-form-urlencoded"
-        response1 = requests.post(url, headers=appheaders, data=payload)
+        response1 = inst.login_session_post(url, headers=appheaders, data=payload)
         return response1
 
     @staticmethod
@@ -511,7 +557,7 @@ class bilibili():
             'Accept': 'application/json, text/plain, */*',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
             'cookie': inst.dic_bilibili['cookie'],
-            #'referer': text2
+            # 'referer': text2
         }
         temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&event_type={raffleid}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&room_id={text1}&ts={CurrentTime()}'
         # params = temp_params + inst.dic_bilibili['app_secret']
