@@ -66,7 +66,7 @@ async def link_sign():
         results = await asyncio.gather(*tasklist)
     BiliTimer.call_after(link_sign, 21600)
 
-async def send_gift():
+async def send_expiring_gift():
     if ConfigLoader().dic_user['task_control']['clean-expiring-gift']:
         argvs = await utils.fetch_bag_list(show=False)
         printer.warn(argvs)
@@ -94,20 +94,16 @@ async def send_gift():
                 await utils.send_gift_web(roomID, giftNum, bagID, giftID)
         else:
             print('未发现即将过期的礼物')
-    BiliTimer.call_after(send_gift, 21600)
 
-async def auto_send_gift():
-    # await utils.WearingMedalInfo()
-    # return
+async def send_medal_gift():
     list_medal = []
     if ConfigLoader().dic_user['task_control']['send2wearing-medal']:
         list_medal = await utils.WearingMedalInfo()
         if not list_medal:
             print('暂未佩戴任何勋章')
-            # BiliTimer.call_after(auto_send_gift, 21600)
     if ConfigLoader().dic_user['task_control']['send2medal']:
         list_medal += await utils.fetch_medal(False, ConfigLoader().dic_user['task_control']['send2medal'])
-    # print(list_medal)    
+    # print(list_medal)
     print('正在投递勋章')
     temp = await utils.fetch_bag_list(show=False)
     # print(temp)
@@ -118,9 +114,11 @@ async def auto_send_gift():
         if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
             list_gift.append(i[:3])
     await full_intimate(list_gift, list_medal)
-            
-    # printer.info(["# 自动送礼共送出亲密度为%s的礼物" % int(calculate)])
-    BiliTimer.call_after(auto_send_gift, 21600)
+
+async def send_gift():
+    await send_expiring_gift()
+    await send_medal_gift()
+    BiliTimer.call_after(send_gift, 21600)
 
 async def full_intimate(list_gift, list_medal):
     json_res = await bilibili.gift_list()
@@ -256,7 +254,7 @@ async def check(id):
             vote = 2
         elif percent <= 0.03:
             vote = 4
-    # 抬一手        
+    # 抬一手
     if vote is None and voted >= 450:
         vote = 2
     return vote, status, voted
@@ -276,7 +274,7 @@ async def judge():
         num_case += 1
         while True:
             vote, status, voted = await check(id)
-            if vote is None and status == 1:                
+            if vote is None and status == 1:
                 if voted < 300:
                     printer.info([f'本次获取到的案件{id}暂时无法判定，在180s后重新尝试'], True)
                     await asyncio.sleep(180)
@@ -308,7 +306,6 @@ def init():
     BiliTimer.call_after(Daily_Task, 0)
     BiliTimer.call_after(link_sign, 0)
     BiliTimer.call_after(send_gift, 0)
-    BiliTimer.call_after(auto_send_gift, 0)
     BiliTimer.call_after(BiliMainTask, 0)
     BiliTimer.call_after(judge, 0)
     
