@@ -9,6 +9,7 @@ docker使用  https://github.com/zsnmwy/bilibili-live-tools-docker
 pythonista3(ios) https://www.jianshu.com/p/669e63b5ec2b
 
 依赖包 https://github.com/yjqiang/bilibili-live-tools/blob/master/requirements.txt  
+运行方法  run.py
 
 多用户版本 https://github.com/yjqiang/bili2.0
 
@@ -82,7 +83,7 @@ version 3.0
 
 环境:
 ------  
-        python3.6
+        python3.6+
   
     
 
