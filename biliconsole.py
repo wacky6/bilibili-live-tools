@@ -5,6 +5,7 @@ from printer import Printer
 from configloader import ConfigLoader
 from rafflehandler import Rafflehandler
 from bilitimer import BiliTimer
+import OnlineHeart
 
 
 def guide_of_console():
@@ -129,6 +130,7 @@ options = {
     '19': Rafflehandler.getlist,
     '20': Statistics.checklist,
     '21': InputGiveCoin2Av,
+    '22': OnlineHeart.draw_lottery,
     'help': guide_of_console,
     'h': guide_of_console
 }
@@ -141,7 +143,7 @@ def return_error():
 def controler():
     while True:
         x = input('')
-        if x in ['3', '4', '5', '6', '14', '17']:
+        if x in ['3', '4', '5', '6', '14', '17', '22']:
             answer = options.get(x, return_error)
             Biliconsole.append2list_console(answer)
         else:

@@ -56,8 +56,6 @@ async def draw_lottery():
                         json_response1 = await bilibili.get_gift_of_lottery(i, g)
                         print("当前时间:", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
                         print("参与实物抽奖回显：", json_response1)
-                    else:
-                        pass
         
         
 async def run():
@@ -65,7 +63,7 @@ async def run():
         printer.info(["心跳"], True)
         login.HandleExpire()
         await heartbeat()
-        await draw_lottery()
+        # await draw_lottery()
         await asyncio.sleep(300)
 
 
