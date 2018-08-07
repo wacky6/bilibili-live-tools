@@ -13,8 +13,6 @@ import json
 from PIL import Image
 from io import BytesIO
 
-reload(sys)
-
 
 def CurrentTime():
     currenttime = int(time.mktime(datetime.datetime.now().timetuple()))

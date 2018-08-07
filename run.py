@@ -1,6 +1,5 @@
 import OnlineHeart
 import Silver
-import LotteryResult
 import Tasks
 import connect
 from rafflehandler import Rafflehandler
@@ -49,7 +48,6 @@ tasks = [
     OnlineHeart.run(),
     Silver.run(),
     danmu_connection.run(),
-    # LotteryResult.run(),
     rafflehandler.run(),
     biliconsole.Biliconsole.run(),
     bili_timer.run(),
