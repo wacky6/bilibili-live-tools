@@ -12,6 +12,7 @@ def CurrentTime():
 
 
 async def heartbeat():
+    printer.info(["心跳"], True)
     json_response = await bilibili.apppost_heartbeat()
     json_response = await bilibili.pcpost_heartbeat()
     json_response = await bilibili.heart_gift()
@@ -60,7 +61,6 @@ async def draw_lottery():
         
 async def run():
     while 1:
-        printer.info(["心跳"], True)
         login.HandleExpire()
         await heartbeat()
         # await draw_lottery()
