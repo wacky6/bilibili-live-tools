@@ -4,13 +4,13 @@ import toml
 
 # "#969696"
 def hex_to_rgb_percent(hex_str):
-    color = webcolors.hex_to_rgb_percent(hex_str)    
+    color = webcolors.hex_to_rgb_percent(hex_str)
     return [float(i.strip('%'))/100.0 for i in color]
 
 
 # "255 255 255"
 def rgb_to_percent(rgb_list):
-    color = webcolors.rgb_to_rgb_percent(rgb_list)    
+    color = webcolors.rgb_to_rgb_percent(rgb_list)
     return [float(i.strip('%'))/100.0 for i in color]
 
     

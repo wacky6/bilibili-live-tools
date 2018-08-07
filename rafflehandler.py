@@ -13,6 +13,7 @@ def CurrentTime():
     currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
     return currenttime
 
+
 class Rafflehandler:
     __slots__ = ('queue_raffle', 'list_raffle_id')
     instance = None
@@ -85,7 +86,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
             print('没抢到。。。。。')
             printer.warn(f'{raffleid}  {raffle_type} {num}')
             return False
-        elif code == 400: 
+        elif code == 400:
             print(json_response2)
             return
             tasklist = []

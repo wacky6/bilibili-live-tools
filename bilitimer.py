@@ -24,7 +24,7 @@ class BiliTimer:
     async def run(self):
         Tasks.init()
         while True:
-            i = await self.jobs.get()  
+            i = await self.jobs.get()
             asyncio.ensure_future(i[0](*i[1]))
       
     @staticmethod

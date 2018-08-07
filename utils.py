@@ -69,8 +69,7 @@ async def fetch_medal(show=True, list_wanted_medal=[]):
     if show:
         printlist.append('查询勋章信息')
         printlist.append(
-            '{} {} {:^12} {:^10} {} {:^6} {}'.format(adjust_for_chinese('勋章'), adjust_for_chinese('主播昵称'), '亲密度',
-                                                   '今日的亲密度', adjust_for_chinese('排名'), '勋章状态', '房间号码'))
+            '{} {} {:^12} {:^10} {} {:^6} {}'.format(adjust_for_chinese('勋章'), adjust_for_chinese('主播昵称'), '亲密度', '今日的亲密度', adjust_for_chinese('排名'), '勋章状态', '房间号码'))
     dic_worn = {'1': '正在佩戴', '0': '待机状态'}
     json_response = await bilibili.request_fetchmedal()
     # print(json_response)
@@ -79,13 +78,7 @@ async def fetch_medal(show=True, list_wanted_medal=[]):
             if 'roomid' in i:
                 list_medal.append((i['roomid'], int(i['dayLimit']) - int(i['todayFeed']), i['medal_name'], i['level']))
                 if show:
-                    printlist.append(
-                    '{} {} {:^14} {:^14} {} {:^6} {:^9}'.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])),
-                                                           adjust_for_chinese(i['anchorInfo']['uname']),
-                                                           str(i['intimacy']) + '/' + str(i['next_intimacy']),
-                                                           str(i['todayFeed']) + '/' + str(i['dayLimit']),
-                                                           adjust_for_chinese(str(i['rank'])),
-                                                           dic_worn[str(i['status'])], i['roomid']))
+                    printlist.append('{} {} {:^14} {:^14} {} {:^6} {:^9}'.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])), adjust_for_chinese(i['anchorInfo']['uname']), str(i['intimacy']) + '/' + str(i['next_intimacy']), str(i['todayFeed']) + '/' + str(i['dayLimit']), adjust_for_chinese(str(i['rank'])), dic_worn[str(i['status'])], i['roomid']))
         if show:
             printer.info(printlist, True)
         if list_wanted_medal:
@@ -467,7 +460,8 @@ async def GetRewardInfo(show=True):
     percent = current_exp / next_exp * 100.0
     process_bar = '# [' + '>' * arrow + '-' * line + ']' + '%.2f' % percent + '%'
     print(process_bar)
-    if show: print(f'每日登陆：{login} 每日观看：{watch_av} 每日投币经验：{coins_av}/50 每日分享：{share_av}')
+    if show:
+        print(f'每日登陆：{login} 每日观看：{watch_av} 每日投币经验：{coins_av}/50 每日分享：{share_av}')
     return login, watch_av, coins_av, share_av
     
         
