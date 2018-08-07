@@ -219,7 +219,7 @@ async def check(id):
     # 4 删除 votedelete
     # 1 封杀 votebreak
     text_rsp = await bilibili().req_check_voted(id)
-    # print(response.text)
+    # print(text_rsp)
         
     pattern = re.compile(r'\((.+)\)')
     match = pattern.findall(text_rsp)
@@ -239,11 +239,13 @@ async def check(id):
     print('目前已投票', voted)
     print('认为不违反规定的比例', percent)
     vote = None
-    if voted >= 400:
-        if percent >= 0.8:
+    if voted >= 300:
+        if percent >= 0.75:
             vote = 2
-        elif percent <= 0.2:
+        elif percent <= 0.25:
             vote = 4
+        elif 0.4 <= percent <= 0.6:
+            vote = 2
     elif voted >= 150:
         if percent >= 0.9:
             vote = 2
@@ -255,8 +257,9 @@ async def check(id):
         elif percent <= 0.03:
             vote = 4
     # 抬一手
-    if vote is None and voted >= 450:
+    if vote is None and voted >= 400:
         vote = 2
+        
     return vote, status, voted
  
                
@@ -288,8 +291,11 @@ async def judge():
         else:
             print('投票决策', id, vote)
             json_rsp = await bilibili().req_vote_case(id, vote)
-            print(json_rsp)
-            num_voted += 1
+            if not json_rsp['code']:
+                print(f'投票{id}成功')
+                num_voted += 1
+            else:
+                print(f'投票{id}失败，请反馈作者')
         
         print('______________________________')
         # await asyncio.sleep(1)
