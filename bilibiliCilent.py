@@ -128,7 +128,7 @@ class bilibiliClient():
                 elif opt == 5:
                     messages = remain_data.decode('utf-8')
                     dic = json.loads(messages)
-                    state = await self.loop_func(dic)
+                    state = self.loop_func(dic)
                 # 握手确认
                 elif opt == 8:
                     printer.info([f'{self.area_id}号弹幕监控进入房间（{self.roomid}）'], True)
@@ -139,8 +139,7 @@ class bilibiliClient():
                     return
                 len_read += len_data
                                         
-    async def printDanMu(self, dic):
-        await asyncio.sleep(0)
+    def printDanMu(self, dic):
         cmd = dic['cmd']
         # print(cmd)
         if cmd == 'DANMU_MSG':
@@ -148,7 +147,7 @@ class bilibiliClient():
             Printer().print_danmu(dic)
             return
     
-    async def DanMuraffle(self, dic):
+    def DanMuraffle(self, dic):
         cmd = dic['cmd']
         
         if cmd == 'PREPARING':
@@ -158,14 +157,9 @@ class bilibiliClient():
             if 'giftId' in dic:
                 if dic['giftId'] == 39:
                     printer.info(["节奏风暴"], True)
-                    temp = await bilibili.get_giftlist_of_storm(dic)
-                    check = len(temp['data'])
-                    if check != 0 and temp['data']['hasJoin'] != 1:
-                        id = temp['data']['id']
-                        json_response1 = await bilibili.get_gift_of_storm(id)
-                        print(json_response1)
-                    else:
-                        printer.info([dic, "请联系开发者"])
+                    roomid = dic['roomid']
+                    rafflehandler.Rafflehandler.Put2Queue((roomid,), rafflehandler.handle_1_room_storm)
+                    Statistics.append2pushed_raffle('节奏风暴', area_id=self.area_id)
                 else:
                     text1 = dic['real_roomid']
                     text2 = dic['url']
@@ -193,6 +187,7 @@ class bilibiliClient():
                 
         elif cmd == 'GUARD_MSG':
             a = re.compile(r"(?<=在主播 )\S+(?= 的直播间开通了总督)")
+            print(dic)
             res = re.search(a, dic['msg'])
             if res is not None:
                 name = str(res.group())

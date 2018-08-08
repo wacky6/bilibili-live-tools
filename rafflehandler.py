@@ -117,6 +117,10 @@ async def handle_1_captain_raffle(num, roomid, raffleid):
     else:
         print(json_response2)
     return True
+    
+async def handle_1_storm_raffle(id):
+    json_response1 = await bilibili.get_gift_of_storm(id)
+    print(json_response1)
  
                                        
 async def handle_1_activity_raffle(num, text1, raffleid):
@@ -174,6 +178,18 @@ async def handle_1_room_TV(real_roomid):
         # print(list_available_raffleid)
         for raffle_id, raffle_type, time_wanted in list_available_raffleid:
             BiliTimer.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, real_roomid, raffle_id, raffle_type))
+            
+async def handle_1_room_storm(roomid):
+    result = await utils.enter_room(roomid)
+    if result:
+        temp = await bilibili.get_giftlist_of_storm(roomid)
+        check = len(temp['data'])
+        list_available_raffleid = []
+        if check != 0 and temp['data']['hasJoin'] != 1:
+            id = temp['data']['id']
+            list_available_raffleid.append((id, 0))
+        for id, time_wanted in list_available_raffleid:
+            BiliTimer.append2list_jobs(handle_1_storm_raffle, time_wanted, (id,))
 
 async def handle_1_room_activity(text1):
     result = await utils.enter_room(text1)

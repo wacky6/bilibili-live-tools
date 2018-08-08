@@ -1,5 +1,4 @@
 import sys
-from imp import reload
 from configloader import ConfigLoader
 import hashlib
 import datetime
@@ -513,9 +512,8 @@ class bilibili():
         return response1
 
     @staticmethod
-    async def get_giftlist_of_storm(dic):
+    async def get_giftlist_of_storm(roomid):
         inst = bilibili.instance
-        roomid = dic['roomid']
         get_url = f"{base_url}/lottery/v1/Storm/check?roomid={roomid}"
         response = await inst.bili_section_get(get_url, headers=inst.dic_bilibili['pcheaders'])
         return response
