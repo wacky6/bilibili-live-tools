@@ -11,7 +11,8 @@ pythonista3(ios) https://www.jianshu.com/p/669e63b5ec2b
 依赖包 https://github.com/yjqiang/bilibili-live-tools/blob/master/requirements.txt  
 运行方法  run.py
 
-多用户版本 https://github.com/yjqiang/bili2.0
+多用户版本 https://github.com/yjqiang/bili2.0  
+二次开发 https://github.com/Hsury/Bilibili-Toolkit  
 
 目前已完成：
 ------
@@ -92,7 +93,9 @@ version 3.0
 
 感谢:https://github.com/lkeme/BiliHelper
 
-感谢:https://github.com/czp3009/bilibili-api
+感谢:https://github.com/czp3009/bilibili-api  
+
+感谢:https://github.com/lzghzr/bilive_client
 
 
 本项目采用MIT开源协议
