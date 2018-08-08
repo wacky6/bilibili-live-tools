@@ -108,46 +108,9 @@ def InputGiveCoin2Av():
     num = input('输入数目')
     Biliconsole.append2list_console([[int(video_id), int(num)], utils.GiveCoin2Av])
 
-options = {
-    '1': Statistics.getlist,
-    '2': Statistics.getresult,
-    '3': utils.fetch_bag_list,  # async
-    '4': utils.fetch_medal,  # async
-    '5': utils.fetch_user_info,  # async
-    '6': utils.check_taskinfo,  # async
-    '7': preprocess_send_danmu_msg_web,  # input async
-    '8': preprocess_send_danmu_msg_web,  # input async
-    '9': preprocess_check_room,  # input async
-    '10': process_send_gift_web,  # input async !!!
-    '11': preprocess_change_danmuji_roomid,  # input async
-    '12': change_printer_dic_user,
-    '13': preprocess_fetch_liveuser_info,
-    '14': utils.fetch_capsule_info,  # async
-    '15': preprocess_open_capsule,
-    '16': process_watch_living_video,  # input async
-    '17': utils.TitleInfo,
-    '18': BiliTimer.getresult,
-    '19': Rafflehandler.getlist,
-    '20': Statistics.checklist,
-    '21': InputGiveCoin2Av,
-    '22': OnlineHeart.draw_lottery,
-    'help': guide_of_console,
-    'h': guide_of_console
-}
-
 
 def return_error():
     print('命令无法识别，请重新输入(提示输入h/help查看详细)')
-
-
-def controler():
-    while True:
-        x = input('')
-        if x in ['3', '4', '5', '6', '14', '17', '22']:
-            answer = options.get(x, return_error)
-            Biliconsole.append2list_console(answer)
-        else:
-            options.get(x, return_error)()
   
               
 class Biliconsole():
@@ -159,6 +122,41 @@ class Biliconsole():
             cls.instance.queue_console = queue
             cls.instance.loop = loop
         return cls.instance
+        
+    def controler(self):
+        options = {
+            '1': Statistics.getlist,
+            '2': Statistics.getresult,
+            '3': utils.fetch_bag_list,  # async
+            '4': utils.fetch_medal,  # async
+            '5': utils.fetch_user_info,  # async
+            '6': utils.check_taskinfo,  # async
+            '7': preprocess_send_danmu_msg_web,  # input async
+            '8': preprocess_send_danmu_msg_web,  # input async
+            '9': preprocess_check_room,  # input async
+            '10': process_send_gift_web,  # input async !!!
+            '11': preprocess_change_danmuji_roomid,  # input async
+            '12': change_printer_dic_user,
+            '13': preprocess_fetch_liveuser_info,
+            '14': utils.fetch_capsule_info,  # async
+            '15': preprocess_open_capsule,
+            '16': process_watch_living_video,  # input async
+            '17': utils.TitleInfo,
+            '18': BiliTimer.getresult,
+            '19': Rafflehandler.getlist,
+            '20': Statistics.checklist,
+            '21': InputGiveCoin2Av,
+            '22': OnlineHeart.draw_lottery,
+            'help': guide_of_console,
+            'h': guide_of_console
+        }
+        while True:
+            x = input('')
+            if x in ['3', '4', '5', '6', '14', '17', '22']:
+                answer = options.get(x, return_error)
+                self.append2list_console(answer)
+            else:
+                options.get(x, return_error)()
         
     @staticmethod
     def append2list_console(request):

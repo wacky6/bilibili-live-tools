@@ -30,7 +30,7 @@ login.login()
 Statistics()
 
 rafflehandler = Rafflehandler()
-biliconsole.Biliconsole(loop, queue)
+var_console = biliconsole.Biliconsole(loop, queue)
 
 list_raffle_connection = [connect.RaffleConnect(i) for i in range(1, 5)]
 list_raffle_connection_task = [i.run() for i in list_raffle_connection]
@@ -40,7 +40,7 @@ danmu_connection = connect.connect()
 
 bili_timer = BiliTimer(loop)
 
-console_thread = threading.Thread(target=biliconsole.controler)
+console_thread = threading.Thread(target=var_console.controler)
 
 console_thread.start()
 
@@ -49,7 +49,7 @@ tasks = [
     Silver.run(),
     danmu_connection.run(),
     rafflehandler.run(),
-    biliconsole.Biliconsole.run(),
+    var_console.run(),
     bili_timer.run(),
     
 ]
