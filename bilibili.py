@@ -476,7 +476,7 @@ class bilibili():
         url = "https://passport.bilibili.com/captcha"
         res = inst.login_session_get(url, headers=headers)
 
-        captcha = input_captcha(res.content)
+        captcha = cnn_captcha(res.content)
         temp_params = f'actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&captcha={captcha}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&password={password}&platform={inst.dic_bilibili["platform"]}&username={username}'
         sign = inst.calc_sign(temp_params)
         payload = f'{temp_params}&sign={sign}'
