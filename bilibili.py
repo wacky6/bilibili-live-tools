@@ -110,11 +110,11 @@ class bilibili():
                 inst.dic_bilibili['pcheaders']['cookie'] = dic[i]
                 inst.dic_bilibili['appheaders']['cookie'] = dic[i]
                 
-    def login_session_post(self, url, headers=None, data=None):
+    def login_session_post(self, url, headers=None, data=None, params=None):
         while True:
             try:
                 # print(self.login_session.cookies, url)
-                response = self.login_session.post(url, headers=headers, data=data)
+                response = self.login_session.post(url, headers=headers, data=data, params=params)
                 if response.status_code == requests.codes.ok:
                     return response
                 elif response.status_code == 403:
@@ -124,11 +124,11 @@ class bilibili():
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
                 continue
     
-    def login_session_get(self, url, headers=None, data=None):
+    def login_session_get(self, url, headers=None, data=None, params=None):
         while True:
             try:
                 # print(self.login_session.cookies, url)
-                response = self.login_session.get(url, headers=headers, data=data)
+                response = self.login_session.get(url, headers=headers, data=data, params=params)
                 if response.status_code == requests.codes.ok:
                     return response
                 elif response.status_code == 403:
@@ -138,10 +138,10 @@ class bilibili():
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
                 continue
 
-    async def bili_section_post(self, url, headers=None, data=None):
+    async def bili_section_post(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.bili_section.post(url, headers=headers, data=data)
+                response = await self.bili_section.post(url, headers=headers, data=data, params=params)
                 if response.status == 200:
                     # json_response = await response.json(content_type=None)
                     data = await response.read()
@@ -158,10 +158,10 @@ class bilibili():
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
                 continue
 
-    async def other_session_get(self, url, headers=None, data=None):
+    async def other_session_get(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.other_session.get(url, headers=headers, data=data)
+                response = await self.other_session.get(url, headers=headers, data=data, params=params)
                 if response.status == 200:
                     # json_response = await response.json(content_type=None)
                     data = await response.read()
@@ -178,10 +178,10 @@ class bilibili():
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
                 continue
                 
-    async def other_session_post(self, url, headers=None, data=None):
+    async def other_session_post(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.other_session.post(url, headers=headers, data=data)
+                response = await self.other_session.post(url, headers=headers, data=data, params=params)
                 if response.status == 200:
                     # json_response = await response.json(content_type=None)
                     data = await response.read()
@@ -198,10 +198,10 @@ class bilibili():
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
                 continue
 
-    async def bili_section_get(self, url, headers=None, data=None):
+    async def bili_section_get(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.bili_section.get(url, headers=headers, data=data)
+                response = await self.bili_section.get(url, headers=headers, data=data, params=params)
                 if response.status == 200:
                     # json_response = await response.json(content_type=None)
                     data = await response.read()
@@ -218,10 +218,10 @@ class bilibili():
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
                 continue
                 
-    async def session_text_get(self, url, headers=None, data=None):
+    async def session_text_get(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.other_session.get(url, headers=headers, data=data)
+                response = await self.other_session.get(url, headers=headers, data=data, params=params)
                 if response.status == 200:
                     return await response.text()
                 elif response.status == 403:
@@ -284,8 +284,7 @@ class bilibili():
         data = f'{params}&sign={sign}'
         appheaders = inst.dic_bilibili['appheaders'].copy()
         appheaders['cookie'] = ''
-        appheaders['Content-type'] = 'application/x-www-form-urlencoded'
-        response = inst.login_session_post(true_url, data=data, headers=appheaders)
+        response = inst.login_session_post(true_url, params=data, headers=appheaders)
         print(response.json())
         return response
 
@@ -467,9 +466,8 @@ class bilibili():
         url = "https://passport.bilibili.com/api/v2/oauth2/login"
         temp_params = f'appkey={inst.dic_bilibili["appkey"]}&password={password}&username={username}'
         sign = inst.calc_sign(temp_params)
-        headers = {"Content-type": "application/x-www-form-urlencoded"}
         payload = f'appkey={inst.dic_bilibili["appkey"]}&password={password}&username={username}&sign={sign}'
-        response = inst.login_session_post(url, data=payload, headers=headers)
+        response = inst.login_session_post(url, params=payload)
         return response
 
     @staticmethod
@@ -489,9 +487,8 @@ class bilibili():
         temp_params = f'actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&captcha={captcha}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&password={password}&platform={inst.dic_bilibili["platform"]}&username={username}'
         sign = inst.calc_sign(temp_params)
         payload = f'{temp_params}&sign={sign}'
-        headers['Content-type'] = "application/x-www-form-urlencoded"
         url = "https://passport.bilibili.com/api/v2/oauth2/login"
-        response = inst.login_session_post(url, data=payload, headers=headers)
+        response = inst.login_session_post(url, params=payload, headers=headers)
         return response
 
     @staticmethod
@@ -515,9 +512,7 @@ class bilibili():
         payload = f'{params}&sign={sign}'
         # print(payload)
         url = f'https://passport.bilibili.com/api/v2/oauth2/refresh_token'
-        appheaders = inst.dic_bilibili['appheaders'].copy()
-        appheaders['Content-type'] = "application/x-www-form-urlencoded"
-        response1 = inst.login_session_post(url, headers=appheaders, data=payload)
+        response1 = inst.login_session_post(url, headers=inst.dic_bilibili['appheaders'], params=payload)
         return response1
 
     @staticmethod
@@ -592,11 +587,9 @@ class bilibili():
         url = f"{base_url}/gift/v4/smalltv/getAward"
         temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}&raffleId={raffle_id}&roomid={real_roomid}&ts={CurrentTime()}&type={raffle_type}'
         sign = inst.calc_sign(temp_params)
-        appheaders = inst.dic_bilibili['appheaders'].copy()
-        appheaders['Content-type'] = "application/x-www-form-urlencoded"
         payload = f'{temp_params}&sign={sign}'
         # print(payload)
-        response = await inst.bili_section_post(url, data=payload, headers=appheaders)
+        response = await inst.bili_section_post(url, params=payload, headers=inst.dic_bilibili['appheaders'])
         # print(response)
         return response
 
