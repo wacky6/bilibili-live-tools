@@ -276,8 +276,17 @@ class bilibili():
     @staticmethod
     def request_logout():
         inst = bilibili.instance
-        url = 'https://passport.bilibili.com/login?act=exit'
-        response = inst.login_session_get(url, headers=inst.dic_bilibili['pcheaders'])
+        list_url = f'access_key={inst.dic_bilibili["access_key"]}&access_token={inst.dic_bilibili["access_key"]}&{inst.app_params}&ts={CurrentTime()}'
+        list_cookie = inst.dic_bilibili['cookie'].split(';')
+        params = ('&'.join(sorted(list_url.split('&') + list_cookie)))
+        sign = inst.calc_sign(params)
+        true_url = f'https://passport.bilibili.com/api/v2/oauth2/revoke'
+        data = f'{params}&sign={sign}'
+        appheaders = inst.dic_bilibili['appheaders'].copy()
+        appheaders['cookie'] = ''
+        appheaders['Content-type'] = 'application/x-www-form-urlencoded'
+        response = inst.login_session_post(true_url, data=data, headers=appheaders)
+        print(response.json())
         return response
 
     # 1:900兑换

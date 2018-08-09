@@ -64,7 +64,7 @@ def login():
 
 def logout():
     response = bilibili.request_logout()
-    if response.text.find('成功退出登录') == -1:
+    if response.json()['code']:
         print('登出失败', response)
     else:
         print('成功退出登陆')
