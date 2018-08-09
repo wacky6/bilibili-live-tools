@@ -117,7 +117,7 @@ class bilibili():
                 response = self.login_session.post(url, headers=headers, data=data)
                 if response.status_code == requests.codes.ok:
                     return response
-                elif requests.codes.ok == 403:
+                elif response.status_code == 403:
                     print('403频繁')
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
@@ -131,7 +131,7 @@ class bilibili():
                 response = self.login_session.get(url, headers=headers, data=data)
                 if response.status_code == requests.codes.ok:
                     return response
-                elif requests.codes.ok == 403:
+                elif response.status_code == 403:
                     print('403频繁')
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
