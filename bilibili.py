@@ -553,18 +553,12 @@ class bilibili():
     @staticmethod
     async def get_gift_of_events_app(text1, raffleid):
         inst = bilibili.instance
-        headers = {
-            'Accept': 'application/json, text/plain, */*',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
-            'cookie': inst.dic_bilibili['cookie'],
-            # 'referer': text2
-        }
         temp_params = f'access_key={inst.dic_bilibili["access_key"]}&actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&device={inst.dic_bilibili["device"]}&event_type={raffleid}&mobi_app={inst.dic_bilibili["mobi_app"]}&platform={inst.dic_bilibili["platform"]}&room_id={text1}&ts={CurrentTime()}'
         # params = temp_params + inst.dic_bilibili['app_secret']
         sign = inst.calc_sign(temp_params)
         true_url = f'{base_url}/YunYing/roomEvent?{temp_params}&sign={sign}'
         # response1 = await inst.bili_section_get(true_url, params=params, headers=headers)
-        response1 = await inst.bili_section_get(true_url, headers=headers)
+        response1 = await inst.bili_section_get(true_url, headers=inst.dic_bilibili['appheaders'])
         return response1
    
     @staticmethod
@@ -629,15 +623,7 @@ class bilibili():
     async def get_activity_result(activity_roomid, activity_raffleid):
         inst = bilibili.instance
         url = f"{base_url}/activity/v1/Raffle/notice?roomid={activity_roomid}&raffleId={activity_raffleid}"
-        headers = {
-            'Accept': 'application/json, text/plain, */*',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-            'accept-encoding': 'gzip, async deflate',
-            'Host': 'api.live.bilibili.com',
-            'cookie': inst.dic_bilibili['cookie'],
-        }
-        response = await inst.bili_section_get(url, headers=headers)
+        response = await inst.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
         return response
 
     @staticmethod
