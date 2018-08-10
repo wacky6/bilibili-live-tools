@@ -3,14 +3,13 @@ from statistics import Statistics
 import printer
 import utils
 import asyncio
-import datetime
 import time
 import random
 from bilitimer import BiliTimer
 
 
 def CurrentTime():
-    currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
+    currenttime = int(time.time())
     return currenttime
 
 

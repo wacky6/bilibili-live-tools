@@ -1,7 +1,6 @@
 import sys
 from configloader import ConfigLoader
 import hashlib
-import datetime
 import time
 import requests
 import base64
@@ -14,7 +13,7 @@ from io import BytesIO
 
 
 def CurrentTime():
-    currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
+    currenttime = int(time.time())
     return str(currenttime)
 
 

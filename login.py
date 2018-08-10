@@ -3,7 +3,7 @@ from configloader import ConfigLoader
 import rsa
 import base64
 from urllib import parse
-import time
+import printer
 
     
 def calc_name_passw(key, Hash, username, password):
@@ -46,11 +46,11 @@ def LoginWithPwd():
         bilibili.load_session(dic_saved_session)
         if ConfigLoader().dic_user['other_control']['keep-login']:
             ConfigLoader().write2bilibili(dic_saved_session)
-        print("[{}] {}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), '密码登陆成功'))
+        printer.info(['登陆成功'], True)
         return True
         
     else:
-        print("[{}] 登录失败,错误信息为:{}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), json_rsp))
+        printer.info([f'登录失败,错误信息为:{json_rsp}'], True)
         return False
 
 

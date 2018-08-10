@@ -1,13 +1,12 @@
 from bilibili import bilibili
 import time
-import datetime
 import asyncio
 import printer
 import login
 
 
 def CurrentTime():
-    currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
+    currenttime = int(time.time())
     return currenttime
 
 
@@ -55,8 +54,7 @@ async def draw_lottery():
                     ts = CurrentTime()
                     if int(join_end_time) > int(ts) > int(join_start_time):
                         json_response1 = await bilibili.get_gift_of_lottery(i, g)
-                        print("当前时间:", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-                        print("参与实物抽奖回显：", json_response1)
+                        printer.info([f'参与实物抽奖回显：{json_response1}'], True)
         
         
 async def run():

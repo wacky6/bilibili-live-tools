@@ -26,7 +26,7 @@ def adjust_for_chinese(str):
 
 
 def CurrentTime():
-    currenttime = int(time.mktime(datetime.datetime.now().timetuple()))
+    currenttime = int(time.time())
     return str(currenttime)
 
 
