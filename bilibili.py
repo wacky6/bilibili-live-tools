@@ -18,7 +18,7 @@ def CurrentTime():
 
 
 def randomint():
-    return ''.join(str(random.choice(range(10))) for _ in range(17))
+    return ''.join(str(random.randint(0, 9)) for _ in range(17))
 
 
 def cnn_captcha(content):
