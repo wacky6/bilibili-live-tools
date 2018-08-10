@@ -98,61 +98,50 @@ async def send_danmu_msg_web(msg, roomId):
 
 async def find_live_user_roomid(wanted_name):
     print(wanted_name)
-    for i in range(len(wanted_name), 0, -1):
-        json_rsp = await bilibili.request_search_biliuser(wanted_name[:i])
+    def check_name_piece(json_rsp, wanted_name):
         results = json_rsp['result']
         if results is None:
             # print('屏蔽全名')
-            continue
+            return None
         for i in results:
             real_name = re.sub(r'<[^>]*>', '', i['uname'])
             # print('去除干扰', real_name)
             if real_name == wanted_name:
-                print('找到结果', i['room_id'])
-                return i['room_id']
+                print('找到结果', i)
+                return i
+        return None
+                
+    for i in range(len(wanted_name), 0, -1):
+        name_piece = wanted_name[:i]
+        json_rsp = await bilibili.request_search_biliuser(name_piece)
+        answer = check_name_piece(json_rsp, wanted_name)
+        if answer is not None:
+            return answer['room_id']
         # print('结束一次')
 
     print('第2备份启用')
     for i in range(len(wanted_name)):
-        json_rsp = await bilibili.request_search_biliuser(wanted_name[i:])
-        results = json_rsp['result']
-        if results is None:
-            # print('屏蔽全名')
-            continue
-        for i in results:
-            real_name = re.sub(r'<[^>]*>', '', i['uname'])
-            # print('去除干扰', real_name)
-            if real_name == wanted_name:
-                print('找到结果', i['room_id'])
-                return i['room_id']
+        name_piece = wanted_name[i:]
+        json_rsp = await bilibili.request_search_biliuser(name_piece)
+        answer = check_name_piece(json_rsp, wanted_name)
+        if answer is not None:
+            return answer['room_id']
 
     print('第3备份启用')
     for i in range(len(wanted_name), 0, -1):
-        json_rsp = await bilibili.request_search_liveuser(wanted_name[:i])
-        results = json_rsp['result']
-        if results is None:
-            # print('屏蔽全名')
-            continue
-        for i in results:
-            real_name = re.sub(r'<[^>]*>', '', i['uname'])
-            # print('去除干扰', real_name)
-            if real_name == wanted_name:
-                print('找到结果', i['roomid'])
-                return i['roomid']
+        name_piece = wanted_name[:i]
+        json_rsp = await bilibili.request_search_liveuser(name_piece)
+        answer = check_name_piece(json_rsp, wanted_name)
+        if answer is not None:
+            return answer['roomid']
 
     print('第4备份启用')
     for i in range(len(wanted_name)):
-        json_rsp = await bilibili.request_search_liveuser(wanted_name[i:])
-        results = json_rsp['result']
-        if results is None:
-            # print('屏蔽全名')
-            continue
-        for i in results:
-            real_name = re.sub(r'<[^>]*>', '', i['uname'])
-            # print('去除干扰', real_name)
-            if real_name == wanted_name:
-                print('找到结果', i['roomid'])
-                return i['roomid']
+        name_piece = wanted_name[i:]
+        json_rsp = await bilibili.request_search_liveuser(name_piece)
+        answer = check_name_piece(json_rsp, wanted_name)
+        if answer is not None:
+            return answer['roomid']
 
 
 async def fetch_capsule_info():
