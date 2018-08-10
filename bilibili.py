@@ -282,8 +282,7 @@ class bilibili():
         sign = inst.calc_sign(params)
         true_url = f'https://passport.bilibili.com/api/v2/oauth2/revoke'
         data = f'{params}&sign={sign}'
-        appheaders = inst.dic_bilibili['appheaders'].copy()
-        appheaders['cookie'] = ''
+        appheaders = {**(inst.dic_bilibili['appheaders']), 'cookie': ''}
         response = inst.login_session_post(true_url, params=data, headers=appheaders)
         print(response.json())
         return response
@@ -473,22 +472,18 @@ class bilibili():
     @staticmethod
     def login_with_captcha(username, password):
         inst = bilibili.instance
-        headers = {
-            'Accept': 'application/json, text/plain, */*',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
-            'Host': 'passport.bilibili.com',
-            # 'cookie': "sid=hxt5szbb"
-        }
+        
         # with requests.Session() as s:
         url = "https://passport.bilibili.com/captcha"
-        res = inst.login_session_get(url, headers=headers)
+        res = inst.login_session_get(url)
+        # print(res.content)
 
         captcha = cnn_captcha(res.content)
         temp_params = f'actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&captcha={captcha}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&password={password}&platform={inst.dic_bilibili["platform"]}&username={username}'
         sign = inst.calc_sign(temp_params)
         payload = f'{temp_params}&sign={sign}'
         url = "https://passport.bilibili.com/api/v2/oauth2/login"
-        response = inst.login_session_post(url, params=payload, headers=headers)
+        response = inst.login_session_post(url, params=payload)
         return response
 
     @staticmethod
@@ -540,11 +535,10 @@ class bilibili():
     async def get_gift_of_events_web(text1, text2, raffleid):
         inst = bilibili.instance
         headers = {
-            'Accept': 'application/json, text/plain, */*',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
-            'cookie': inst.dic_bilibili['cookie'],
+            **(inst.dic_bilibili['pcheaders']),
             'referer': text2
-        }
+            }
+        
         pc_url = f'{base_url}/activity/v1/Raffle/join?roomid={text1}&raffleId={raffleid}'
         pc_response = await inst.bili_section_get(pc_url, headers=headers)
 
@@ -759,8 +753,10 @@ class bilibili():
 
     async def ReqGiveCoin2Av(self, video_id, num):
         url = 'https://api.bilibili.com/x/web-interface/coin/add'
-        pcheaders = self.dic_bilibili['pcheaders'].copy()
-        pcheaders['referer'] = f'https://www.bilibili.com/video/av{video_id}'
+        pcheaders = {
+            **(self.dic_bilibili['pcheaders']),
+            'referer': f'https://www.bilibili.com/video/av{video_id}'
+            }
         data = {
             'aid': video_id,
             'multiply': num,
@@ -829,12 +825,10 @@ class bilibili():
         
     async def req_check_voted(self, id):
         headers = {
-            "Host": "api.bilibili.com",
+            **(self.dic_bilibili['pcheaders']),
             "Referer": f'https://www.bilibili.com/judgement/vote/{id}',
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Cookie": self.dic_bilibili['pcheaders']['cookie']
-        }
+            }
+        
         url = f'https://api.bilibili.com/x/credit/jury/juryCase?jsonp=jsonp&callback=jQuery1720{randomint()}_{CurrentTime()}&cid={id}&_={CurrentTime()}'
         text_rsp = await self.session_text_get(url, headers=headers)
         # print(text_rsp)
