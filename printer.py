@@ -36,6 +36,11 @@ def warn(msg):
         
 def error(msg):
     print(msg)
+
+        
+def debug(msg):
+    if ConfigLoader().dic_user['print_control']['debug']:
+        info([msg], True)
     
 
 class Printer():

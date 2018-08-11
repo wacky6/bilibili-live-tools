@@ -6,6 +6,7 @@ from configloader import ConfigLoader
 from rafflehandler import Rafflehandler
 from bilitimer import BiliTimer
 import OnlineHeart
+import login
 
 
 def guide_of_console():
@@ -111,6 +112,14 @@ def InputGiveCoin2Av():
 
 def return_error():
     print('命令无法识别，请重新输入(提示输入h/help查看详细)')
+
+        
+def change_debug_dic_user():
+    new_words = input('debug控制')
+    if new_words == 'T':
+        Printer().dic_user['print_control']['debug'] = True
+    else:
+        Printer().dic_user['print_control']['debug'] = False
   
               
 class Biliconsole():
@@ -147,6 +156,8 @@ class Biliconsole():
             '20': Statistics.checklist,
             '21': InputGiveCoin2Av,
             '22': OnlineHeart.draw_lottery,
+            # '23': login.logout,
+            '23': change_debug_dic_user,
             'help': guide_of_console,
             'h': guide_of_console
         }

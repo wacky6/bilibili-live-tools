@@ -123,7 +123,7 @@ class bilibiliClient():
                 # 人气值/心跳 3s间隔
                 if opt == 3:
                     # self._UserCount, = struct.unpack('!I', remain_data)
-                    pass
+                    printer.debug(f'弹幕心跳检测{self.area_id}')
                 # cmd
                 elif opt == 5:
                     messages = remain_data.decode('utf-8')
