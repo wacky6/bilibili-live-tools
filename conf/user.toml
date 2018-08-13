@@ -3,7 +3,7 @@ platform = "others"
 
 [print_control]
 danmu = false
-debug = true
+debug = false
 
 [task_control]
 # 清理即将过期礼物，请true之后一定要把紧随其后的room设置为真实房间号
@@ -22,7 +22,7 @@ send2wearing-medal = false
 # 房间号 短房间 
 send2medal = []
 
-# 老接口高倍率兑换硬币为银瓜子，现已失效，请勿修改
+# 老接口高倍率兑换硬币为银瓜子，现已失效，请勿修改！！
 doublegain_coin2silver = false
 
 # 输入数字 0-5 表示主站自动投币

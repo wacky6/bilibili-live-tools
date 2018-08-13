@@ -98,6 +98,7 @@ async def send_danmu_msg_web(msg, roomId):
 
 async def find_live_user_roomid(wanted_name):
     print(wanted_name)
+    
     def check_name_piece(json_rsp, wanted_name):
         results = json_rsp['result']
         if results is None:
