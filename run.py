@@ -16,7 +16,6 @@ from bilitimer import BiliTimer
 
 
 loop = asyncio.get_event_loop()
-queue = asyncio.Queue()
 fileDir = os.path.dirname(os.path.realpath('__file__'))
 file_color = f'{fileDir}/conf/color.toml'
 file_user = f'{fileDir}/conf/user.toml'
@@ -30,7 +29,7 @@ login.login()
 Statistics()
 
 rafflehandler = Rafflehandler()
-var_console = biliconsole.Biliconsole(loop, queue)
+var_console = biliconsole.Biliconsole(loop)
 
 list_raffle_connection = [connect.RaffleConnect(i) for i in range(1, 5)]
 list_raffle_connection_task = [i.run() for i in list_raffle_connection]
@@ -49,7 +48,7 @@ tasks = [
     Silver.run(),
     danmu_connection.run(),
     rafflehandler.run(),
-    var_console.run(),
+    # var_console.run(),
     bili_timer.run(),
     
 ]

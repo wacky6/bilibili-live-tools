@@ -7,6 +7,7 @@ from rafflehandler import Rafflehandler
 from bilitimer import BiliTimer
 import OnlineHeart
 import login
+import asyncio
 
 
 def guide_of_console():
@@ -125,10 +126,9 @@ def change_debug_dic_user():
 class Biliconsole():
     instance = None
 
-    def __new__(cls, loop, queue):
+    def __new__(cls, loop):
         if not cls.instance:
             cls.instance = super(Biliconsole, cls).__new__(cls)
-            cls.instance.queue_console = queue
             cls.instance.loop = loop
         return cls.instance
         
@@ -172,27 +172,22 @@ class Biliconsole():
     @staticmethod
     def append2list_console(request):
         inst = Biliconsole.instance
-        inst.loop.call_soon_threadsafe(inst.queue_console.put_nowait, request)
+        asyncio.run_coroutine_threadsafe(inst.excute_async(request), inst.loop)
+        # inst.loop.call_soon_threadsafe(inst.queue_console.put_nowait, request)
         
-    @staticmethod
-    async def run():
-        while True:
-            i = await Biliconsole.instance.queue_console.get()
-            if isinstance(i, list):
-                # 对10号单独简陋处理
-                for j in range(len(i[0])):
-                    if isinstance(i[0][j], list):
-                        # print('检测')
-                        i[0][j] = await i[0][j][1](*(i[0][j][0]))
-                if i[1] == 'normal':
-                    i[2](*i[0])
-                else:
-                    await i[1](*i[0])
+    async def excute_async(self, i):
+        if isinstance(i, list):
+            # 对10号单独简陋处理
+            for j in range(len(i[0])):
+                if isinstance(i[0][j], list):
+                    # print('检测')
+                    i[0][j] = await i[0][j][1](*(i[0][j][0]))
+            if i[1] == 'normal':
+                i[2](*i[0])
             else:
-                await i()
-            # print('剩余', self.queue_console.qsize())
-        
-        
+                await i[1](*i[0])
+        else:
+            await i()
     
     
     
