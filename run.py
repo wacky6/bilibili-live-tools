@@ -49,7 +49,7 @@ tasks = [
     danmu_connection.run(),
     rafflehandler.run(),
     # var_console.run(),
-    bili_timer.run(),
+    # bili_timer.run(),
     
 ]
 try:
