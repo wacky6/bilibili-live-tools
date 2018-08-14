@@ -63,7 +63,7 @@ async def TitleInfo():
                 max = '-'
             print(i['activity'], i['score'], max)
 
-async def fetch_medal(show=True, list_wanted_medal=[]):
+async def fetch_medal(show=True, list_wanted_medal=None):
     printlist = []
     list_medal = []
     if show:
@@ -81,7 +81,7 @@ async def fetch_medal(show=True, list_wanted_medal=[]):
                     printlist.append('{} {} {:^14} {:^14} {} {:^6} {:^9}'.format(adjust_for_chinese(i['medal_name'] + '|' + str(i['level'])), adjust_for_chinese(i['anchorInfo']['uname']), str(i['intimacy']) + '/' + str(i['next_intimacy']), str(i['todayFeed']) + '/' + str(i['dayLimit']), adjust_for_chinese(str(i['rank'])), dic_worn[str(i['status'])], i['roomid']))
         if show:
             printer.info(printlist, True)
-        if list_wanted_medal:
+        if list_wanted_medal is not None:
             list_return_medal = []
             for roomid in list_wanted_medal:
                 for i in list_medal:
