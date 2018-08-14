@@ -136,22 +136,29 @@ class bilibili():
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
                 continue
+                
+    async def get_json_rsp(self, rsp):
+        if rsp.status == 200:
+            # json_response = await response.json(content_type=None)
+            data = await rsp.read()
+            json_rsp = json.loads(data)
+            if isinstance(json_rsp, dict) and 'code' in json_rsp:
+                tag = await replay_request(json_rsp['code'])
+                if tag:
+                    return None
+            return json_rsp
+        elif rsp.status == 403:
+            print('403频繁')
+            return None
+        return None
 
     async def bili_section_post(self, url, headers=None, data=None, params=None):
         while True:
             try:
                 response = await self.bili_section.post(url, headers=headers, data=data, params=params)
-                if response.status == 200:
-                    # json_response = await response.json(content_type=None)
-                    data = await response.read()
-                    json_response = json.loads(data)
-                    if isinstance(json_response, dict):
-                        tag = await replay_request(json_response['code'])
-                        if tag:
-                            continue
-                    return json_response
-                elif response.status == 403:
-                    print('403频繁', url)
+                json_rsp = await self.get_json_rsp(response)
+                if json_rsp is not None:
+                    return json_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
@@ -161,17 +168,9 @@ class bilibili():
         while True:
             try:
                 response = await self.other_session.get(url, headers=headers, data=data, params=params)
-                if response.status == 200:
-                    # json_response = await response.json(content_type=None)
-                    data = await response.read()
-                    json_response = json.loads(data)
-                    if isinstance(json_response, dict) and 'code' in json_response:
-                        tag = await replay_request(json_response['code'])
-                        if tag:
-                            continue
-                    return json_response
-                elif response.status == 403:
-                    print('403频繁', url)
+                json_rsp = await self.get_json_rsp(response)
+                if json_rsp is not None:
+                    return json_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
@@ -181,17 +180,9 @@ class bilibili():
         while True:
             try:
                 response = await self.other_session.post(url, headers=headers, data=data, params=params)
-                if response.status == 200:
-                    # json_response = await response.json(content_type=None)
-                    data = await response.read()
-                    json_response = json.loads(data)
-                    if isinstance(json_response, dict) and 'code' in json_response:
-                        tag = await replay_request(json_response['code'])
-                        if tag:
-                            continue
-                    return json_response
-                elif response.status == 403:
-                    print('403频繁', url)
+                json_rsp = await self.get_json_rsp(response)
+                if json_rsp is not None:
+                    return json_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
@@ -201,17 +192,9 @@ class bilibili():
         while True:
             try:
                 response = await self.bili_section.get(url, headers=headers, data=data, params=params)
-                if response.status == 200:
-                    # json_response = await response.json(content_type=None)
-                    data = await response.read()
-                    json_response = json.loads(data)
-                    if isinstance(json_response, dict):
-                        tag = await replay_request(json_response['code'])
-                        if tag:
-                            continue
-                    return json_response
-                elif response.status == 403:
-                    print('403频繁', url)
+                json_rsp = await self.get_json_rsp(response)
+                if json_rsp is not None:
+                    return json_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
