@@ -39,22 +39,6 @@ def input_captcha(content):
     return captcha
 
 
-async def replay_request(code):
-    if code == 1024:
-        print('b站炸了，暂停所有请求1.5s后重试，请耐心等待')
-        await asyncio.sleep(1.5)
-        return True
-    if code == 3:
-        print('api错误，稍后重试，请反馈给作者')
-        await asyncio.sleep(1)
-        return True
-    if code == 0:
-        return False
-    else:
-        # print(json_response)
-        return False
-
-
 base_url = 'https://api.live.bilibili.com'
 
 
@@ -143,8 +127,14 @@ class bilibili():
             data = await rsp.read()
             json_rsp = json.loads(data)
             if isinstance(json_rsp, dict) and 'code' in json_rsp:
-                tag = await replay_request(json_rsp['code'])
-                if tag:
+                code = json_rsp['code']
+                if code == 1024:
+                    print('b站炸了，暂停所有请求1.5s后重试，请耐心等待')
+                    await asyncio.sleep(1.5)
+                    return None
+                elif code == 3:
+                    print('api错误，稍后重试，请反馈给作者')
+                    await asyncio.sleep(1)
                     return None
             return json_rsp
         elif rsp.status == 403:
