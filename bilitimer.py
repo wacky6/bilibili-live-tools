@@ -1,6 +1,5 @@
 import asyncio
 import time
-import Tasks
 import printer
 
 
@@ -10,14 +9,13 @@ def CurrentTime():
 
 
 class BiliTimer:
-    __slots__ = ('jobs', 'loop')
+    __slots__ = ('loop',)
     instance = None
 
     def __new__(cls, loop=None):
         if not cls.instance:
             cls.instance = super(BiliTimer, cls).__new__(cls)
             cls.instance.loop = loop
-            Tasks.init()
         return cls.instance
     
     def excute_async(self, i):
@@ -29,9 +27,6 @@ class BiliTimer:
         inst = BiliTimer.instance
         value = (func, ())
         inst.loop.call_later(delay, inst.excute_async, value)
-        # print('添加任务', time_expected, func.__name__, func, tuple_values)
-        # print('添加任务')
-        return
         
     @staticmethod
     def append2list_jobs(func, time_expected, tuple_values):
@@ -39,11 +34,4 @@ class BiliTimer:
         current_time = CurrentTime()
         value = (func, tuple_values)
         inst.loop.call_later(time_expected-current_time, inst.excute_async, value)
-        # print('添加任务', time_expected, func.__name__, func, tuple_values)
-        return
-        
-    @staticmethod
-    def getresult():
-        print('数目', BiliTimer.instance.jobs.qsize())
-        
     

@@ -151,7 +151,6 @@ class Biliconsole():
             '15': preprocess_open_capsule,
             '16': process_watch_living_video,  # input async
             '17': utils.TitleInfo,
-            '18': BiliTimer.getresult,
             '19': Rafflehandler.getlist,
             '20': Statistics.checklist,
             '21': InputGiveCoin2Av,

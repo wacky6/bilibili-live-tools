@@ -43,6 +43,7 @@ console_thread = threading.Thread(target=var_console.controler)
 
 console_thread.start()
 
+Tasks.init()
 tasks = [
     OnlineHeart.run(),
     Silver.run(),
