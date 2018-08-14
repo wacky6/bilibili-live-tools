@@ -139,7 +139,13 @@ class bilibili():
             return json_rsp
         elif rsp.status == 403:
             print('403频繁')
-            return None
+        return None
+        
+    async def get_text_rsp(self, rsp):
+        if rsp.status == 200:
+            return await rsp.text()
+        elif rsp.status == 403:
+            print('403频繁')
         return None
 
     async def bili_section_post(self, url, headers=None, data=None, params=None):
@@ -194,10 +200,9 @@ class bilibili():
         while True:
             try:
                 response = await self.other_session.get(url, headers=headers, data=data, params=params)
-                if response.status == 200:
-                    return await response.text()
-                elif response.status == 403:
-                    print('403频繁', url)
+                text_rsp = await self.get_text_rsp(response)
+                if text_rsp is not None:
+                    return text_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
