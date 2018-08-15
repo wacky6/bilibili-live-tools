@@ -151,10 +151,10 @@ class bilibili():
     async def bili_section_post(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.bili_section.post(url, headers=headers, data=data, params=params)
-                json_rsp = await self.get_json_rsp(response)
-                if json_rsp is not None:
-                    return json_rsp
+                async with self.bili_section.post(url, headers=headers, data=data, params=params) as response:
+                    json_rsp = await self.get_json_rsp(response)
+                    if json_rsp is not None:
+                        return json_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
@@ -163,10 +163,10 @@ class bilibili():
     async def other_session_get(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.other_session.get(url, headers=headers, data=data, params=params)
-                json_rsp = await self.get_json_rsp(response)
-                if json_rsp is not None:
-                    return json_rsp
+                async with self.other_session.get(url, headers=headers, data=data, params=params) as response:
+                    json_rsp = await self.get_json_rsp(response)
+                    if json_rsp is not None:
+                        return json_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
@@ -175,10 +175,10 @@ class bilibili():
     async def other_session_post(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.other_session.post(url, headers=headers, data=data, params=params)
-                json_rsp = await self.get_json_rsp(response)
-                if json_rsp is not None:
-                    return json_rsp
+                async with self.other_session.post(url, headers=headers, data=data, params=params) as response:
+                    json_rsp = await self.get_json_rsp(response)
+                    if json_rsp is not None:
+                        return json_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
@@ -187,10 +187,10 @@ class bilibili():
     async def bili_section_get(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.bili_section.get(url, headers=headers, data=data, params=params)
-                json_rsp = await self.get_json_rsp(response)
-                if json_rsp is not None:
-                    return json_rsp
+                async with self.bili_section.get(url, headers=headers, data=data, params=params) as response:
+                    json_rsp = await self.get_json_rsp(response)
+                    if json_rsp is not None:
+                        return json_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
@@ -199,10 +199,10 @@ class bilibili():
     async def session_text_get(self, url, headers=None, data=None, params=None):
         while True:
             try:
-                response = await self.other_session.get(url, headers=headers, data=data, params=params)
-                text_rsp = await self.get_text_rsp(response)
-                if text_rsp is not None:
-                    return text_rsp
+                async with self.other_session.get(url, headers=headers, data=data, params=params) as response:
+                    text_rsp = await self.get_text_rsp(response)
+                    if text_rsp is not None:
+                        return text_rsp
             except:
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
