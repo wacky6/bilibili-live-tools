@@ -11,7 +11,7 @@ from configloader import ConfigLoader
 import threading
 import os
 import login
-import biliconsole
+import  bili_console
 from bilitimer import BiliTimer
 
 
@@ -29,7 +29,7 @@ login.login()
 Statistics()
 
 rafflehandler = Rafflehandler()
-var_console = biliconsole.Biliconsole(loop)
+var_console = bili_console.Biliconsole(loop)
 
 list_raffle_connection = [connect.RaffleConnect(i) for i in range(1, 5)]
 list_raffle_connection_task = [i.run() for i in list_raffle_connection]
@@ -39,7 +39,7 @@ danmu_connection = connect.connect()
 
 bili_timer = BiliTimer(loop)
 
-console_thread = threading.Thread(target=var_console.controler)
+console_thread = threading.Thread(target=var_console.cmdloop)
 
 console_thread.start()
 
