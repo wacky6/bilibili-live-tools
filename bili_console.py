@@ -7,26 +7,6 @@ from rafflehandler import Rafflehandler
 import OnlineHeart
 import asyncio
 from cmd import Cmd
-
-
-def guide_of_console():
-    print('___________________________')
-    print('| 欢迎使用本控制台           |')
-    print('|1 输出本次抽奖统计          |')
-    print('|2 查看目前拥有礼物的统计     |')
-    print('|3 查看持有勋章状态          |')
-    print('|4 获取直播个人的基本信息     |')
-    print('|5 检查今日任务的完成情况     |')
-    print('|6 模拟电脑网页端发送弹幕     |')
-    print('|7 直播间的长短号码的转化     |')
-    print('|8 手动送礼物到指定直播间     |')
-    print('|9 切换监听的直播间          |')
-    print('|10 T或F控制弹幕的开关       |')
-    print('|11 房间号码查看主播         |')
-    print('|12 当前拥有的扭蛋币         |')
-    print('|13 开扭蛋币(只能1，10，100) |')
-    print('|16 尝试一次实物抽奖         |')
-    print('￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣')
     
 
 def fetch_real_roomid(roomid):
@@ -38,14 +18,36 @@ def fetch_real_roomid(roomid):
   
               
 class Biliconsole(Cmd):
-    prompt = '>>> '
+    prompt = ''
 
     def __init__(self, loop):
         self.loop = loop
         Cmd.__init__(self)
         
+    def guide_of_console(self):
+        print('___________________________')
+        print('| 欢迎使用本控制台           |')
+        print('|1 输出本次抽奖统计          |')
+        print('|2 查看目前拥有礼物的统计     |')
+        print('|3 查看持有勋章状态          |')
+        print('|4 获取直播个人的基本信息     |')
+        print('|5 检查今日任务的完成情况     |')
+        print('|6 模拟电脑网页端发送弹幕     |')
+        print('|7 直播间的长短号码的转化     |')
+        print('|8 手动送礼物到指定直播间     |')
+        print('|9 切换监听的直播间          |')
+        print('|10 T或F控制弹幕的开关       |')
+        print('|11 房间号码查看主播         |')
+        print('|12 当前拥有的扭蛋币         |')
+        print('|13 开扭蛋币(只能1，10，100) |')
+        print('|16 尝试一次实物抽奖         |')
+        print('￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣')
+        
     def default(self, line):
-        guide_of_console()
+        self.guide_of_console()
+        
+    def emptyline(self):
+        self.guide_of_console()
         
     def do_1(self, line):
         Statistics.getlist()
