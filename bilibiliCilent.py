@@ -118,7 +118,7 @@ class bilibiliClient():
             loop_time = 0
             while len_read != len_bytes_datas:
                 loop_time += 1
-                if loop_time > 30:
+                if loop_time > 50:
                     print('请联系作者', bytes_datas)
                 state = None
                 split_header = self.structer.unpack(bytes_datas[len_read:16+len_read])
