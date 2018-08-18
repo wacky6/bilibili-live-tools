@@ -69,6 +69,7 @@ class connect():
         ConfigLoader().dic_user['other_control']['default_monitor_roomid'] = roomid
         print('已经切换roomid')
         if connect.instance.danmuji is not None:
+            connect.instance.danmuji.roomid = roomid
             await connect.instance.danmuji.close_connection()
         
         
