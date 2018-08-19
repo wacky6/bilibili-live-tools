@@ -7,6 +7,7 @@ from io import BytesIO
 import webbrowser
 import re
 from operator import itemgetter
+from configloader import ConfigLoader
 
 
 def adjust_for_chinese(str):
@@ -53,6 +54,7 @@ async def WearingMedalInfo():
 
 async def TitleInfo():
     json_response = await bilibili.ReqTitleInfo()
+    dic_title = ConfigLoader().dic_title
     # print(json_response)
     if not json_response['code']:
         data = json_response['data']
@@ -61,7 +63,7 @@ async def TitleInfo():
                 max = i['level'][1]
             else:
                 max = '-'
-            print(i['activity'], i['score'], max)
+            print(dic_title[i['title_pic']['id']], i['activity'], i['score'], max)
 
 async def fetch_medal(show=True, list_wanted_medal=None):
     printlist = []

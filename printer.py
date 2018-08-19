@@ -51,6 +51,7 @@ class Printer():
             cls.instance = super(Printer, cls).__new__(cls, *args, **kw)
             cls.instance.dic_color = ConfigLoader().dic_color
             cls.instance.dic_user = ConfigLoader().dic_user
+            cls.instance.dic_title = ConfigLoader().dic_title
             if (cls.instance.dic_user['platform']['platform'] == 'ios_pythonista'):
                 cls.instance.danmu_print = cls.instance.concole_print
             else:

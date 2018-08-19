@@ -11,16 +11,14 @@ from configloader import ConfigLoader
 import threading
 import os
 import login
-import  bili_console
+import bili_console
 from bilitimer import BiliTimer
 
 
 loop = asyncio.get_event_loop()
 fileDir = os.path.dirname(os.path.realpath('__file__'))
-file_color = f'{fileDir}/conf/color.toml'
-file_user = f'{fileDir}/conf/user.toml'
-file_bilibili = f'{fileDir}/conf/bilibili.toml'
-ConfigLoader(colorfile=file_color, userfile=file_user, bilibilifile=file_bilibili)
+
+ConfigLoader(fileDir)
 
 # print('Hello world.')
 printer = Printer()
