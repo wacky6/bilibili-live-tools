@@ -96,6 +96,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
             return
         elif code != -401 and code != -403:
             pass
+        print('如果循环请联系作者', num, real_roomid, raffleid, raffle_type)
         
     data = json_response2['data']
     Statistics.append_to_TVlist(raffleid, real_roomid)
