@@ -8,7 +8,6 @@ import utils
 import asyncio
 import struct
 import json
-import re
 import sys
 import aiohttp
                                                           
@@ -183,15 +182,12 @@ class bilibiliClient():
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_activity)
                 Statistics.append2pushed_raffle(type_text, area_id=self.area_id)
-                
+        
         elif cmd == 'GUARD_MSG':
-            a = re.compile(r"(?<=在主播 )\S+(?= 的直播间开通了总督)")
-            print(dic)
-            res = re.search(a, dic['msg'])
-            if res is not None:
-                name = str(res.group())
-                printer.info([f'{self.area_id}号弹幕监控检测到{name:^9}的总督'], True)
-                rafflehandler.Rafflehandler.Put2Queue((((name,), utils.find_live_user_roomid),), rafflehandler.handle_1_room_captain)
+            if 'buy_type' in dic and dic['buy_type'] == 1:
+                roomid = dic['roomid']
+                printer.info([f'{self.area_id}号弹幕监控检测到{roomid:^9}的总督'], True)
+                rafflehandler.Rafflehandler.Put2Queue((roomid,), rafflehandler.handle_1_room_captain)
                 Statistics.append2pushed_raffle('总督', area_id=self.area_id)
             
         
