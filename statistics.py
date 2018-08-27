@@ -79,7 +79,7 @@ class Statistics:
     @staticmethod
     def append2pushed_raffle(type, area_id=0, num=1):
         inst = Statistics.instance
-        if '摩天' in type:
+        if '摩天' in type or '金人' in type:
             inst.pushed_raffle[type] = inst.pushed_raffle.get(type, 0) + int(num)
         else:
             if area_id == 1:
