@@ -565,6 +565,13 @@ class bilibili():
         payload = {"roomid": roomid, "id": id, "type": "guard", "csrf_token": ''}
         response2 = await inst.bili_section_post(join_url, data=payload, headers=inst.dic_bilibili['pcheaders'])
         return response2
+        
+    @staticmethod
+    async def get_gift_of_guard(roomid, id):
+        inst = bilibili.instance
+        join_url = f"{base_url}/lottery/v2/Lottery/join?id={id}&roomid={roomid}&type=guard"
+        response2 = await inst.bili_section_post(join_url, headers=inst.dic_bilibili['pcheaders'])
+        return response2
 
     @staticmethod
     async def get_giftlist_of_events(text1):
@@ -589,6 +596,13 @@ class bilibili():
         true_url = f'{base_url}/lottery/v1/lottery/check?roomid={roomid}'
         response1 = await inst.bili_section_get(true_url, headers=inst.dic_bilibili['pcheaders'])
         return response1
+        
+    @staticmethod
+    async def get_giftlist_of_guard(roomid):
+        inst = bilibili.instance
+        true_url = f'{base_url}/lottery/v1/Lottery/check_guard?roomid={roomid}'
+        response = await inst.bili_section_get(true_url, headers=inst.dic_bilibili['pcheaders'])
+        return response
 
     @staticmethod
     async def get_activity_result(activity_roomid, activity_raffleid):
