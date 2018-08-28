@@ -57,6 +57,13 @@ class Rafflehandler:
         Rafflehandler.instance.queue_raffle.put_nowait((value, func))
         # print('appended')
         return
+        
+    @staticmethod
+    async def Put2Queue_wait(value, func):
+        # print('welcome to appending')
+        await Rafflehandler.instance.queue_raffle.put((value, func))
+        # print('appended')
+        return
             
     @staticmethod
     def getlist():
@@ -232,14 +239,16 @@ async def handle_1_room_activity(text1):
 async def handle_1_room_captain(roomid):
     result = await utils.enter_room(roomid)
     if result:
-        while True:
+        for i in range(10):
             json_response1 = await bilibili.get_giftlist_of_captain(roomid)
             # print(json_response1['data']['guard'])
             if not json_response1['data']['guard']:
                 await asyncio.sleep(1)
             else:
                 break
-            
+        if not json_response1['data']['guard']:
+            print(f'{roomid}没有总督或总督已经领取')
+            return
         list_available_raffleid = []
         # guard这里领取后，list对应会消失，其实就没有status了，这里是为了统一
         for j in json_response1['data']['guard']:
@@ -268,14 +277,16 @@ async def handle_1_room_captain(roomid):
 async def handle_1_room_guard(roomid):
     result = await utils.enter_room(roomid)
     if result:
-        while True:
+        for i in range(10):
             json_response1 = await bilibili.get_giftlist_of_guard(roomid)
             print(json_response1)
             if not json_response1['data']:
                 await asyncio.sleep(1)
             else:
                 break
-            
+        if not json_response1['data']:
+            print(f'{roomid}没有guard或者guard已经领取')
+            return
         list_available_raffleid = []
         # guard这里领取后，list对应会消失，其实就没有status了，这里是为了统一
         for j in json_response1['data']:
