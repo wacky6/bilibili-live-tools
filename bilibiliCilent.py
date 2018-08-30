@@ -187,7 +187,7 @@ class bilibiliClient():
             if 'buy_type' in dic and dic['buy_type'] == 1:
                 roomid = dic['roomid']
                 printer.info([f'{self.area_id}号弹幕监控检测到{roomid:^9}的总督'], True)
-                rafflehandler.Rafflehandler.Put2Queue((roomid,), rafflehandler.handle_1_room_captain)
+                rafflehandler.Rafflehandler.Put2Queue((roomid,), rafflehandler.handle_1_room_guard)
                 Statistics.append2pushed_raffle('总督', area_id=self.area_id)
             if 'buy_type' in dic and dic['buy_type'] != 1:
                 print(dic)

@@ -557,20 +557,18 @@ class bilibili():
         response = await inst.bili_section_post(url, params=payload, headers=inst.dic_bilibili['appheaders'])
         # print(response)
         return response
-
-    @staticmethod
-    async def get_gift_of_captain(roomid, id):
-        inst = bilibili.instance
-        join_url = f"{base_url}/lottery/v1/lottery/join"
-        payload = {"roomid": roomid, "id": id, "type": "guard", "csrf_token": ''}
-        response2 = await inst.bili_section_post(join_url, data=payload, headers=inst.dic_bilibili['pcheaders'])
-        return response2
         
     @staticmethod
     async def get_gift_of_guard(roomid, id):
         inst = bilibili.instance
-        join_url = f"{base_url}/lottery/v2/Lottery/join?id={id}&roomid={roomid}&type=guard"
-        response2 = await inst.bili_section_post(join_url, headers=inst.dic_bilibili['pcheaders'])
+        join_url = f"{base_url}/lottery/v2/Lottery/join"
+        data = {
+            'roomid': roomid,
+            'id': id,
+            'type': 'guard',
+            'csrf_token': inst.dic_bilibili['csrf']
+        }
+        response2 = await inst.bili_section_post(join_url, data=data, headers=inst.dic_bilibili['pcheaders'])
         return response2
 
     @staticmethod
@@ -589,13 +587,6 @@ class bilibili():
         url = f"{base_url}/gift/v3/smalltv/check?roomid={real_roomid}"
         response = await inst.bili_section_get(url, headers=inst.dic_bilibili['pcheaders'])
         return response
-
-    @staticmethod
-    async def get_giftlist_of_captain(roomid):
-        inst = bilibili.instance
-        true_url = f'{base_url}/lottery/v1/lottery/check?roomid={roomid}'
-        response1 = await inst.bili_section_get(true_url, headers=inst.dic_bilibili['pcheaders'])
-        return response1
         
     @staticmethod
     async def get_giftlist_of_guard(roomid):

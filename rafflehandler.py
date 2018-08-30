@@ -113,22 +113,11 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
     printer.info([f'# 房间{real_roomid:^9}网页端活动抽奖结果: {data["gift_name"]}X{data["gift_num"]}'])
     return True
  
-               
-async def handle_1_captain_raffle(num, roomid, raffleid):
-    await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
-    json_response2 = await bilibili.get_gift_of_captain(roomid, raffleid)
-    if not json_response2['code']:
-        print("# 获取到房间 %s 的总督奖励: " % (roomid), json_response2['data']['message'])
-        # print(json_response2)
-        Statistics.append_to_captainlist()
-    else:
-        print(json_response2)
-    return True
     
 async def handle_1_guard_raffle(num, roomid, raffleid):
     await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
     json_response2 = await bilibili.get_gift_of_guard(roomid, raffleid)
-    print(json_response2)
+    # print(json_response2)
     if not json_response2['code']:
         print("# 获取到房间 %s 的提督/舰长奖励: " % (roomid), json_response2['data']['message'])
         # print(json_response2)
@@ -234,52 +223,14 @@ async def handle_1_room_activity(text1):
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
                 Rafflehandler.Put2Queue((text1), handle_1_room_activity)
-            
 
-async def handle_1_room_captain(roomid):
-    result = await utils.enter_room(roomid)
-    if result:
-        for i in range(10):
-            json_response1 = await bilibili.get_giftlist_of_captain(roomid)
-            # print(json_response1['data']['guard'])
-            if not json_response1['data']['guard']:
-                await asyncio.sleep(1)
-            else:
-                break
-        if not json_response1['data']['guard']:
-            print(f'{roomid}没有总督或总督已经领取')
-            return
-        list_available_raffleid = []
-        # guard这里领取后，list对应会消失，其实就没有status了，这里是为了统一
-        for j in json_response1['data']['guard']:
-            id = j['id']
-            status = j['status']
-            if status == 1:
-                # print('未参加')
-                list_available_raffleid.append(id)
-            elif status == 2:
-                # print('过滤')
-                pass
-            else:
-                print(json_response1)
-            
-        tasklist = []
-        num_available = len(list_available_raffleid)
-        for raffleid in list_available_raffleid:
-            task = asyncio.ensure_future(handle_1_captain_raffle(num_available, roomid, raffleid))
-            tasklist.append(task)
-        if tasklist:
-            raffle_results = await asyncio.gather(*tasklist)
-            if False in raffle_results:
-                print('有繁忙提示，稍后重新尝试')
-                Rafflehandler.Put2Queue((roomid,), handle_1_room_captain)
                 
 async def handle_1_room_guard(roomid):
     result = await utils.enter_room(roomid)
     if result:
         for i in range(10):
             json_response1 = await bilibili.get_giftlist_of_guard(roomid)
-            print(json_response1)
+            # print(json_response1)
             if not json_response1['data']:
                 await asyncio.sleep(1)
             else:
@@ -310,7 +261,7 @@ async def handle_1_room_guard(roomid):
             raffle_results = await asyncio.gather(*tasklist)
             if False in raffle_results:
                 print('有繁忙提示，稍后重新尝试')
-                Rafflehandler.Put2Queue((roomid,), handle_1_room_captain)
+                Rafflehandler.Put2Queue((roomid,), handle_1_room_guard)
                 
          
 async def handle_1_TV_raffle_black(num, real_roomid, raffleid, raffle_type):
