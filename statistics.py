@@ -67,7 +67,7 @@ class Statistics:
         # print("tv加入成功", inst.joined_TV)
         
     @staticmethod
-    def append_to_captainlist():
+    def append_to_guardlist():
         inst = Statistics.instance
         inst.append2joined_raffle('总督(合计)')
         

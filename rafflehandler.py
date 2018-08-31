@@ -121,7 +121,7 @@ async def handle_1_guard_raffle(num, roomid, raffleid):
     if not json_response2['code']:
         print("# 获取到房间 %s 的提督/舰长奖励: " % (roomid), json_response2['data']['message'])
         # print(json_response2)
-        Statistics.append_to_captainlist()
+        Statistics.append_to_guardlist()
     else:
         print(json_response2)
     return True
