@@ -202,7 +202,23 @@ class DanmuRaffleHandler(BaseDanmu):
                 Statistics.append2pushed_raffle('提督/舰长', area_id=self.area_id)
             
         
-                  
+class YjMonitorHandler(BaseDanmu):
+    def handle_danmu(self, dic):
+        cmd = dic['cmd']
+        # print(cmd)
+        if cmd == 'DANMU_MSG':
+            msg = dic['info'][1]
+            if '-' in msg:
+                list_word = msg.split('-')
+                try:
+                    roomid = int(list_word[0])
+                    raffleid = int(list_word[1])
+                    printer.info([f'弹幕监控检测到{roomid:^9}的提督/舰长{raffleid}'], True)
+                    rafflehandler.Rafflehandler.Put2Queue((1, roomid, raffleid), rafflehandler.handle_1_guard_raffle)
+                    Statistics.append2pushed_raffle('提督/舰长', area_id=1)
+                except ValueError:
+                    print(msg)
+            Printer().print_danmu(dic)
                     
                     
                
