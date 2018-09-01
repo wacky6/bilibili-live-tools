@@ -174,7 +174,7 @@ async def sliver2coin():
 
 async def GetVideoExp(list_topvideo):
     print('开始获取视频观看经验')
-    aid = list_topvideo[random.randint(0, 19)]
+    aid = random.choice(list_topvideo)
     cid = await utils.GetVideoCid(aid)
     await bilibili().Heartbeat(aid, cid)
 
