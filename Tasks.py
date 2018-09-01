@@ -125,6 +125,8 @@ async def full_intimate(list_gift, list_medal):
         # print(list_gift)
         for i in list_gift:
             gift_id, gift_num, bag_id = i
+            if gift_num == 0:
+                continue
             # print(gift_id, bag_id)
             if (gift_num * dic_gift[gift_id] <= left_intimate):
                 pass
