@@ -95,9 +95,7 @@ class BaseDanmu():
             print(sys.exc_info()[0], sys.exc_info()[1])
             print('请联系开发者')
             return None
-        # print(tmp)
-           
-        # print('测试0', bytes_data)
+        
         return bytes_data
     
     async def ReceiveMessageLoop(self):
