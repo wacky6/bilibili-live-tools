@@ -113,8 +113,8 @@ async def send_medal_gift():
     await full_intimate(list_gift, list_medal)
 
 async def send_gift():
-    await send_expiring_gift()
     await send_medal_gift()
+    await send_expiring_gift()
     BiliTimer.call_after(send_gift, 21600)
 
 async def full_intimate(list_gift, list_medal):
