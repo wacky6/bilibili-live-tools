@@ -758,7 +758,7 @@ class bilibili():
     async def ReqMasterInfo(self):
         url = 'https://account.bilibili.com/home/reward'
         json_rsp = await self.other_session_get(url, headers=self.dic_bilibili['pcheaders'])
-        return json_rsp['data']
+        return json_rsp
 
     async def ReqVideoCid(self, video_aid):
         url = f'https://www.bilibili.com/widget/getPageList?aid={video_aid}'
