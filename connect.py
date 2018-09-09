@@ -117,7 +117,6 @@ class YjConnection():
     async def run(self):
         self.roomid = ConfigLoader().dic_user['other_control']['raffle_minitor_roomid']
         if not self.roomid:
-            print('hjjkkk结束了坎坎坷坷坎坎坷坷')
             return
         self.danmuji = bilibiliCilent.YjMonitorHandler(self.roomid, self.areaid)
         while True:
