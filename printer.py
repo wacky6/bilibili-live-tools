@@ -2,7 +2,7 @@ try:
     import console
 except ImportError:
     pass
-import webcolors
+from matplotlib import colors
 from configloader import ConfigLoader
 import time
 import codecs
@@ -10,9 +10,8 @@ import codecs
 
 # "#969696"
 def hex_to_rgb_percent(hex_str):
-    color = webcolors.hex_to_rgb_percent(hex_str)
-    # print([float(i.strip('%'))/100.0 for i in color])
-    return [float(i.strip('%'))/100.0 for i in color]
+    rgb_pct_color = colors.hex2color(hex_str)
+    return rgb_pct_color
 
 
 def timestamp(tag_time):
