@@ -10,12 +10,14 @@ import struct
 import json
 import sys
 import aiohttp
+import string
                                                           
 
 class BaseDanmu():
     
     __slots__ = ('ws', 'roomid', 'area_id', 'client')
     structer = struct.Struct('!I2H2I')
+    digs = string.digits + string.ascii_letters
 
     def __init__(self, roomid=None, area_id=None):
         self.client = aiohttp.ClientSession()
@@ -201,6 +203,12 @@ class DanmuRaffleHandler(BaseDanmu):
             
         
 class YjMonitorHandler(BaseDanmu):
+    def base2dec(self, str_num, base):
+        result = 0
+        for i in str_num:
+            result = result * base + self.digs.index(i)
+        return result
+        
     def handle_danmu(self, dic):
         cmd = dic['cmd']
         # print(cmd)
@@ -209,8 +217,8 @@ class YjMonitorHandler(BaseDanmu):
             if '-' in msg:
                 list_word = msg.split('-')
                 try:
-                    roomid = int(list_word[0])
-                    raffleid = int(list_word[1])
+                    roomid = self.base2dec(list_word[0], 62)
+                    raffleid = self.base2dec(list_word[1], 62)
                     printer.info([f'弹幕监控检测到{roomid:^9}的提督/舰长{raffleid}'], True)
                     rafflehandler.Rafflehandler.Put2Queue((1, roomid, raffleid), rafflehandler.handle_1_guard_raffle)
                     Statistics.append2pushed_raffle('提督/舰长', area_id=1)
