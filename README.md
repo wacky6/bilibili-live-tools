@@ -26,9 +26,9 @@ docker build -t bilibili_img .
 2、运行镜像
 
 ```
-docker run -d -e USER_NAME=B站登陆账户 -e USER_PASSWORD=登陆密码 --name 容器名字(随意) zuosc/bilibili-live-tools-python
+docker run -d -e USER_NAME=B站登陆账户 -e USER_PASSWORD=登陆密码 --name 容器名字(随意) image名称
 ```
-eg: docker run -d -e USER_NAME=xxxxxxxxxxx -e USER_PASSWORD=pwd --name bilibili zuosc/bilibili-live-tools-python
+eg: docker run -d -e USER_NAME=xxxxxxxxxxx -e USER_PASSWORD=pwd --name bilibili bilibili_img
 
 
 ## 其他版本Docker使用介绍
