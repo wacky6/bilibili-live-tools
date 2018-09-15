@@ -225,33 +225,31 @@ async def handle_1_room_activity(text1):
                 Rafflehandler.Put2Queue((text1), handle_1_room_activity)
 
                 
-async def handle_1_room_guard(roomid):
+async def handle_1_room_guard(roomid, raffleid=None):
     result = await utils.enter_room(roomid)
     if result:
-        for i in range(10):
-            json_response1 = await bilibili.get_giftlist_of_guard(roomid)
-            # print(json_response1)
+        if raffleid is not None:
+            json_response1 = {'data': [{'id': raffleid}]}
+        else:
+            for i in range(10):
+                json_response1 = await bilibili.get_giftlist_of_guard(roomid)
+                # print(json_response1)
+                if not json_response1['data']:
+                    await asyncio.sleep(1)
+                else:
+                    break
             if not json_response1['data']:
-                await asyncio.sleep(1)
-            else:
-                break
-        if not json_response1['data']:
-            print(f'{roomid}没有guard或者guard已经领取')
-            return
+                print(f'{roomid}没有guard或者guard已经领取')
+                return
         list_available_raffleid = []
         # guard这里领取后，list对应会消失，其实就没有status了，这里是为了统一
         for j in json_response1['data']:
-            id = j['id']
-            status = j['status']
-            if status == 1:
-                # print('未参加')
-                list_available_raffleid.append(id)
-            elif status == 2:
-                # print('过滤')
-                pass
-            else:
-                print(json_response1)
-            
+            raffle_id = j['id']
+            if not Rafflehandler().check_duplicate(raffle_id):
+                # print(raffle_id)
+                list_available_raffleid.append(raffle_id)
+                Rafflehandler().add2raffle_id(raffle_id)
+                        
         tasklist = []
         num_available = len(list_available_raffleid)
         for raffleid in list_available_raffleid:

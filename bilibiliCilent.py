@@ -221,7 +221,7 @@ class YjMonitorHandler(BaseDanmu):
                     roomid = self.base2dec(list_word[0], 62)
                     raffleid = self.base2dec(list_word[1], 62)
                     printer.info([f'弹幕监控检测到{roomid:^9}的提督/舰长{raffleid}'], True)
-                    rafflehandler.Rafflehandler.Put2Queue((1, roomid, raffleid), rafflehandler.handle_1_guard_raffle)
+                    rafflehandler.Rafflehandler.Put2Queue((roomid, raffleid), rafflehandler.handle_1_room_guard)
                     Statistics.append2pushed_raffle('提督/舰长', area_id=1)
                 except ValueError:
                     print(msg)
