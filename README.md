@@ -3,6 +3,35 @@
 
 yjqiang分支是一个次分支，特别感谢主分支所有参与者的基础奠定
 
+## Docker使用介绍
+- 直接拉取构建好的Docker镜像
+
+```
+docker run -d -e USER_NAME=B站登陆账户 -e USER_PASSWORD=登陆密码 --name 容器名字(随意) zuosc/bilibili-live-tools-python
+```
+eg: docker run -d -e USER_NAME=xxxxxxxxxxx -e USER_PASSWORD=pwd --name bilibili zuosc/bilibili-live-tools-python
+
+
+- 本地构建Docker镜像
+
+1、构建镜像
+
+```
+docker build -t image名称 .
+```
+eg:
+docker build -t bilibili_img .
+
+
+2、运行镜像
+
+```
+docker run -d -e USER_NAME=B站登陆账户 -e USER_PASSWORD=登陆密码 --name 容器名字(随意) zuosc/bilibili-live-tools-python
+```
+eg: docker run -d -e USER_NAME=xxxxxxxxxxx -e USER_PASSWORD=pwd --name bilibili zuosc/bilibili-live-tools-python
+
+
+## 其他版本Docker使用介绍
 docker使用 https://github.com/Muromi-Rikka/bilibili-live-tools-docker  
 docker使用  https://github.com/zsnmwy/bilibili-live-tools-docker
 
