@@ -17,7 +17,6 @@ class BaseDanmu():
     
     __slots__ = ('ws', 'roomid', 'area_id', 'client')
     structer = struct.Struct('!I2H2I')
-    digs = string.digits + string.ascii_letters
 
     def __init__(self, roomid=None, area_id=None):
         self.client = aiohttp.ClientSession()
@@ -203,6 +202,8 @@ class DanmuRaffleHandler(BaseDanmu):
             
         
 class YjMonitorHandler(BaseDanmu):
+    digs = string.digits + string.ascii_letters
+    
     def base2dec(self, str_num, base):
         result = 0
         for i in str_num:
