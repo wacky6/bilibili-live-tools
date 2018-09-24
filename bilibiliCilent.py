@@ -209,6 +209,12 @@ class YjMonitorHandler(BaseDanmu):
         for i in str_num:
             result = result * base + self.digs.index(i)
         return result
+    
+    def get_origin(self, danmu, split_str):
+        print('正在准备还原', danmu)
+        origin_danmu = danmu.replace('?', '')
+        print('原来弹幕', origin_danmu)
+        return [self.base2dec(i, 62) for i in origin_danmu.split(split_str)]
         
     def handle_danmu(self, dic):
         cmd = dic['cmd']
@@ -216,10 +222,10 @@ class YjMonitorHandler(BaseDanmu):
         if cmd == 'DANMU_MSG':
             msg = dic['info'][1]
             if '+' in msg:
-                list_word = msg.split('+')
                 try:
-                    roomid = self.base2dec(list_word[0], 62)
-                    raffleid = self.base2dec(list_word[1], 62)
+                    list_word = self.get_origin(msg, '+')
+                    roomid = list_word[0]
+                    raffleid = list_word[1]
                     printer.info([f'弹幕监控检测到{roomid:^9}的提督/舰长{raffleid}'], True)
                     rafflehandler.Rafflehandler.Put2Queue((roomid, raffleid), rafflehandler.handle_1_room_guard)
                     Statistics.append2pushed_raffle('提督/舰长', area_id=1)
