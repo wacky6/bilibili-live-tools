@@ -436,26 +436,10 @@ class bilibili():
         return response
 
     @staticmethod
-    def normal_login(username, password):
+    def normal_login(username, password, captcha=None):
         inst = bilibili.instance
-        # url = 'https://passport.bilibili.com/api/oauth2/login'   //旧接口
-        url = "https://passport.bilibili.com/api/v2/oauth2/login"
-        temp_params = f'appkey={inst.dic_bilibili["appkey"]}&password={password}&username={username}'
-        sign = inst.calc_sign(temp_params)
-        payload = f'appkey={inst.dic_bilibili["appkey"]}&password={password}&username={username}&sign={sign}'
-        response = inst.login_session_post(url, params=payload)
-        return response
-
-    @staticmethod
-    def login_with_captcha(username, password):
-        inst = bilibili.instance
-        
-        # with requests.Session() as s:
-        url = "https://passport.bilibili.com/captcha"
-        res = inst.login_session_get(url)
-        # print(res.content)
-
-        captcha = cnn_captcha(res.content)
+        if captcha is None:
+            captcha = ''
         temp_params = f'actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&captcha={captcha}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&password={password}&platform={inst.dic_bilibili["platform"]}&username={username}'
         sign = inst.calc_sign(temp_params)
         payload = f'{temp_params}&sign={sign}'
@@ -463,6 +447,19 @@ class bilibili():
         response = inst.login_session_post(url, params=payload)
         return response
 
+    @staticmethod
+    def get_captcha(username, password):
+        inst = bilibili.instance
+        
+        # with requests.Session() as s:
+        url = "https://passport.bilibili.com/captcha"
+        res = inst.login_session_get(url)
+        # print(res.content)
+        # print(res.content)
+
+        captcha = cnn_captcha(res.content)
+        return captcha
+        
     @staticmethod
     def request_check_token():
         inst = bilibili.instance

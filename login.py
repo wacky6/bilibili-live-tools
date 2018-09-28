@@ -22,10 +22,11 @@ def LoginWithPwd():
     key = value['key']
     Hash = str(value['hash'])
     username, password = calc_name_passw(key, Hash, username, password)
-    
-    response = bilibili.normal_login(username, password)
+    captcha = None
+    response = bilibili.normal_login(username, password, captcha)
     while response.json()['code'] == -105:
-        response = bilibili.login_with_captcha(username, password)
+        captcha = bilibili.get_captcha(username, password)
+        response = bilibili.normal_login(username, password, captcha)
     json_rsp = response.json()
     # print(json_rsp)
     if not json_rsp['code'] and not json_rsp['data']['status']:
