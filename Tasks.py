@@ -244,12 +244,11 @@ async def check(id):
     print('认为不违反规定的比例', percent)
     vote = None
     if voted >= 300:
-        if percent >= 0.75:
+        # 认为这里可能出现了较多分歧，抬一手
+        if percent >= 0.4:
             vote = 2
         elif percent <= 0.25:
             vote = 4
-        elif 0.4 <= percent <= 0.6:
-            vote = 2
     elif voted >= 150:
         if percent >= 0.9:
             vote = 2
