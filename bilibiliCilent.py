@@ -10,7 +10,6 @@ import struct
 import json
 import sys
 import aiohttp
-import string
                                                           
 
 class BaseDanmu():
@@ -34,17 +33,6 @@ class BaseDanmu():
         except:
             print('请联系开发者', sys.exc_info()[0], sys.exc_info()[1])
         printer.info([f'{self.area_id}号弹幕收尾模块状态{self.ws.closed}'], True)
-        
-    async def CheckArea(self):
-        try:
-            while True:
-                area_id = await asyncio.shield(utils.FetchRoomArea(self.roomid))
-                if area_id != self.area_id:
-                    printer.info([f'{self.roomid}更换分区{self.area_id}为{area_id}，即将切换房间'], True)
-                    return
-                await asyncio.sleep(300)
-        except asyncio.CancelledError:
-            printer.info([f'{self.area_id}号弹幕监控分区检测模块主动取消'], True)
         
     async def connectServer(self):
         try:
@@ -149,6 +137,17 @@ class DanmuPrinter(BaseDanmu):
 
         
 class DanmuRaffleHandler(BaseDanmu):
+    async def CheckArea(self):
+        try:
+            while True:
+                area_id = await asyncio.shield(utils.FetchRoomArea(self.roomid))
+                if area_id != self.area_id:
+                    printer.info([f'{self.roomid}更换分区{self.area_id}为{area_id}，即将切换房间'], True)
+                    return
+                await asyncio.sleep(300)
+        except asyncio.CancelledError:
+            printer.info([f'{self.area_id}号弹幕监控分区检测模块主动取消'], True)
+        
     def handle_danmu(self, dic):
         cmd = dic['cmd']
         
@@ -202,19 +201,16 @@ class DanmuRaffleHandler(BaseDanmu):
             
         
 class YjMonitorHandler(BaseDanmu):
-    digs = string.digits + string.ascii_letters
+    digs = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     
-    def base2dec(self, str_num, base):
+    def base2dec(self, str_num, base=62):
         result = 0
         for i in str_num:
             result = result * base + self.digs.index(i)
         return result
     
-    def get_origin(self, danmu, split_str):
-        print('正在准备还原', danmu)
-        origin_danmu = danmu.replace('?', '')
-        print('原来弹幕', origin_danmu)
-        return [self.base2dec(i, 62) for i in origin_danmu.split(split_str)]
+    def get_origin(self, words, gap):
+        return map(self.base2dec, words.replace('?', '').split(gap))
         
     def handle_danmu(self, dic):
         cmd = dic['cmd']
@@ -223,9 +219,7 @@ class YjMonitorHandler(BaseDanmu):
             msg = dic['info'][1]
             if '+' in msg:
                 try:
-                    list_word = self.get_origin(msg, '+')
-                    roomid = list_word[0]
-                    raffleid = list_word[1]
+                    roomid, raffleid = self.get_origin(msg, '+')
                     printer.info([f'弹幕监控检测到{roomid:^9}的提督/舰长{raffleid}'], True)
                     rafflehandler.Rafflehandler.Put2Queue((roomid, raffleid), rafflehandler.handle_1_room_guard)
                     Statistics.append2pushed_raffle('提督/舰长', area_id=1)
