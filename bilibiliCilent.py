@@ -93,12 +93,7 @@ class BaseDanmu():
                 break
             len_read = 0
             len_bytes_datas = len(bytes_datas)
-            loop_time = 0
             while len_read != len_bytes_datas:
-                loop_time += 1
-                if loop_time > 100:
-                    print('请联系作者', bytes_datas)
-                state = None
                 split_header = self.structer.unpack(bytes_datas[len_read:16+len_read])
                 len_data, len_header, ver, opt, seq = split_header
                 remain_data = bytes_datas[len_read+16:len_read+len_data]
@@ -110,15 +105,14 @@ class BaseDanmu():
                 elif opt == 5:
                     messages = remain_data.decode('utf-8')
                     dic = json.loads(messages)
-                    state = self.handle_danmu(dic)
+                    if not self.handle_danmu(dic):
+                        return
                 # 握手确认
                 elif opt == 8:
                     printer.info([f'{self.area_id}号弹幕监控进入房间（{self.roomid}）'], True)
                 else:
                     printer.warn(bytes_datas[len_read:len_read + len_data])
-                            
-                if state is not None and not state:
-                    return
+
                 len_read += len_data
                 
     def handle_danmu(self, dic):
@@ -132,7 +126,7 @@ class DanmuPrinter(BaseDanmu):
         if cmd == 'DANMU_MSG':
             # print(dic)
             Printer().print_danmu(dic)
-            return
+        return True
 
         
 class DanmuRaffleHandler(BaseDanmu):
@@ -175,7 +169,7 @@ class DanmuRaffleHandler(BaseDanmu):
                     
             else:
                 printer.info(['普通送礼提示', dic['msg_text']])
-            return
+
         elif cmd == 'SYS_MSG':
             if 'real_roomid' in dic:
                 real_roomid = dic['real_roomid']
@@ -184,7 +178,25 @@ class DanmuRaffleHandler(BaseDanmu):
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_activity)
                 Statistics.append2pushed_raffle(type_text, area_id=self.area_id)
-        
+                
+            '''
+        elif cmd == 'NOTICE_MSG':
+            # 5 恭喜
+            # 1 公告
+            # 2 抽奖推送
+            # 3 舰长
+            try:
+                if dic['msg_type'] == 2:
+                    raffle_name = (dic['msg_common'].split('%> ')[-1]).split('，')[0][2:]
+                    print(dic['msg_type'], dic['msg_common'], raffle_name, file=sys.stderr)
+                    Statistics.append2pushed_raffle(f'{raffle_name}, 2', area_id=1)
+                else:
+                    print(dic['msg_type'], dic['msg_common'], file=sys.stderr)
+                    Statistics.append2pushed_raffle(f'{dic["msg_common"]}, {dic["msg_type"]}', area_id=1)
+            except:
+                print(dic, file=sys.stderr)
+            '''
+                   
         elif cmd == 'GUARD_MSG':
             if 'buy_type' in dic and dic['buy_type'] == 1:
                 roomid = dic['roomid']
@@ -197,6 +209,7 @@ class DanmuRaffleHandler(BaseDanmu):
                 printer.info([f'{self.area_id}号弹幕监控检测到{self.roomid:^9}的提督/舰长'], True)
                 rafflehandler.Rafflehandler.Put2Queue((self.roomid,), rafflehandler.handle_1_room_guard)
                 Statistics.append2pushed_raffle('提督/舰长', area_id=self.area_id)
+        return True
             
         
 class YjMonitorHandler(BaseDanmu):
@@ -225,6 +238,7 @@ class YjMonitorHandler(BaseDanmu):
                 except ValueError:
                     print(msg)
             Printer().print_danmu(dic)
+        return True
                     
                     
                
