@@ -66,15 +66,15 @@ class Statistics:
     def append2joined_raffle(type, num=1):
         inst = Statistics.instance
         inst.joined_raffle[type] = inst.joined_raffle.get(type, 0) + int(num)
-        
-    @staticmethod
-    def append2pushed_raffle(type, area_id=0, num=1):
+     
+    @staticmethod   
+    def add2pushed_raffle(raffle_name, num=1, broadcast_type=0):
+        # broadcast_type 0全区 1分区 2本房间
         inst = Statistics.instance
-        if '摩天' in type or '金人' in type:
-            inst.pushed_raffle[type] = inst.pushed_raffle.get(type, 0) + int(num)
+        if broadcast_type == 0:
+            inst.pushed_raffle[raffle_name] = inst.pushed_raffle.get(raffle_name, 0) + int(num) / 4
         else:
-            if area_id == 1:
-                inst.pushed_raffle[type] = inst.pushed_raffle.get(type, 0) + int(num)
+            inst.pushed_raffle[raffle_name] = inst.pushed_raffle.get(raffle_name, 0) + int(num)
                     
     @staticmethod
     def check_TVlist(real_roomid, raffleid):

@@ -1,4 +1,3 @@
-from bilibili import bilibili
 from statistics import Statistics
 import printer
 from printer import Printer
@@ -147,68 +146,45 @@ class DanmuRaffleHandler(BaseDanmu):
         if cmd == 'PREPARING':
             printer.info([f'{self.area_id}号弹幕监控房间下播({self.roomid})'], True)
             return False
-        elif cmd == 'SYS_GIFT':
-            if 'giftId' in dic:
-                if dic['giftId'] == 39:
-                    printer.info(["节奏风暴"], True)
-                    roomid = dic['roomid']
-                    rafflehandler.Rafflehandler.Put2Queue((roomid,), rafflehandler.handle_1_room_storm)
-                    Statistics.append2pushed_raffle('节奏风暴', area_id=self.area_id)
-                else:
-                    text1 = dic['real_roomid']
-                    text2 = dic['url']
-                    printer.info([dic, "请联系开发者"])
-                    try:
-                        giftId = dic['giftId']
-                        printer.info(["检测到房间{:^9}的{}活动抽奖".format(text1, bilibili.get_giftids_raffle(str(giftId)))], True)
-                        rafflehandler.Rafflehandler.Put2Queue((giftId, text1, text2), rafflehandler.handle_1_room_activity)
-                        Statistics.append2pushed_raffle('活动', area_id=self.area_id)
-                                
-                    except:
-                        printer.info([dic, "请联系开发者"])
-                    
-            else:
-                printer.info(['普通送礼提示', dic['msg_text']])
-
-        elif cmd == 'SYS_MSG':
-            if 'real_roomid' in dic:
-                real_roomid = dic['real_roomid']
-                type_text = (dic['msg'].split(':? ')[-1]).split('，')[0][2:]
-                printer.info([f'{self.area_id}号弹幕监控检测到{real_roomid:^9}的{type_text}'], True)
-                rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
-                rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_activity)
-                Statistics.append2pushed_raffle(type_text, area_id=self.area_id)
-                
-            '''
+    
         elif cmd == 'NOTICE_MSG':
-            # 5 恭喜
-            # 1 公告
-            # 2 抽奖推送
-            # 3 舰长
-            try:
-                if dic['msg_type'] == 2:
-                    raffle_name = (dic['msg_common'].split('%> ')[-1]).split('，')[0][2:]
-                    print(dic['msg_type'], dic['msg_common'], raffle_name, file=sys.stderr)
-                    Statistics.append2pushed_raffle(f'{raffle_name}, 2', area_id=1)
+            # 1 《第五人格》哔哩哔哩直播预选赛六强诞生！
+            # 2 娱乐区广播: <%硬币需要阿璃守护%> 送给<% 陸赛赛%> 1个摩天大楼，点击前往TA的房间去抽奖吧
+            # 3 <%暗月柴静%> 在 <%優しい七酱%> 的房间开通了总督并触发了抽奖，点击前往TA的房间去抽奖吧
+            # 4 欢迎 <%总督 不再瞎逛的菜菜大佬%> 登船
+            # 5 恭喜 <%ChineseHerbalTea%> 获得大奖 <%23333x银瓜子%>, 感谢 <%樱桃小姐姐给幻幻子穿上漂亮的裙裙%> 的赠送
+            # 6 <%雪昼%> 在直播间 <%529%> 使用了 <%20%> 倍节奏风暴，大家快去跟风领取奖励吧！ (只报20的)
+            msg_type = dic['msg_type']
+            if msg_type not in (2, 3, 6):
+                return True
+            msg_common = dic['msg_common']
+            real_roomid = dic['real_roomid']
+            msg_common = dic['msg_common'].replace(' ', '')
+
+            if msg_type == 2:
+                raffle_num, raffle_name = (msg_common.split('%>')[-1]).split('，')[0].split('个')
+                broadcast = msg_common.split('广播')[0]
+                printer.info([f'{self.area_id}号弹幕监控检测到{real_roomid:^9}的{raffle_name}'], True)
+                rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
+                if broadcast == '全区':
+                    broadcast_type = 0
                 else:
-                    print(dic['msg_type'], dic['msg_common'], file=sys.stderr)
-                    Statistics.append2pushed_raffle(f'{dic["msg_common"]}, {dic["msg_type"]}', area_id=1)
-            except:
-                print(dic, file=sys.stderr)
-            '''
-                   
-        elif cmd == 'GUARD_MSG':
-            if 'buy_type' in dic and dic['buy_type'] == 1:
-                roomid = dic['roomid']
-                printer.info([f'{self.area_id}号弹幕监控检测到{roomid:^9}的总督'], True)
-                rafflehandler.Rafflehandler.Put2Queue((roomid,), rafflehandler.handle_1_room_guard)
-                Statistics.append2pushed_raffle('总督', area_id=self.area_id)
-            if 'buy_type' in dic and dic['buy_type'] != 1:
-                print(dic)
-                # roomid = dic['roomid']
-                printer.info([f'{self.area_id}号弹幕监控检测到{self.roomid:^9}的提督/舰长'], True)
-                rafflehandler.Rafflehandler.Put2Queue((self.roomid,), rafflehandler.handle_1_room_guard)
-                Statistics.append2pushed_raffle('提督/舰长', area_id=self.area_id)
+                    broadcast_type = 1
+                Statistics.add2pushed_raffle(raffle_name, 1, broadcast_type)
+            elif msg_type == 3:
+                raffle_name = msg_common.split('开通了')[-1][:2]
+                printer.info([f'{self.area_id}号弹幕监控检测到{real_roomid:^9}的{raffle_name}'], True)
+                rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_guard)
+                if raffle_name == '总督':
+                    broadcast_type = 0
+                else:
+                    broadcast_type = 2
+                Statistics.add2pushed_raffle(raffle_name, 1, broadcast_type)
+            elif msg_type == 6:
+                printer.info(["20倍节奏风暴"], True)
+                rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_storm)
+                Statistics.add2pushed_raffle('20倍节奏风暴')
+        
         return True
             
         
@@ -234,7 +210,7 @@ class YjMonitorHandler(BaseDanmu):
                     roomid, raffleid = self.get_origin(msg, '+')
                     printer.info([f'弹幕监控检测到{roomid:^9}的提督/舰长{raffleid}'], True)
                     rafflehandler.Rafflehandler.Put2Queue((roomid, raffleid), rafflehandler.handle_1_room_guard)
-                    Statistics.append2pushed_raffle('提督/舰长', area_id=1)
+                    Statistics.add2pushed_raffle('YJ推送提督/舰长', 1, 2)
                 except ValueError:
                     print(msg)
             Printer().print_danmu(dic)
