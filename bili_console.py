@@ -1,7 +1,7 @@
 import utils
 from statistics import Statistics
 from connect import connect
-from printer import Printer
+import printer
 from configloader import ConfigLoader
 from rafflehandler import Rafflehandler
 import rafflehandler
@@ -95,9 +95,9 @@ class Biliconsole(Cmd):
     def do_10(self, line):
         new_words = input('弹幕控制')
         if new_words == 'T':
-            Printer().dic_user['print_control']['danmu'] = True
+            printer.control_printer(True, None)
         else:
-            Printer().dic_user['print_control']['danmu'] = False
+            printer.control_printer(False, None)
             
     def do_11(self, line):
         roomid = input('请输入roomid')
@@ -128,9 +128,9 @@ class Biliconsole(Cmd):
     def do_17(self, line):
         new_words = input('debug控制')
         if new_words == 'T':
-            Printer().dic_user['print_control']['debug'] = True
+            printer.control_printer(None, True)
         else:
-            Printer().dic_user['print_control']['debug'] = False
+            printer.control_printer(None, True)
             
     def do_18(self, line):
         video_id = input('请输入av号')

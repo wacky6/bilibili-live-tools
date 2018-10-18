@@ -4,7 +4,7 @@ import Tasks
 import connect
 from rafflehandler import Rafflehandler
 import asyncio
-from printer import Printer
+import printer
 from statistics import Statistics
 from bilibili import bilibili
 from configloader import ConfigLoader
@@ -21,7 +21,7 @@ fileDir = os.path.dirname(os.path.realpath('__file__'))
 ConfigLoader(fileDir)
 
 # print('Hello world.')
-printer = Printer()
+printer.init_config()
 bilibili()
 login.login()
 Statistics()

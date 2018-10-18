@@ -6,56 +6,59 @@ from matplotlib import colors
 from configloader import ConfigLoader
 import time
 import codecs
-
-
-# "#969696"
-def hex_to_rgb_percent(hex_str):
-    rgb_pct_color = colors.hex2color(hex_str)
-    return rgb_pct_color
-
-
-def timestamp(tag_time):
-    if tag_time:
-        str_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-        print(f'[{str_time}]', end=' ')
-        return str_time
-
-
-def info(list_msg, tag_time=False):
-    timestamp(tag_time)
-    for msg in list_msg:
-        print(msg)
-        
-
-def warn(msg):
-    with codecs.open(r'bili.log', 'a', encoding='utf-8') as f:
-        f.write(f'{timestamp(True)} {msg}\n')
-    print(msg)
+import sys
 
         
-def error(msg):
-    print(msg)
-
-        
-def debug(msg):
-    if ConfigLoader().dic_user['print_control']['debug']:
-        info([msg], True)
-    
-
 class Printer():
-    instance = None
-
-    def __new__(cls, *args, **kw):
-        if not cls.instance:
-            cls.instance = super(Printer, cls).__new__(cls, *args, **kw)
-            cls.instance.dic_color = ConfigLoader().dic_color
-            cls.instance.dic_user = ConfigLoader().dic_user
-            cls.instance.dic_title = ConfigLoader().dic_title
-            if (cls.instance.dic_user['platform']['platform'] == 'ios_pythonista'):
-                cls.instance.danmu_print = cls.instance.concole_print
-            else:
-                cls.instance.danmu_print = cls.instance.normal_print
-        return cls.instance
+    def init_config(self):
+        configs = ConfigLoader()
+        self.dic_color = configs.dic_color
+        self.dic_user = configs.dic_user
+        self.dic_title = configs.dic_title
+        if (sys.platform == 'ios'):
+            self.danmu_print = self.concole_print
+        else:
+            self.danmu_print = self.normal_print
+        self.danmu_control = self.dic_user['print_control']['danmu']
+        
+    def control_printer(self, danmu_control=None, debug_control=None):
+        if danmu_control is not None:
+            self.danmu_control = danmu_control
+            ConfigLoader().dic_user['print_control']['danmu'] = danmu_control
+        if debug_control is not None:
+            ConfigLoader().dic_user['print_control']['debug'] = debug_control
+            self.debug_control = debug_control
+            
+    def timestamp(self, tag_time):
+        if tag_time:
+            str_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            print(f'[{str_time}]', end=' ')
+            return str_time
+        return None
+        
+    def info(self, list_msg, tag_time=False):
+        self.timestamp(tag_time)
+        for msg in list_msg:
+            print(msg)
+            
+    def warn(self, msg):
+        return
+        with codecs.open(r'bili.log', 'a', encoding='utf-8') as f:
+            f.write(f'{self.timestamp(True)} {msg}\n')
+        # print(msg)
+        
+    def debug(self, msg):
+        if ConfigLoader().dic_user['print_control']['debug']:
+            self.info([msg], True)
+            
+    def error(self, msg):
+        print('出现致命错误，请联系作者！！！！', msg, file=sys.stderr)
+        sys.exit(-1)
+            
+    # "#969696"
+    def hex_to_rgb_percent(self, hex_str):
+        rgb_pct_color = colors.hex2color(hex_str)
+        return rgb_pct_color
         
     def concole_print(self, msg, color):
         for i, j in zip(msg, color):
@@ -69,14 +72,10 @@ class Printer():
              
     # 弹幕 礼物 。。。。type
     def print_danmu(self, dic_msg, type='normal'):
-        if not self.dic_user['print_control']['danmu']:
+        if not self.danmu_control:
             return
-        list_msg, list_color = self.print_danmu_msg(dic_msg)
-        self.danmu_print(list_msg, list_color)
+        info = dic_msg['info']
 
-    def print_danmu_msg(self, dic):
-        info = dic['info']
-        # tmp = dic['info'][2][1] + ':' + dic['info'][1]
         list_msg = []
         list_color = []
         if info[7] == 3:
@@ -97,20 +96,19 @@ class Printer():
                 
             # 勋章
             if info[3]:
-                list_color.append(self.dic_color['fans-level']['fl' + str(info[3][0])])
-                list_msg.append(info[3][1] + '|' + str(info[3][0]) + ' ')
+                list_color.append(self.dic_color['fans-level'][f'fl{info[3][0]}'])
+                list_msg.append(f'{info[3][1]}|{info[3][0]} ')
             # 等级
             if not info[5]:
-                list_color.append(self.dic_color['user-level']['ul' + str(info[4][0])])
-                list_msg.append('UL' + str(info[4][0]) + ' ')
+                list_color.append(self.dic_color['user-level'][f'ul{info[4][0]}'])
+                list_msg.append(f'UL{info[4][0]} ')
         try:
             if info[2][7]:
-                list_color.append(hex_to_rgb_percent(info[2][7]))
+                list_color.append(self.hex_to_rgb_percent(info[2][7]))
                 list_msg.append(info[2][1] + ':')
             else:
                 list_msg.append(info[2][1] + ':')
                 list_color.append(self.dic_color['others']['default_name'])
-            # print(info)
         except:
             print("# 小电视降临本直播间")
             list_msg.append(info[2][1] + ':')
@@ -118,11 +116,35 @@ class Printer():
             
         list_msg.append(info[1])
         list_color.append([])
-        return list_msg, list_color
+        self.danmu_print(list_msg, list_color)
+ 
+printer = Printer()
+
+
+def init_config():
+    printer.init_config()
+
+
+def info(list_msg, tag_time=False):
+    printer.info(list_msg, tag_time)
+
+
+def warn(msg):
+    printer.warn(msg)
+        
+        
+def error(msg):
+    printer.error(msg)
+   
+             
+def debug(msg):
+    printer.debug(msg)
+  
+      
+def print_danmu(dic_msg, type='normal'):
+    printer.print_danmu(dic_msg, type)
+    
+    
+def control_printer(danmu_control=None, debug_control=None):
+    printer.control_printer(danmu_control, debug_control)
             
-
-        
-        
-        
-
-

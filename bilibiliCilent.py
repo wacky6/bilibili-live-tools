@@ -1,6 +1,5 @@
 from statistics import Statistics
 import printer
-from printer import Printer
 import rafflehandler
 from configloader import ConfigLoader
 import utils
@@ -124,7 +123,7 @@ class DanmuPrinter(BaseDanmu):
         # print(cmd)
         if cmd == 'DANMU_MSG':
             # print(dic)
-            Printer().print_danmu(dic)
+            printer.print_danmu(dic)
         return True
 
         
@@ -213,7 +212,7 @@ class YjMonitorHandler(BaseDanmu):
                     Statistics.add2pushed_raffle('YJ推送提督/舰长', 1, 2)
                 except ValueError:
                     print(msg)
-            Printer().print_danmu(dic)
+            printer.print_danmu(dic)
         return True
                     
                     
