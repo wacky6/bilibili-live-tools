@@ -1,3 +1,4 @@
+import sys
 import utils
 from statistics import Statistics
 from connect import connect
@@ -112,7 +113,7 @@ class Biliconsole(Cmd):
         self.append2list_console([[count], utils.open_capsule])
         
     def do_14(self, line):
-        if ConfigLoader().dic_user['platform']['platform'] == 'ios_pythonista':
+        if sys.platform == 'ios':
             roomid = input('请输入roomid')
             real_roomid = fetch_real_roomid(roomid)
             self.append2list_console([[real_roomid], utils.watch_living_video])

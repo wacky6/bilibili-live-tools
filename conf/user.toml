@@ -1,6 +1,3 @@
-[platform]
-platform = "others"
-
 [print_control]
 danmu = false
 debug = false
