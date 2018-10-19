@@ -159,9 +159,16 @@ class DanmuRaffleHandler(BaseDanmu):
             msg_common = dic['msg_common']
             real_roomid = dic['real_roomid']
             msg_common = dic['msg_common'].replace(' ', '')
-
             if msg_type == 2:
-                raffle_num, raffle_name = (msg_common.split('%>')[-1]).split('，')[0].split('个')
+                str_gift = msg_common.split('%>')[-1].split('，')[0]
+                if '个' in str_gift:
+                    raffle_num, raffle_name = str_gift.split('个')
+                elif '了' in str_gift:
+                    raffle_num = 1
+                    raffle_name = str_gift.split('了')[-1]
+                else:
+                    raffle_num = 1
+                    raffle_name = str_gift
                 broadcast = msg_common.split('广播')[0]
                 printer.info([f'{self.area_id}号弹幕监控检测到{real_roomid:^9}的{raffle_name}'], True)
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
