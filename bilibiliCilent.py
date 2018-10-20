@@ -172,19 +172,13 @@ class DanmuRaffleHandler(BaseDanmu):
                 broadcast = msg_common.split('广播')[0]
                 printer.info([f'{self.area_id}号弹幕监控检测到{real_roomid:^9}的{raffle_name}'], True)
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
-                if broadcast == '全区':
-                    broadcast_type = 0
-                else:
-                    broadcast_type = 1
+                broadcast_type = 0 if broadcast == '全区' else 1
                 Statistics.add2pushed_raffle(raffle_name, 1, broadcast_type)
             elif msg_type == 3:
                 raffle_name = msg_common.split('开通了')[-1][:2]
                 printer.info([f'{self.area_id}号弹幕监控检测到{real_roomid:^9}的{raffle_name}'], True)
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_guard)
-                if raffle_name == '总督':
-                    broadcast_type = 0
-                else:
-                    broadcast_type = 2
+                broadcast_type = 0 if raffle_name == '总督' else 2
                 Statistics.add2pushed_raffle(raffle_name, 1, broadcast_type)
             elif msg_type == 6:
                 printer.info(["20倍节奏风暴"], True)
