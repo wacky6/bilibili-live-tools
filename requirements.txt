@@ -3,4 +3,3 @@ rsa
 aiohttp
 Pillow
 toml
-matplotlib

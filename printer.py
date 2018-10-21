@@ -2,7 +2,6 @@ try:
     import console
 except ImportError:
     pass
-from matplotlib import colors
 from configloader import ConfigLoader
 import time
 import codecs
@@ -57,8 +56,7 @@ class Printer():
             
     # "#969696"
     def hex_to_rgb_percent(self, hex_str):
-        rgb_pct_color = colors.hex2color(hex_str)
-        return rgb_pct_color
+        return tuple(int(n, 16)/255 for n in (hex_str[1:3], hex_str[3:5], hex_str[5:7]))
         
     def concole_print(self, msg, color):
         for i, j in zip(msg, color):
