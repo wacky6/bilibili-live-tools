@@ -24,9 +24,7 @@ RUN apk add --no-cache --virtual .build-deps \
     musl-dev \
     freetype-dev
 
-RUN ln -s /usr/include/locale.h /usr/include/xlocale.h \
-    && pip install --no-cache-dir  numpy \
-    && pip install --no-cache-dir matplotlib 
+RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 
 RUN apk add --no-cache git && \
     git clone https://github.com/yjqiang/bilibili-live-tools /app && \
