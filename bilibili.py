@@ -98,7 +98,7 @@ class bilibili():
             try:
                 # print(self.login_session.cookies, url)
                 rsp = self.login_session.post(url, headers=headers, data=data, params=params)
-                if rsp.status_code == requests.codes.ok:
+                if rsp.status_code == requests.codes.ok and rsp.content:
                     return rsp
                 elif rsp.status_code == 403:
                     print('403频繁')
@@ -112,7 +112,7 @@ class bilibili():
             try:
                 # print(self.login_session.cookies, url)
                 rsp = self.login_session.get(url, headers=headers, data=data, params=params)
-                if rsp.status_code == requests.codes.ok:
+                if rsp.status_code == requests.codes.ok and rsp.content:
                     return rsp
                 elif rsp.status_code == 403:
                     print('403频繁')
