@@ -1,6 +1,6 @@
 import asyncio
 import utils
-import Danmu
+import danmu
 import printer
 from bilibili import bilibili
 from configloader import ConfigLoader
@@ -41,7 +41,7 @@ class connect():
         return cls.instance
         
     async def run(self):
-        self.danmuji = Danmu.DanmuPrinter()
+        self.danmuji = danmu.DanmuPrinter()
         while True:
             printer.info(['正在启动直播监控弹幕姬'], True)
             time_start = int(utils.CurrentTime())
@@ -80,7 +80,7 @@ class RaffleConnect():
         self.areaid = areaid
         
     async def run(self):
-        self.danmuji = Danmu.DanmuRaffleHandler(self.roomid, self.areaid)
+        self.danmuji = danmu.DanmuRaffleHandler(self.roomid, self.areaid)
         while True:
             self.danmuji.roomid = await get_one(self.areaid)
             printer.info(['正在启动抽奖监控弹幕姬'], True)
@@ -118,7 +118,7 @@ class YjConnection():
         self.roomid = ConfigLoader().dic_user['other_control']['raffle_minitor_roomid']
         if not self.roomid:
             return
-        self.danmuji = Danmu.YjMonitorHandler(self.roomid, self.areaid)
+        self.danmuji = danmu.YjMonitorHandler(self.roomid, self.areaid)
         while True:
             printer.info(['正在启动Yj监控弹幕姬'], True)
             time_start = int(utils.CurrentTime())
