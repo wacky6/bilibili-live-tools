@@ -25,14 +25,15 @@ class BaseDanmu():
             self.area_id = area_id
 
     # 待确认
-    async def close_connection(self):
+    async def terminate(self):
         try:
             await self.ws.close()
         except:
             print('请联系开发者', sys.exc_info()[0], sys.exc_info()[1])
-        printer.info([f'{self.area_id}号弹幕收尾模块状态{self.ws.closed}'], True)
+        if not self.ws.closed:
+            printer.info([f'请联系开发者  {self.area_id}号弹幕收尾模块状态{self.ws.closed}'], True)
         
-    async def connectServer(self):
+    async def start(self):
         try:
             url = 'wss://broadcastlv.chat.bilibili.com:443/sub'
             
@@ -43,18 +44,18 @@ class BaseDanmu():
             return False
         printer.info([f'{self.area_id}号弹幕监控已连接b站服务器'], True)
         body = f'{{"uid":0,"roomid":{self.roomid},"protover":1,"platform":"web","clientver":"1.3.3"}}'
-        return (await self.SendSocketData(opt=7, body=body))
+        return (await self.__send_msg(opt=7, body=body))
 
-    async def HeartbeatLoop(self):
+    async def heart_beat(self):
         try:
             while True:
-                if not (await self.SendSocketData(opt=2, body='')):
+                if not (await self.__send_msg(opt=2, body='')):
                     return
                 await asyncio.sleep(30)
         except asyncio.CancelledError:
-            printer.info([f'{self.area_id}号弹幕监控心跳模块主动取消'], True)
+            pass
 
-    async def SendSocketData(self, opt, body, len_header=16, ver=1, seq=1):
+    async def __send_msg(self, opt, body, len_header=16, ver=1, seq=1):
         remain_data = body.encode('utf-8')
         len_data = len(remain_data) + len_header
         header = self.structer.pack(len_data, len_header, ver, opt, seq)
@@ -62,14 +63,13 @@ class BaseDanmu():
         try:
             await self.ws.send_bytes(data)
         except asyncio.CancelledError:
-            printer.info([f'{self.area_id}号弹幕监控发送模块主动取消'], True)
             return False
         except:
             print(sys.exc_info()[0], sys.exc_info()[1])
             return False
         return True
 
-    async def ReadSocketData(self):
+    async def __read_msg(self):
         bytes_data = None
         try:
             msg = await asyncio.wait_for(self.ws.receive(), timeout=35.0)
@@ -84,11 +84,11 @@ class BaseDanmu():
         
         return bytes_data
     
-    async def ReceiveMessageLoop(self):
+    async def handle_msg(self):
         while True:
-            bytes_datas = await self.ReadSocketData()
+            bytes_datas = await self.__read_msg()
             if bytes_datas is None:
-                break
+                return
             len_read = 0
             len_bytes_datas = len(bytes_datas)
             while len_read != len_bytes_datas:
@@ -101,9 +101,7 @@ class BaseDanmu():
                     printer.debug(f'弹幕心跳检测{self.area_id}')
                 # cmd
                 elif opt == 5:
-                    messages = remain_data.decode('utf-8')
-                    dic = json.loads(messages)
-                    if not self.handle_danmu(dic):
+                    if not self.handle_danmu(remain_data):
                         return
                 # 握手确认
                 elif opt == 8:
@@ -113,12 +111,13 @@ class BaseDanmu():
 
                 len_read += len_data
                 
-    def handle_danmu(self, dic):
+    def handle_danmu(self, bytes_msg):
         return True
                 
                 
 class DanmuPrinter(BaseDanmu):
-    def handle_danmu(self, dic):
+    def handle_danmu(self, bytes_msg):
+        dic = json.loads(bytes_msg.decode('utf-8'))
         cmd = dic['cmd']
         # print(cmd)
         if cmd == 'DANMU_MSG':
@@ -128,7 +127,7 @@ class DanmuPrinter(BaseDanmu):
 
         
 class DanmuRaffleHandler(BaseDanmu):
-    async def CheckArea(self):
+    async def check_area(self):
         try:
             while True:
                 area_id = await asyncio.shield(utils.FetchRoomArea(self.roomid))
@@ -137,9 +136,10 @@ class DanmuRaffleHandler(BaseDanmu):
                     return
                 await asyncio.sleep(300)
         except asyncio.CancelledError:
-            printer.info([f'{self.area_id}号弹幕监控分区检测模块主动取消'], True)
+            pass
         
-    def handle_danmu(self, dic):
+    def handle_danmu(self, bytes_msg):
+        dic = json.loads(bytes_msg.decode('utf-8'))
         cmd = dic['cmd']
         
         if cmd == 'PREPARING':
@@ -200,7 +200,8 @@ class YjMonitorHandler(BaseDanmu):
     def get_origin(self, words, gap):
         return map(self.base2dec, words.replace('?', '').split(gap))
         
-    def handle_danmu(self, dic):
+    def handle_danmu(self, bytes_msg):
+        dic = json.loads(bytes_msg.decode('utf-8'))
         cmd = dic['cmd']
         # print(cmd)
         if cmd == 'DANMU_MSG':

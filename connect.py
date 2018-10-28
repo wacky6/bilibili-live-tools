@@ -1,6 +1,6 @@
 import asyncio
 import utils
-import bilibiliCilent
+import Danmu
 import printer
 from bilibili import bilibili
 from configloader import ConfigLoader
@@ -41,21 +41,22 @@ class connect():
         return cls.instance
         
     async def run(self):
-        self.danmuji = bilibiliCilent.DanmuPrinter()
+        self.danmuji = Danmu.DanmuPrinter()
         while True:
             printer.info(['正在启动直播监控弹幕姬'], True)
             time_start = int(utils.CurrentTime())
-            connect_results = await self.danmuji.connectServer()
+            connect_results = await self.danmuji.start()
             if not connect_results:
                 continue
-            task_main = asyncio.ensure_future(self.danmuji.ReceiveMessageLoop())
-            task_heartbeat = asyncio.ensure_future(self.danmuji.HeartbeatLoop())
-            finished, pending = await asyncio.wait([task_main, task_heartbeat], return_when=asyncio.FIRST_COMPLETED)
+            task_main = asyncio.ensure_future(self.danmuji.handle_msg())
+            task_heartbeat = asyncio.ensure_future(self.danmuji.heart_beat())
+            tasks = [task_main, task_heartbeat]
+            finished, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             printer.info(['主弹幕姬异常或主动断开，正在处理剩余信息'], True)
             time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
-            task_terminate = asyncio.ensure_future(self.danmuji.close_connection())
+            task_terminate = asyncio.ensure_future(self.danmuji.terminate())
             await asyncio.wait(pending)
             await asyncio.wait([task_terminate])
             printer.info(['主弹幕姬退出，剩余任务处理完毕'], True)
@@ -69,7 +70,7 @@ class connect():
         print('已经切换roomid')
         if connect.instance.danmuji is not None:
             connect.instance.danmuji.roomid = roomid
-            await connect.instance.danmuji.close_connection()
+            await connect.instance.danmuji.terminate()
         
         
 class RaffleConnect():
@@ -79,25 +80,26 @@ class RaffleConnect():
         self.areaid = areaid
         
     async def run(self):
-        self.danmuji = bilibiliCilent.DanmuRaffleHandler(self.roomid, self.areaid)
+        self.danmuji = Danmu.DanmuRaffleHandler(self.roomid, self.areaid)
         while True:
             self.danmuji.roomid = await get_one(self.areaid)
             printer.info(['正在启动抽奖监控弹幕姬'], True)
             time_start = int(utils.CurrentTime())
-            connect_results = await self.danmuji.connectServer()
+            connect_results = await self.danmuji.start()
             if not connect_results:
                 continue
-            task_main = asyncio.ensure_future(self.danmuji.ReceiveMessageLoop())
-            task_heartbeat = asyncio.ensure_future(self.danmuji.HeartbeatLoop())
-            task_checkarea = asyncio.ensure_future(self.danmuji.CheckArea())
-            finished, pending = await asyncio.wait([task_main, task_heartbeat, task_checkarea], return_when=asyncio.FIRST_COMPLETED)
+            task_main = asyncio.ensure_future(self.danmuji.handle_msg())
+            task_heartbeat = asyncio.ensure_future(self.danmuji.heart_beat())
+            task_checkarea = asyncio.ensure_future(self.danmuji.check_area())
+            tasks = [task_main, task_heartbeat, task_checkarea]
+            finished, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             printer.info([f'{self.areaid}号弹幕姬异常或主动断开，正在处理剩余信息'], True)
             time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
             if not task_checkarea.done():
                 task_checkarea.cancel()
-            task_terminate = asyncio.ensure_future(self.danmuji.close_connection())
+            task_terminate = asyncio.ensure_future(self.danmuji.terminate())
             await asyncio.wait(pending)
             await asyncio.wait([task_terminate])
             printer.info([f'{self.areaid}号弹幕姬退出，剩余任务处理完毕'], True)
@@ -116,21 +118,22 @@ class YjConnection():
         self.roomid = ConfigLoader().dic_user['other_control']['raffle_minitor_roomid']
         if not self.roomid:
             return
-        self.danmuji = bilibiliCilent.YjMonitorHandler(self.roomid, self.areaid)
+        self.danmuji = Danmu.YjMonitorHandler(self.roomid, self.areaid)
         while True:
             printer.info(['正在启动Yj监控弹幕姬'], True)
             time_start = int(utils.CurrentTime())
-            connect_results = await self.danmuji.connectServer()
+            connect_results = await self.danmuji.start()
             if not connect_results:
                 continue
-            task_main = asyncio.ensure_future(self.danmuji.ReceiveMessageLoop())
-            task_heartbeat = asyncio.ensure_future(self.danmuji.HeartbeatLoop())
-            finished, pending = await asyncio.wait([task_main, task_heartbeat], return_when=asyncio.FIRST_COMPLETED)
+            task_main = asyncio.ensure_future(self.danmuji.handle_msg())
+            task_heartbeat = asyncio.ensure_future(self.danmuji.heart_beat())
+            tasks = [task_main, task_heartbeat]
+            finished, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             printer.info(['Yj弹幕姬异常或主动断开，正在处理剩余信息'], True)
             time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
-            task_terminate = asyncio.ensure_future(self.danmuji.close_connection())
+            task_terminate = asyncio.ensure_future(self.danmuji.terminate())
             await asyncio.wait(pending)
             await asyncio.wait([task_terminate])
             printer.info(['Yj弹幕姬退出，剩余任务处理完毕'], True)
