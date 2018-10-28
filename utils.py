@@ -336,6 +336,8 @@ async def send_gift_web(roomid, num_wanted, bagid, giftid=None):
     if giftid is None:
         giftid, num_owned = await fetch_bag_list(False, bagid)
         num_wanted = min(num_owned, num_wanted)
+    if not num_wanted:
+        return
     json_response = await bilibili.request_check_room(roomid)
     ruid = json_response['data']['uid']
     biz_id = json_response['data']['room_id']
