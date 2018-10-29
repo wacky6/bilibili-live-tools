@@ -134,6 +134,7 @@ class bilibili():
                     return None
                 elif code == 3:
                     print('api错误，稍后重试，请反馈给作者')
+                    print(json_rsp)
                     await asyncio.sleep(1)
                     return None
             return json_rsp
