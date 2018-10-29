@@ -3,6 +3,7 @@ import toml
 
 
 rsp = requests.get('https://api.live.bilibili.com/rc/v1/Title/webTitles')
+rsp.encoding = 'utf-8'
 json_rsp = rsp.json()
 data = json_rsp['data']
 dict_title = {i['identification']: i['name'] for i in data}
