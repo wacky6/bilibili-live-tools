@@ -302,7 +302,8 @@ async def judge():
                 wait_time += sleep_time
         
         if vote is None:
-            vote = 2
+            num_voted -= 1
+            vote = 3
         print('该案件的投票决策', id, vote)
         json_rsp = await bilibili().req_vote_case(id, vote)
         if not json_rsp['code']:
