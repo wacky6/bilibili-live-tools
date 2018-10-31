@@ -12,7 +12,6 @@ import json
 async def Daily_bag():
     json_response = await bilibili.get_dailybag()
     # no done code
-    printer.warn(json_response)
     for i in json_response['data']['bag_list']:
         printer.info([f'# 获得包裹 {i["bag_name"]}'])
     BiliTimer.call_after(Daily_bag, 21600)
@@ -22,7 +21,6 @@ async def Daily_bag():
 async def DoSign():
     # -500 done
     temp = await bilibili.get_dosign()
-    printer.warn(temp)
     printer.info([f'# 签到状态: {temp["msg"]}'])
     if temp['code'] == -500 and '已' in temp['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
@@ -34,7 +32,6 @@ async def DoSign():
 async def Daily_Task():
     # -400 done/not yet
     json_response2 = await bilibili.get_dailytask()
-    printer.warn(json_response2)
     printer.info([f'# 双端观看直播:  {json_response2["msg"]}'])
     if json_response2['code'] == -400 and '已' in json_response2['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
@@ -54,7 +51,6 @@ async def Sign1Group(i1, i2):
 # 应援团签到
 async def link_sign():
     json_rsp = await bilibili.get_grouplist()
-    printer.warn(json_rsp)
     list_check = json_rsp['data']['list']
     for i in list_check:
         asyncio.ensure_future(Sign1Group(i['group_id'], i['owner_uid']))
@@ -64,7 +60,6 @@ async def send_expiring_gift():
     task_control = ConfigLoader().dic_user['task_control']
     if task_control['clean-expiring-gift']:
         argvs = await utils.fetch_bag_list(show=False)
-        printer.warn(argvs)
         roomID = task_control['clean-expiring-gift2room']
         time_set = task_control['set-expiring-time']
         list_gift = []
@@ -75,8 +70,6 @@ async def send_expiring_gift():
                 list_gift.append(i[:3])
         if list_gift:
             print('发现即将过期的礼物', list_gift)
-            if(len(list_gift) > 5):
-                printer.warn(f'过期礼物{list_gift}')
             if task_control['clean_expiring_gift2all_medal']:
                 print('正在投递其他勋章')
                 list_medal = await utils.fetch_medal(show=False)
