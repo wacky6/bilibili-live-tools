@@ -1,23 +1,17 @@
-try:
-    import console
-except ImportError:
-    pass
-from configloader import ConfigLoader
+import sys
 import time
 import codecs
-import sys
+from configloader import ConfigLoader
+if sys.platform == 'ios':
+    import console
 
         
-class Printer():
+class BasePrinter():
     def init_config(self):
         configs = ConfigLoader()
         self.dic_color = configs.dic_color
         self.dic_user = configs.dic_user
         self.dic_title = configs.dic_title
-        if (sys.platform == 'ios'):
-            self.danmu_print = self.concole_print
-        else:
-            self.danmu_print = self.normal_print
         self.danmu_control = self.dic_user['print_control']['danmu']
         
     def control_printer(self, danmu_control=None, debug_control=None):
@@ -28,46 +22,36 @@ class Printer():
             ConfigLoader().dic_user['print_control']['debug'] = debug_control
             self.debug_control = debug_control
             
-    def timestamp(self, tag_time):
-        if tag_time:
-            str_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            print(f'[{str_time}]', end=' ')
-            return str_time
-        return None
+    def timestamp(self):
+        str_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        return str_time
         
     def info(self, list_msg, tag_time=False):
-        self.timestamp(tag_time)
+        if tag_time:
+            print(f'[{self.timestamp()}]', end=' ')
         for msg in list_msg:
             print(msg)
             
     def warn(self, msg):
-        return
+        print(msg, file=sys.stderr)
         with codecs.open(r'bili.log', 'a', encoding='utf-8') as f:
-            f.write(f'{self.timestamp(True)} {msg}\n')
-        # print(msg)
+            f.write(f'{self.timestamp()} {msg}\n')
         
     def debug(self, msg):
         if ConfigLoader().dic_user['print_control']['debug']:
-            self.info([msg], True)
+            self.warn(msg)
             
     def error(self, msg):
-        print('出现致命错误，请联系作者！！！！', msg, file=sys.stderr)
+        self.warn(msg)
         sys.exit(-1)
+    
+    
+class PythonistaPrinter(BasePrinter):
             
     # "#969696"
     def hex_to_rgb_percent(self, hex_str):
         return tuple(int(n, 16)/255 for n in (hex_str[1:3], hex_str[3:5], hex_str[5:7]))
         
-    def concole_print(self, msg, color):
-        for i, j in zip(msg, color):
-            console.set_color(*j)
-            print(i, end='')
-        print()
-        console.set_color()
-            
-    def normal_print(self, msg, color):
-        print(''.join(msg))
-             
     # 弹幕 礼物 。。。。type
     def print_danmu(self, dic_msg, type='normal'):
         if not self.danmu_control:
@@ -114,9 +98,55 @@ class Printer():
             
         list_msg.append(info[1])
         list_color.append([])
-        self.danmu_print(list_msg, list_color)
+        for i, j in zip(list_msg, list_color):
+            console.set_color(*j)
+            print(i, end='')
+        print()
+        console.set_color()
+
+                
+class NormalPrinter(BasePrinter):
+        
+    def print_danmu(self, dic_msg, type='normal'):
+        if not self.danmu_control:
+            return
+        info = dic_msg['info']
+
+        list_msg = []
+        if info[7] == 3:
+            # print('舰', end=' ')
+            list_msg.append('⚓️ ')
+        else:
+            if info[2][3] == 1:
+                if info[2][4] == 0:
+                    list_msg.append('爷 ')
+                else:
+                    list_msg.append('爷 ')
+            if info[2][2] == 1:
+                list_msg.append('房管 ')
+                
+            # 勋章
+            if info[3]:
+                list_msg.append(f'{info[3][1]}|{info[3][0]} ')
+            # 等级
+            if not info[5]:
+                list_msg.append(f'UL{info[4][0]} ')
+        try:
+            if info[2][7]:
+                list_msg.append(info[2][1] + ':')
+            else:
+                list_msg.append(info[2][1] + ':')
+        except:
+            print("# 小电视降临本直播间")
+            list_msg.append(info[2][1] + ':')
+            
+        list_msg.append(info[1])
+        print(''.join(list_msg))
  
-printer = Printer()
+if (sys.platform == 'ios'):
+    printer = PythonistaPrinter()
+else:
+    printer = NormalPrinter()
 
 
 def init_config():
