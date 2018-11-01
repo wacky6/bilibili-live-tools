@@ -148,18 +148,16 @@ class DanmuRaffleHandler(BaseDanmu):
     
         elif cmd == 'NOTICE_MSG':
             # 1 《第五人格》哔哩哔哩直播预选赛六强诞生！
-            # 2 娱乐区广播: <%硬币需要阿璃守护%> 送给<% 陸赛赛%> 1个摩天大楼，点击前往TA的房间去抽奖吧
             # 3 <%暗月柴静%> 在 <%優しい七酱%> 的房间开通了总督并触发了抽奖，点击前往TA的房间去抽奖吧
             # 4 欢迎 <%总督 不再瞎逛的菜菜大佬%> 登船
             # 5 恭喜 <%ChineseHerbalTea%> 获得大奖 <%23333x银瓜子%>, 感谢 <%樱桃小姐姐给幻幻子穿上漂亮的裙裙%> 的赠送
             # 6 <%雪昼%> 在直播间 <%529%> 使用了 <%20%> 倍节奏风暴，大家快去跟风领取奖励吧！ (只报20的)
+            # 8 全区广播：<%沉鱼落雁的吃藕妹%>送给<%聆桑哟%>1个嗨翻全城，快来抽奖吧
             msg_type = dic['msg_type']
-            if msg_type not in (2, 3, 6):
-                return True
             msg_common = dic['msg_common']
             real_roomid = dic['real_roomid']
             msg_common = dic['msg_common'].replace(' ', '')
-            if msg_type == 2:
+            if msg_type == 8:
                 str_gift = msg_common.split('%>')[-1].split('，')[0]
                 if '个' in str_gift:
                     raffle_num, raffle_name = str_gift.split('个')
