@@ -56,9 +56,8 @@ class connect():
             time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
-            task_terminate = asyncio.ensure_future(self.danmuji.terminate())
+            await self.danmuji.terminate()
             await asyncio.wait(pending)
-            await asyncio.wait([task_terminate])
             printer.info(['主弹幕姬退出，剩余任务处理完毕'], True)
             if time_end - time_start < 5:
                 printer.info(['当前网络不稳定，为避免频繁不必要尝试，将自动在5秒后重试'], True)
@@ -99,9 +98,8 @@ class RaffleConnect():
                 task_heartbeat.cancel()
             if not task_checkarea.done():
                 task_checkarea.cancel()
-            task_terminate = asyncio.ensure_future(self.danmuji.terminate())
+            await self.danmuji.terminate()
             await asyncio.wait(pending)
-            await asyncio.wait([task_terminate])
             printer.info([f'{self.areaid}号弹幕姬退出，剩余任务处理完毕'], True)
             if time_end - time_start < 5:
                 printer.info(['当前网络不稳定，为避免频繁不必要尝试，将自动在5秒后重试'], True)
@@ -133,9 +131,8 @@ class YjConnection():
             time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
-            task_terminate = asyncio.ensure_future(self.danmuji.terminate())
+            await self.danmuji.terminate()
             await asyncio.wait(pending)
-            await asyncio.wait([task_terminate])
             printer.info(['Yj弹幕姬退出，剩余任务处理完毕'], True)
             if time_end - time_start < 5:
                 printer.info(['当前网络不稳定，为避免频繁不必要尝试，将自动在5秒后重试'], True)
