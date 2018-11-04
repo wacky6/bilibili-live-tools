@@ -152,7 +152,7 @@ class OnlineNet():
         # print(rsp)
         if not is_online:
             future = asyncio.Future()
-            self.delay_requests.append(future)
+            self.list_delay.append(future)
             await future
         # 未登陆且未处理
         if rsp == 3 and is_online:
