@@ -23,6 +23,9 @@ async def get_one(areaid):
     while True:
         json_rsp = await bilibili.req_realroomid(areaid)
         data = json_rsp['data']
+        if not data:
+            await asyncio.sleep(3)
+            continue
         roomid = random.choice(data)['roomid']
         state = await check_room_state(roomid)
         if state == 1:
@@ -42,9 +45,13 @@ class connect():
         
     async def run(self):
         self.danmuji = danmu.DanmuPrinter()
+        time_now = 0
         while True:
+            if int(utils.CurrentTime()) - time_now <= 3:
+                printer.info(['当前网络不稳定，弹幕监控将自动延迟3秒后重启'], True)
+                await asyncio.sleep(3)
             printer.info(['正在启动直播监控弹幕姬'], True)
-            time_start = int(utils.CurrentTime())
+            time_now = int(utils.CurrentTime())
             connect_results = await self.danmuji.start()
             if not connect_results:
                 continue
@@ -53,15 +60,11 @@ class connect():
             tasks = [task_main, task_heartbeat]
             finished, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             printer.info(['主弹幕姬异常或主动断开，正在处理剩余信息'], True)
-            time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
             await self.danmuji.terminate()
             await asyncio.wait(pending)
             printer.info(['主弹幕姬退出，剩余任务处理完毕'], True)
-            if time_end - time_start < 5:
-                printer.info(['当前网络不稳定，为避免频繁不必要尝试，将自动在5秒后重试'], True)
-                await asyncio.sleep(5)
     
     @staticmethod
     async def reconnect(roomid):
@@ -80,10 +83,14 @@ class RaffleConnect():
         
     async def run(self):
         self.danmuji = danmu.DanmuRaffleHandler(self.roomid, self.areaid)
+        time_now = 0
         while True:
+            if int(utils.CurrentTime()) - time_now <= 3:
+                printer.info(['当前网络不稳定，弹幕监控将自动延迟3秒后重启'], True)
+                await asyncio.sleep(3)
             self.danmuji.roomid = await get_one(self.areaid)
             printer.info(['正在启动抽奖监控弹幕姬'], True)
-            time_start = int(utils.CurrentTime())
+            time_now = int(utils.CurrentTime())
             connect_results = await self.danmuji.start()
             if not connect_results:
                 continue
@@ -93,7 +100,6 @@ class RaffleConnect():
             tasks = [task_main, task_heartbeat, task_checkarea]
             finished, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             printer.info([f'{self.areaid}号弹幕姬异常或主动断开，正在处理剩余信息'], True)
-            time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
             if not task_checkarea.done():
@@ -101,9 +107,6 @@ class RaffleConnect():
             await self.danmuji.terminate()
             await asyncio.wait(pending)
             printer.info([f'{self.areaid}号弹幕姬退出，剩余任务处理完毕'], True)
-            if time_end - time_start < 5:
-                printer.info(['当前网络不稳定，为避免频繁不必要尝试，将自动在5秒后重试'], True)
-                await asyncio.sleep(5)
                 
                 
 class YjConnection():
@@ -117,9 +120,13 @@ class YjConnection():
         if not self.roomid:
             return
         self.danmuji = danmu.YjMonitorHandler(self.roomid, self.areaid)
+        time_now = 0
         while True:
+            if int(utils.CurrentTime()) - time_now <= 3:
+                printer.info(['当前网络不稳定，弹幕监控将自动延迟3秒后重启'], True)
+                await asyncio.sleep(3)
             printer.info(['正在启动Yj监控弹幕姬'], True)
-            time_start = int(utils.CurrentTime())
+            time_now = int(utils.CurrentTime())
             connect_results = await self.danmuji.start()
             if not connect_results:
                 continue
@@ -128,15 +135,11 @@ class YjConnection():
             tasks = [task_main, task_heartbeat]
             finished, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             printer.info(['Yj弹幕姬异常或主动断开，正在处理剩余信息'], True)
-            time_end = int(utils.CurrentTime())
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
             await self.danmuji.terminate()
             await asyncio.wait(pending)
             printer.info(['Yj弹幕姬退出，剩余任务处理完毕'], True)
-            if time_end - time_start < 5:
-                printer.info(['当前网络不稳定，为避免频繁不必要尝试，将自动在5秒后重试'], True)
-                await asyncio.sleep(5)
             
             
 
