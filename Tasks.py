@@ -297,7 +297,8 @@ async def judge():
         if vote is None:
             num_voted -= 1
             vote = 3
-        print('该案件的投票决策', id, vote)
+        vote_info = '作废票' if vote == 3 else '有效票'
+        print('该案件的投票决策', id, vote, vote_info)
         json_rsp = await bilibili().req_vote_case(id, vote)
         if not json_rsp['code']:
             print('该案件的投票结果', id, '投票成功')
