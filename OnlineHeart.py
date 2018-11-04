@@ -1,4 +1,4 @@
-from bilibili import bilibili
+from online_net import OnlineNet
 import time
 import asyncio
 import printer
@@ -12,9 +12,9 @@ def CurrentTime():
 
 async def heartbeat():
     printer.info(["心跳"], True)
-    json_response = await bilibili.apppost_heartbeat()
-    json_response = await bilibili.pcpost_heartbeat()
-    json_response = await bilibili.heart_gift()
+    json_response = await OnlineNet().req('apppost_heartbeat')
+    json_response = await OnlineNet().req('pcpost_heartbeat')
+    json_response = await OnlineNet().req('heart_gift')
     # print('pcpost_heartbeat', json_response)
 
 
@@ -26,10 +26,10 @@ async def draw_lottery():
     while max > min:
         # print(min, max)
         middle = int((min + max + 1) / 2)
-        code_middle = (await bilibili.get_lotterylist(middle))['code']
+        code_middle = (await OnlineNet().req('get_lotterylist', middle))["code"]
         if code_middle:
-            code_middle1 = (await bilibili.get_lotterylist(middle + 1))['code']
-            code_middle2 = (await bilibili.get_lotterylist(middle + 2))['code']
+            code_middle1 = (await OnlineNet().req('get_lotterylist', middle + 1))['code']
+            code_middle2 = (await OnlineNet().req('get_lotterylist', middle + 2))['code']
             if code_middle1 and code_middle2:
                 max = middle - 1
             else:
@@ -38,7 +38,7 @@ async def draw_lottery():
             min = middle
     print('最新实物抽奖id为', min, max)
     for i in range(max - 30, max + 1):
-        json_response = await bilibili.get_lotterylist(i)
+        json_response = await OnlineNet().req('get_lotterylist', i)
         print('id对应code数值为', json_response['code'], i)
         # -400 不存在
         if not json_response['code']:
@@ -53,13 +53,13 @@ async def draw_lottery():
                     join_start_time = value['join_start_time']
                     ts = CurrentTime()
                     if int(join_end_time) > int(ts) > int(join_start_time):
-                        json_response1 = await bilibili.get_gift_of_lottery(i, g)
+                        json_response1 = await OnlineNet().req('get_gift_of_lottery', i, g)
                         printer.info([f'参与实物抽奖回显：{json_response1}'], True)
         
         
 async def run():
     while 1:
-        login.HandleExpire()
+        # login.HandleExpire()
         await heartbeat()
         # await draw_lottery()
         await asyncio.sleep(300)

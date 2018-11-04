@@ -2,13 +2,13 @@ import asyncio
 import utils
 import danmu
 import printer
-from bilibili import bilibili
+from online_net import OnlineNet
 from configloader import ConfigLoader
 import random
 
      
 async def check_room_state(roomid):
-    json_rsp = await bilibili.req_room_init(roomid)
+    json_rsp = await OnlineNet().req('req_room_init', roomid)
     return json_rsp['data']['live_status']
 
 async def get_one(areaid):
@@ -21,7 +21,7 @@ async def get_one(areaid):
             return roomid
             
     while True:
-        json_rsp = await bilibili.req_realroomid(areaid)
+        json_rsp = await OnlineNet().req('req_realroomid', areaid)
         data = json_rsp['data']
         if not data:
             await asyncio.sleep(3)

@@ -4,6 +4,7 @@ import rsa
 import base64
 from urllib import parse
 import printer
+import asyncio
 
     
 def calc_name_passw(key, Hash, username, password):
@@ -122,8 +123,50 @@ def HandleExpire():
     return True
     
             
+class OnlineNet():
+    instance = None
 
+    def __new__(cls, *args, **kw):
+        if not cls.instance:
+            cls.instance = super(OnlineNet, cls).__new__(cls, *args, **kw)
+            cls.instance.bili = bilibili()
+            cls.instance.var_is_online = True
+            cls.instance.list_delay = []
+        return cls.instance
+     
+    @property   
+    def is_online(self):
+        return self.var_is_online
         
-        
-
-    
+    @is_online.setter
+    def is_online(self, setting):
+        self.var_is_online = setting
+        if setting:
+            for future in self.list_delay:
+                future.set_result(True)
+            del self.list_delay[:]
+            
+    async def req(self, str_func, *args):
+        rsp = await getattr(self.bili, str_func)(*args)
+        is_online = self.is_online
+        # print(rsp)
+        if not is_online:
+            future = asyncio.Future()
+            self.delay_requests.append(future)
+            await future
+        # 未登陆且未处理
+        if rsp == 3 and is_online:
+            printer.info([f'判定出现了登陆失败，且未处理'], True)
+            self.is_online = False
+            # login
+            HandleExpire()
+            # await asyncio.sleep(10)
+            print(self.list_delay)
+            printer.info([f'已经登陆了'], True)
+            self.is_online = True
+            rsp = await getattr(self.bili, str_func)(*args)
+        # 未登陆，但已处理
+        elif not is_online:
+            printer.info([f'判定出现了登陆失败，已经处理'], True)
+            rsp = await getattr(self.bili, str_func)(*args)
+        return rsp

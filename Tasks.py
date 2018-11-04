@@ -1,4 +1,4 @@
-from bilibili import bilibili
+from online_net import OnlineNet
 import asyncio
 from configloader import ConfigLoader
 import utils
@@ -10,7 +10,7 @@ import json
 
 # 获取每日包裹奖励
 async def Daily_bag():
-    json_response = await bilibili.get_dailybag()
+    json_response = await OnlineNet().req('get_dailybag')
     # no done code
     for i in json_response['data']['bag_list']:
         printer.info([f'# 获得包裹 {i["bag_name"]}'])
@@ -20,7 +20,7 @@ async def Daily_bag():
 # 签到功能
 async def DoSign():
     # -500 done
-    temp = await bilibili.get_dosign()
+    temp = await OnlineNet().req('get_dosign')
     printer.info([f'# 签到状态: {temp["msg"]}'])
     if temp['code'] == -500 and '已' in temp['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
@@ -31,7 +31,7 @@ async def DoSign():
 # 领取每日任务奖励
 async def Daily_Task():
     # -400 done/not yet
-    json_response2 = await bilibili.get_dailytask()
+    json_response2 = await OnlineNet().req('get_dailytask')
     printer.info([f'# 双端观看直播:  {json_response2["msg"]}'])
     if json_response2['code'] == -400 and '已' in json_response2['msg']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
@@ -40,7 +40,7 @@ async def Daily_Task():
     BiliTimer.call_after(Daily_Task, sleeptime)
 
 async def Sign1Group(i1, i2):
-    json_response = await bilibili.assign_group(i1, i2)
+    json_response = await OnlineNet().req('assign_group', i1, i2)
     if not json_response['code']:
         data = json_response['data']
         if data['status']:
@@ -50,7 +50,7 @@ async def Sign1Group(i1, i2):
 
 # 应援团签到
 async def link_sign():
-    json_rsp = await bilibili.get_grouplist()
+    json_rsp = await OnlineNet().req('get_grouplist')
     list_check = json_rsp['data']['list']
     for i in list_check:
         asyncio.ensure_future(Sign1Group(i['group_id'], i['owner_uid']))
@@ -111,7 +111,7 @@ async def send_gift():
     BiliTimer.call_after(send_gift, 21600)
 
 async def full_intimate(list_gift, list_medal):
-    json_res = await bilibili.gift_list()
+    json_res = await OnlineNet().req('gift_list')
     dic_gift = {j['id']: int(j['price'] / 100) for j in json_res['data']}
     for roomid, score_wanted, medal_name in list_medal:
         sum_score = 0
@@ -135,17 +135,17 @@ async def full_intimate(list_gift, list_medal):
 
 async def doublegain_coin2silver():
     if ConfigLoader().dic_user['task_control']['doublegain_coin2silver']:
-        json_response0 = await bilibili.request_doublegain_coin2silver()
-        json_response1 = await bilibili.request_doublegain_coin2silver()
+        json_response0 = await OnlineNet().req('request_doublegain_coin2silver')
+        json_response1 = await OnlineNet().req('request_doublegain_coin2silver')
         print(json_response0['msg'], json_response1['msg'])
     BiliTimer.call_after(doublegain_coin2silver, 21600)
 
 async def sliver2coin():
     if ConfigLoader().dic_user['task_control']['silver2coin']:
         # 403 done
-        # json_response1 = await bilibili.silver2coin_app()
+        # json_response1 = await OnlineNet().req('silver2coin_app')
         
-        json_response = await bilibili.silver2coin_web()
+        json_response = await OnlineNet().req('silver2coin_web')
         printer.info([f'#  {json_response["msg"]}'])
         
         if json_response['code'] == 403 and '最多' in json_response['msg']:
@@ -167,7 +167,7 @@ async def GetVideoExp(list_topvideo):
     print('开始获取视频观看经验')
     aid = random.choice(list_topvideo)
     cid = await utils.GetVideoCid(aid)
-    await bilibili().Heartbeat(aid, cid)
+    await OnlineNet().req('Heartbeat', aid, cid)
 
 async def GiveCoinTask(coin_remain, list_topvideo):
     i = 0
@@ -186,7 +186,7 @@ async def GiveCoinTask(coin_remain, list_topvideo):
 async def GetVideoShareExp(list_topvideo):
     print('开始获取视频分享经验')
     aid = random.choice(list_topvideo)
-    await bilibili().DailyVideoShare(aid)
+    await OnlineNet().req('DailyVideoShare', aid)
 
 async def BiliMainTask():
     task_control = ConfigLoader().dic_user['task_control']
@@ -212,7 +212,7 @@ async def check(id):
     # 2 否 voterule
     # 4 删除 votedelete
     # 1 封杀 votebreak
-    text_rsp = await bilibili().req_check_voted(id)
+    text_rsp = await OnlineNet().req('req_check_voted', id)
     pattern = re.compile(r'\((.+)\)')
     match = pattern.findall(text_rsp)
     temp = json.loads(match[0])
@@ -257,7 +257,7 @@ async def judge():
     num_case = 0
     num_voted = 0
     while True:
-        temp = await bilibili().req_fetch_case()
+        temp = await OnlineNet().req('req_fetch_case')
         if not temp['code']:
             id = temp['data']['id']
             num_case += 1
@@ -299,7 +299,7 @@ async def judge():
             vote = 3
         vote_info = '作废票' if vote == 3 else '有效票'
         print('该案件的投票决策', id, vote, vote_info)
-        json_rsp = await bilibili().req_vote_case(id, vote)
+        json_rsp = await OnlineNet().req('req_vote_case', id, vote)
         if not json_rsp['code']:
             print('该案件的投票结果', id, '投票成功')
             num_voted += 1

@@ -1,4 +1,4 @@
-from bilibili import bilibili
+from online_net import OnlineNet
 import utils
 import printer
 import asyncio
@@ -6,18 +6,18 @@ import asyncio
 
 # 领取银瓜子
 async def GetAward():
-    temp = await bilibili.get_time_about_silver()
+    temp = await OnlineNet().req('get_time_about_silver')
     # print (temp['code'])    #宝箱领完返回的code为-10017
     if temp['code'] == -10017:
         printer.info(["# 今日宝箱领取完毕"])
     else:
         time_start = temp['data']['time_start']
         time_end = temp['data']['time_end']
-        json_response = await bilibili.get_silver(time_start, time_end)
+        json_response = await OnlineNet().req('get_silver', time_start, time_end)
         return json_response
         
 async def GetAward_black():
-    temp = await bilibili.get_time_about_silver()
+    temp = await OnlineNet().req('get_time_about_silver')
     # print (temp['code'])    #宝箱领完返回的code为-10017
     if temp['code'] == -10017:
         printer.info(["# 今日宝箱领取完毕"])
@@ -25,7 +25,7 @@ async def GetAward_black():
         time_start = temp['data']['time_start']
         time_end = temp['data']['time_end']
         for i in range(50):
-            json_response = await bilibili.get_silver(time_start, time_end)
+            json_response = await OnlineNet().req('get_silver', time_start, time_end)
             
             if json_response['code'] != 400:
                 print('宝箱小黑屋的结果返回', json_response)

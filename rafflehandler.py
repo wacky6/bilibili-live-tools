@@ -1,4 +1,4 @@
-from bilibili import bilibili
+from online_net import OnlineNet
 from statistics import Statistics
 import printer
 import utils
@@ -82,7 +82,7 @@ class Rafflehandler:
 
 async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
     while True:
-        json_response2 = await bilibili.get_gift_of_TV_app(real_roomid, raffleid, raffle_type)
+        json_response2 = await OnlineNet().req('get_gift_of_TV_app', real_roomid, raffleid, raffle_type)
         code = json_response2['code']
         if not code:
             break
@@ -116,7 +116,7 @@ async def handle_1_TV_raffle(num, real_roomid, raffleid, raffle_type):
     
 async def handle_1_guard_raffle(num, roomid, raffleid):
     await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
-    json_response2 = await bilibili.get_gift_of_guard(roomid, raffleid)
+    json_response2 = await OnlineNet().req('get_gift_of_guard', roomid, raffleid)
     # print(json_response2)
     if not json_response2['code']:
         print("# 获取到房间 %s 的提督/舰长奖励: " % (roomid), json_response2['data']['message'])
@@ -127,15 +127,15 @@ async def handle_1_guard_raffle(num, roomid, raffleid):
     return True
     
 async def handle_1_storm_raffle(id):
-    json_response1 = await bilibili.get_gift_of_storm(id)
+    json_response1 = await OnlineNet().req('get_gift_of_storm', id)
     print(json_response1)
  
                                        
 async def handle_1_activity_raffle(num, text1, raffleid):
     # print('参与')
     # await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
-    json_response1 = await bilibili.get_gift_of_events_app(text1, raffleid)
-    # json_pc_response = await bilibili.get_gift_of_events_web(text1, text2, raffleid)
+    json_response1 = await OnlineNet().req('get_gift_of_events_app', text1, raffleid)
+    # json_pc_response = await OnlineNet().req('get_gift_of_events_web', text1, text2, raffleid)
     # print(json_response1)
     printer.info([f'参与了房间{text1:^9}的活动抽奖'], True)
 
@@ -167,7 +167,7 @@ async def handle_1_activity_raffle(num, text1, raffleid):
 async def handle_1_room_TV(real_roomid):
     result = await utils.enter_room(real_roomid)
     if result:
-        json_response = await bilibili.get_giftlist_of_TV(real_roomid)
+        json_response = await OnlineNet().req('get_giftlist_of_TV', real_roomid)
         current_time = CurrentTime()
         # print(json_response['data']['list'])
         checklen = json_response['data']['list']
@@ -190,7 +190,7 @@ async def handle_1_room_TV(real_roomid):
 async def handle_1_room_storm(roomid):
     result = await utils.enter_room(roomid)
     if result:
-        temp = await bilibili.get_giftlist_of_storm(roomid)
+        temp = await OnlineNet().req('get_giftlist_of_storm', roomid)
         check = len(temp['data'])
         list_available_raffleid = []
         if check != 0 and temp['data']['hasJoin'] != 1:
@@ -202,7 +202,7 @@ async def handle_1_room_storm(roomid):
 async def handle_1_room_activity(text1):
     result = await utils.enter_room(text1)
     if result:
-        json_response = await bilibili.get_giftlist_of_events(text1)
+        json_response = await OnlineNet().req('get_giftlist_of_events', text1)
         # print(json_response)
         checklen = json_response['data']['lotteryInfo']
         list_available_raffleid = []
@@ -232,7 +232,7 @@ async def handle_1_room_guard(roomid, raffleid=None):
             json_response1 = {'data': [{'id': raffleid}]}
         else:
             for i in range(10):
-                json_response1 = await bilibili.get_giftlist_of_guard(roomid)
+                json_response1 = await OnlineNet().req('get_giftlist_of_guard', roomid)
                 # print(json_response1)
                 if not json_response1['data']:
                     await asyncio.sleep(1)
@@ -265,7 +265,7 @@ async def handle_1_room_guard(roomid, raffleid=None):
 async def handle_1_TV_raffle_black(num, real_roomid, raffleid, raffle_type):
     # print('ffffffffffggggdgdfddf')
     for i in range(50):
-        json_response2 = await bilibili.get_gift_of_TV_app(real_roomid, raffleid, raffle_type)
+        json_response2 = await OnlineNet().req('get_gift_of_TV_app', real_roomid, raffleid, raffle_type)
         code = json_response2['code']
         if not code:
             break
@@ -295,7 +295,7 @@ async def handle_1_activity_raffle_black(num, text1, raffleid):
     # print('参与')
     # await asyncio.sleep(random.uniform(0.5, min(30, num * 1.3)))
     for i in range(50):
-        json_response1 = await bilibili.get_gift_of_events_app(text1, raffleid)
+        json_response1 = await OnlineNet().req('get_gift_of_events_app', text1, raffleid)
         code = json_response1['code']
         if not code:
             break
@@ -308,7 +308,7 @@ async def handle_1_activity_raffle_black(num, text1, raffleid):
         elif code != -401 and code != -403:
             # print('00', json_response2)
             pass
-    # json_pc_response = await bilibili.get_gift_of_events_web(text1, text2, raffleid)
+    # json_pc_response = await OnlineNet().req('get_gift_of_events_web', text1, text2, raffleid)
     # print(json_response1)
     printer.info([f'参与了房间{text1:^9}的活动抽奖'], True)
 

@@ -1,4 +1,4 @@
-from bilibili import bilibili
+from online_net import OnlineNet
 import printer
 import time
 import datetime
@@ -39,7 +39,7 @@ def seconds_until_tomorrow():
     return tomorrow_start_time - current_time
 
 async def WearingMedalInfo():
-    json_response = await bilibili.ReqWearingMedal()
+    json_response = await OnlineNet().req('ReqWearingMedal')
     # print(json_response)
     if not json_response['code']:
         data = json_response['data']
@@ -53,7 +53,7 @@ async def WearingMedalInfo():
         # web api返回值信息少
 
 async def TitleInfo():
-    json_response = await bilibili.ReqTitleInfo()
+    json_response = await OnlineNet().req('ReqTitleInfo')
     dic_title = ConfigLoader().dic_title
     # print(json_response)
     if not json_response['code']:
@@ -73,7 +73,7 @@ async def fetch_medal(show=True, list_wanted_medal=None):
         printlist.append(
             '{} {} {:^12} {:^10} {} {:^6} {}'.format(adjust_for_chinese('勋章'), adjust_for_chinese('主播昵称'), '亲密度', '今日的亲密度', adjust_for_chinese('排名'), '勋章状态', '房间号码'))
     dic_worn = {'1': '正在佩戴', '0': '待机状态'}
-    json_response = await bilibili.request_fetchmedal()
+    json_response = await OnlineNet().req('request_fetchmedal')
     # print(json_response)
     if not json_response['code']:
         for i in json_response['data']['fansMedalList']:
@@ -95,7 +95,7 @@ async def fetch_medal(show=True, list_wanted_medal=None):
         return list_return_medal
 
 async def send_danmu_msg_web(msg, roomId):
-    json_response = await bilibili.request_send_danmu_msg_web(msg, roomId)
+    json_response = await OnlineNet().req('request_send_danmu_msg_web', msg, roomId)
     print(json_response)
 
 async def find_live_user_roomid(wanted_name):
@@ -116,7 +116,7 @@ async def find_live_user_roomid(wanted_name):
                 
     for i in range(len(wanted_name), 0, -1):
         name_piece = wanted_name[:i]
-        json_rsp = await bilibili.request_search_biliuser(name_piece)
+        json_rsp = await OnlineNet().req('request_search_biliuser', name_piece)
         answer = check_name_piece(json_rsp, wanted_name)
         if answer is not None:
             return answer['room_id']
@@ -125,7 +125,7 @@ async def find_live_user_roomid(wanted_name):
     print('第2备份启用')
     for i in range(len(wanted_name)):
         name_piece = wanted_name[i:]
-        json_rsp = await bilibili.request_search_biliuser(name_piece)
+        json_rsp = await OnlineNet().req('request_search_biliuser', name_piece)
         answer = check_name_piece(json_rsp, wanted_name)
         if answer is not None:
             return answer['room_id']
@@ -133,7 +133,7 @@ async def find_live_user_roomid(wanted_name):
     print('第3备份启用')
     for i in range(len(wanted_name), 0, -1):
         name_piece = wanted_name[:i]
-        json_rsp = await bilibili.request_search_liveuser(name_piece)
+        json_rsp = await OnlineNet().req('request_search_liveuser', name_piece)
         answer = check_name_piece(json_rsp, wanted_name)
         if answer is not None:
             return answer['roomid']
@@ -141,14 +141,14 @@ async def find_live_user_roomid(wanted_name):
     print('第4备份启用')
     for i in range(len(wanted_name)):
         name_piece = wanted_name[i:]
-        json_rsp = await bilibili.request_search_liveuser(name_piece)
+        json_rsp = await OnlineNet().req('request_search_liveuser', name_piece)
         answer = check_name_piece(json_rsp, wanted_name)
         if answer is not None:
             return answer['roomid']
 
 
 async def fetch_capsule_info():
-    json_response = await bilibili.request_fetch_capsule()
+    json_response = await OnlineNet().req('request_fetch_capsule')
     # print(json_response)
     if not json_response['code']:
         data = json_response['data']
@@ -164,7 +164,7 @@ async def fetch_capsule_info():
             print('普通扭蛋币暂不可用')
 
 async def open_capsule(count):
-    json_response = await bilibili.request_open_capsule(count)
+    json_response = await OnlineNet().req('request_open_capsule', count)
     # print(json_response)
     if not json_response['code']:
         # print(json_response['data']['text'])
@@ -176,7 +176,7 @@ async def watch_living_video(cid):
     sound.set_honors_silent_switch(False)
     sound.set_volume(1)
     sound.play_effect('piano:D3')
-    json_response = await bilibili.request_playurl(cid)
+    json_response = await OnlineNet().req('request_playurl', cid)
     print(json_response)
     if not json_response['code']:
         data = json_response['data']
@@ -184,8 +184,8 @@ async def watch_living_video(cid):
         webbrowser.open(data)
 
 async def fetch_user_info():
-    json_response = await bilibili.request_fetch_user_info()
-    json_response_ios = await bilibili.request_fetch_user_infor_ios()
+    json_response = await OnlineNet().req('request_fetch_user_info')
+    json_response_ios = await OnlineNet().req('request_fetch_user_infor_ios')
     print('[{}] 查询用户信息'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))))
     if not json_response_ios['code']:
         gold_ios = json_response_ios['data']['gold']
@@ -210,7 +210,7 @@ async def fetch_user_info():
         bili_coins = userCoinIfo['bili_coins']
         print('# 用户名', uname)
         size = 100, 100
-        response_face = await bilibili.request_load_img(userInfo['face'])
+        response_face = await OnlineNet().req('request_load_img', userInfo['face'])
         img = Image.open(BytesIO(await response_face.read()))
         img.thumbnail(size)
         try:
@@ -235,7 +235,7 @@ async def fetch_user_info():
         print('# 等级榜', user_level_rank)
 
 async def fetch_bag_list(verbose=False, bagid=None, show=True):
-    json_response = await bilibili.request_fetch_bag_list()
+    json_response = await OnlineNet().req('request_fetch_bag_list')
     gift_list = []
     # print(json_response)
     if show:
@@ -266,7 +266,7 @@ async def fetch_bag_list(verbose=False, bagid=None, show=True):
     return gift_list
 
 async def check_taskinfo():
-    json_response = await bilibili.request_check_taskinfo()
+    json_response = await OnlineNet().req('request_check_taskinfo')
     # print(json_response)
     if not json_response['code']:
         data = json_response['data']
@@ -316,7 +316,7 @@ async def check_taskinfo():
             print('# 未完成(目前本项目未实现自动完成直播任务)')
 
 async def check_room(roomid):
-    json_response = await bilibili.request_check_room(roomid)
+    json_response = await OnlineNet().req('request_check_room', roomid)
     if not json_response['code']:
         # print(json_response)
         print('查询结果:')
@@ -338,11 +338,11 @@ async def send_gift_web(roomid, num_wanted, bagid, giftid=None):
         num_wanted = min(num_owned, num_wanted)
     if not num_wanted:
         return
-    json_response = await bilibili.request_check_room(roomid)
+    json_response = await OnlineNet().req('request_check_room', roomid)
     ruid = json_response['data']['uid']
     biz_id = json_response['data']['room_id']
     # 200027 不足数目
-    json_response1 = await bilibili.request_send_gift_web(giftid, num_wanted, bagid, ruid, biz_id)
+    json_response1 = await OnlineNet().req('request_send_gift_web', giftid, num_wanted, bagid, ruid, biz_id)
     if not json_response1['code']:
         # print(json_response1['data'])
         print(f'# 送出礼物: {json_response1["data"]["gift_name"]}X{json_response1["data"]["gift_num"]}')
@@ -350,14 +350,14 @@ async def send_gift_web(roomid, num_wanted, bagid, giftid=None):
         print("# 错误", json_response1['msg'], roomid, num_wanted, bagid, giftid)
 
 async def fetch_liveuser_info(real_roomid):
-    json_response = await bilibili.request_fetch_liveuser_info(real_roomid)
+    json_response = await OnlineNet().req('request_fetch_liveuser_info', real_roomid)
     if not json_response['code']:
         data = json_response['data']
         # print(data)
         print(f'# 主播姓名 {data["info"]["uname"]}')
 
         uid = data['level']['uid']  # str
-        json_response_fan = await bilibili.request_fetch_fan(real_roomid, uid)
+        json_response_fan = await OnlineNet().req('request_fetch_fan', real_roomid, uid)
         # print(json_response_fan)
         data_fan = json_response_fan['data']
         if not json_response_fan['code'] and data_fan['medal']['status'] == 2:
@@ -366,7 +366,7 @@ async def fetch_liveuser_info(real_roomid):
             print('# 该主播暂时没有开通勋章')  # print(json_response_fan)
 
         size = 100, 100
-        response_face = await bilibili.request_load_img(data['info']['face'])
+        response_face = await OnlineNet().req('request_load_img', data['info']['face'])
         img = Image.open(BytesIO(await response_face.read()))
         img.thumbnail(size)
         try:
@@ -375,7 +375,7 @@ async def fetch_liveuser_info(real_roomid):
             pass
 
 async def enter_room(roomid):
-    json_response = await bilibili.request_check_room(roomid)
+    json_response = await OnlineNet().req('request_check_room', roomid)
 
     if not json_response['code']:
         data = json_response['data']
@@ -387,7 +387,7 @@ async def enter_room(roomid):
             printer.warn(f'抽奖脚本检测到房间{roomid:^9}为异常房间')
             return False
         else:
-            await bilibili.post_watching_history(roomid)
+            await OnlineNet().req('post_watching_history', roomid)
             return True
 
 async def GiveCoin2Av(video_id, num):
@@ -396,7 +396,7 @@ async def GiveCoin2Av(video_id, num):
     # 10004 稿件已经被删除
     # 34005 超过，满了
     # -104 不足硬币
-    json_rsp = await bilibili().ReqGiveCoin2Av(video_id, num)
+    json_rsp = await OnlineNet().req('ReqGiveCoin2Av', video_id, num)
     code = json_rsp['code']
     if not code:
         print(f'给视频av{video_id}投{num}枚硬币成功')
@@ -408,7 +408,7 @@ async def GiveCoin2Av(video_id, num):
         return False
 
 async def GetTopVideoList():
-    text_rsp = await bilibili().req_fetch_av()
+    text_rsp = await OnlineNet().req('req_fetch_av')
     list_av = re.findall(r'(?<=www.bilibili.com/video/av)\d+(?=/)', text_rsp)
     list_av = list(set(list_av))
     return list_av
@@ -416,14 +416,14 @@ async def GetTopVideoList():
 async def fetch_uper_video(list_mid):
     list_av = []
     for mid in list_mid:
-        json_rsp = await bilibili().req_fetch_uper_video(mid, 1)
+        json_rsp = await OnlineNet().req('req_fetch_uper_video', mid, 1)
         # print(json_rsp)
         data = json_rsp['data']
         pages = data['pages']
         if data['vlist']:
             list_av += [av['aid'] for av in data['vlist']]
         for page in range(2, pages + 1):
-            json_rsp = await bilibili().req_fetch_uper_video(mid, page)
+            json_rsp = await OnlineNet().req('req_fetch_uper_video', mid, page)
             # print(json_rsp)
             data = json_rsp['data']
             list_av += [av['aid'] for av in data['vlist']]
@@ -431,12 +431,12 @@ async def fetch_uper_video(list_mid):
     return list_av
 
 async def GetVideoCid(video_aid):
-    json_rsp = await bilibili().ReqVideoCid(video_aid)
+    json_rsp = await OnlineNet().req('ReqVideoCid', video_aid)
     # print(json_rsp[0]['cid'])
     return (json_rsp[0]['cid'])
 
 async def GetRewardInfo(show=True):
-    json_rsp = await bilibili().ReqMasterInfo()
+    json_rsp = await OnlineNet().req('ReqMasterInfo')
     data = json_rsp['data']
     login = data['login']
     watch_av = data['watch_av']
@@ -461,7 +461,7 @@ async def GetRewardInfo(show=True):
     
         
 async def FetchRoomArea(roomid):
-    json_response = await bilibili.ReqRoomInfo(roomid)
+    json_response = await OnlineNet().req('ReqRoomInfo', roomid)
 
     if not json_response['code']:
         # print(json_response)

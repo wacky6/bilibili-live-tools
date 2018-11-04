@@ -136,7 +136,7 @@ class bilibili():
                     print('api错误，稍后重试，请反馈给作者')
                     print(json_rsp)
                     await asyncio.sleep(1)
-                    return None
+                    return 3
             return json_rsp
         elif rsp.status == 403:
             print('403频繁', url)

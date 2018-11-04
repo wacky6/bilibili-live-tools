@@ -10,7 +10,7 @@ from bilibili import bilibili
 from configloader import ConfigLoader
 import threading
 import os
-import login
+import online_net
 import bili_console
 from bilitimer import BiliTimer
 
@@ -23,7 +23,8 @@ ConfigLoader(fileDir)
 # print('Hello world.')
 printer.init_config()
 bilibili()
-login.login()
+online_net.login()
+online_net.OnlineNet()
 Statistics()
 
 rafflehandler = Rafflehandler()
@@ -57,7 +58,7 @@ except KeyboardInterrupt:
     if ConfigLoader().dic_user['other_control']['keep-login']:
         pass
     else:
-        response = login.logout()
+        response = online_net.logout()
     
 console_thread.join()
 
