@@ -2,7 +2,6 @@ from online_net import OnlineNet
 import time
 import asyncio
 import printer
-import login
 
 
 def CurrentTime():
