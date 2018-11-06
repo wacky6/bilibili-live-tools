@@ -11,8 +11,6 @@ import aiohttp
                                                           
 
 class BaseDanmu():
-    
-    __slots__ = ('ws', 'roomid', 'area_id', 'client')
     structer = struct.Struct('!I2H2I')
 
     def __init__(self, roomid=None, area_id=None):
@@ -187,31 +185,67 @@ class DanmuRaffleHandler(BaseDanmu):
             
         
 class YjMonitorHandler(BaseDanmu):
-    digs = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    def __init__(self, roomid=None, area_id=None):
+        self.read = {}
+        self.client = aiohttp.ClientSession()
+        self.roomid = roomid
+        self.area_id = area_id
     
-    def base2dec(self, str_num, base=62):
-        result = 0
-        for i in str_num:
-            result = result * base + self.digs.index(i)
-        return result
-    
-    def get_origin(self, words, gap):
-        return map(self.base2dec, words.replace('?', '').split(gap))
+    def varify(self, msg):
+        msg = msg.replace('?', '')
+        first = ord(msg[0])
+        last = ord(msg[-1])
+        if 48 <= first <= 57 and 48 <= last <= 57 and not (first + last - 105):
+            msg = msg[:-1]
+            return msg
+        return None
+            
+    def combine_piece(self, uid, msg):
+        # None/''
+        if not msg:
+            return None
+        if uid not in self.reads:
+            self.reads[uid] = {}
+        user_danmus = self.reads[uid]
+        pieces = msg.split('.')
+        msg_id = int(pieces[0])
+        real_msg = pieces[1]
+        if msg_id % 2:
+            id_need = msg_id - 1
+        else:
+            id_need = msg_id + 1
+        pop_realmsg = user_danmus.pop(id_need, None)
+        if pop_realmsg is not None:
+            if msg_id % 2:
+                return pop_realmsg + real_msg
+            else:
+                return real_msg + pop_realmsg
+        else:
+            user_danmus[msg_id] = real_msg
+            return None
         
     def handle_danmu(self, bytes_msg):
         dic = json.loads(bytes_msg.decode('utf-8'))
         cmd = dic['cmd']
         # print(cmd)
         if cmd == 'DANMU_MSG':
-            msg = dic['info'][1]
-            if '+' in msg:
-                try:
-                    roomid, raffleid = self.get_origin(msg, '+')
+            info = dic['info']
+            msg = info[1]
+            uid = info[2][0]
+            print(msg, uid)
+            ori = msg
+            try:
+                msg = self.varify(msg)
+                msg = self.combine_piece(uid, msg)
+                if msg is None:
+                    return True
+                if '+' in msg:
+                    roomid, raffleid = map(int, msg.split('+'))
                     printer.info([f'弹幕监控检测到{roomid:^9}的提督/舰长{raffleid}'], True)
                     rafflehandler.Rafflehandler.Put2Queue((roomid, raffleid), rafflehandler.handle_1_room_guard)
                     Statistics.add2pushed_raffle('YJ推送提督/舰长', 1, 2)
-                except ValueError:
-                    print(msg)
+            except Exception:
+                printer.warn(f'Yj监控房间内可能有恶意干扰{uid}: {ori}   {msg}')
             printer.print_danmu(dic)
         return True
                     
