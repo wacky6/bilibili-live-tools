@@ -204,9 +204,9 @@ class YjMonitorHandler(BaseDanmu):
         # None/''
         if not msg:
             return None
-        if uid not in self.reads:
-            self.reads[uid] = {}
-        user_danmus = self.reads[uid]
+        if uid not in self.read:
+            self.read[uid] = {}
+        user_danmus = self.read[uid]
         pieces = msg.split('.')
         msg_id = int(pieces[0])
         real_msg = pieces[1]
