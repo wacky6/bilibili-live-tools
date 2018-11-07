@@ -143,9 +143,9 @@ class DanmuRaffleHandler(BaseDanmu):
     async def check_area(self):
         try:
             while True:
-                area_id = await asyncio.shield(utils.FetchRoomArea(self._room_id))
-                if area_id != self._area_id:
-                    printer.info([f'{self._room_id}更换分区{self._area_id}为{area_id}，即将切换房间'], True)
+                is_ok = await asyncio.shield(utils.check_room_for_danmu(self._room_id, self._area_id))
+                if not is_ok:
+                    printer.info([f'{self._room_id}不再适合作为监控房间，即将切换'], True)
                     return
                 await asyncio.sleep(300)
         except asyncio.CancelledError:
@@ -161,11 +161,11 @@ class DanmuRaffleHandler(BaseDanmu):
     
         elif cmd == 'NOTICE_MSG':
             # 1 《第五人格》哔哩哔哩直播预选赛六强诞生！
-            # 3 <%暗月柴静%> 在 <%優しい七酱%> 的房间开通了总督并触发了抽奖，点击前往TA的房间去抽奖吧
-            # 4 欢迎 <%总督 不再瞎逛的菜菜大佬%> 登船
-            # 5 恭喜 <%ChineseHerbalTea%> 获得大奖 <%23333x银瓜子%>, 感谢 <%樱桃小姐姐给幻幻子穿上漂亮的裙裙%> 的赠送
-            # 6 <%雪昼%> 在直播间 <%529%> 使用了 <%20%> 倍节奏风暴，大家快去跟风领取奖励吧！ (只报20的)
-            # 2 全区广播：<%沉鱼落雁的吃藕妹%>送给<%聆桑哟%>1个嗨翻全城，快来抽奖吧
+            # 2 全区广播：<%user_name%>送给<%user_name%>1个嗨翻全城，快来抽奖吧
+            # 3 <%user_name%> 在 <%user_name%> 的房间开通了总督并触发了抽奖，点击前往TA的房间去抽奖吧
+            # 4 欢迎 <%总督 user_name%> 登船
+            # 5 恭喜 <%user_name%> 获得大奖 <%23333x银瓜子%>, 感谢 <%user_name%> 的赠送
+            # 6 <%user_name%> 在直播间 <%529%> 使用了 <%20%> 倍节奏风暴，大家快去跟风领取奖励吧！(只报20的)
             msg_type = dic['msg_type']
             msg_common = dic['msg_common']
             real_roomid = dic['real_roomid']
@@ -245,7 +245,6 @@ class YjMonitorHandler(BaseDanmu):
             ori = msg
             try:
                 msg = self.__varify(msg)
-                print(uid, ':', msg)
                 msg = self.__combine_piece(uid, msg)
                 if msg is None:
                     return True
@@ -256,7 +255,6 @@ class YjMonitorHandler(BaseDanmu):
                     Statistics.add2pushed_raffle('YJ推送提督/舰长', 1, 2)
             except Exception:
                 printer.warn(f'Yj监控房间内可能有恶意干扰{uid}: {ori}   {msg}')
-            printer.print_danmu(dic)
         return True
                     
                     

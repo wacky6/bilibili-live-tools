@@ -468,3 +468,25 @@ async def FetchRoomArea(roomid):
         # print(json_response['data']['parent_area_id'])
         return json_response['data']['parent_area_id']
     
+    
+async def check_room_for_danmu(room_id, area_id):
+    json_response = await OnlineNet().req('request_check_room', room_id)
+    data = json_response['data']
+    is_hidden = data['is_hidden']
+    is_locked = data['is_locked']
+    is_encrypted = data['encrypted']
+    if any((is_hidden, is_locked, is_encrypted)):
+        is_normal = False
+    else:
+        is_normal = True
+            
+    json_response = await OnlineNet().req('ReqRoomInfo', room_id)
+    data = json_response['data']
+    is_open = True if data['live_status'] == 1 else False
+    current_area_id = data['parent_area_id']
+    # print(is_hidden, is_locked, is_encrypted, is_open, current_area_id)
+    is_ok = (area_id == current_area_id) and is_normal and is_open
+    return is_ok
+            
+            
+            

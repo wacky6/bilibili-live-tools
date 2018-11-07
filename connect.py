@@ -6,17 +6,12 @@ from online_net import OnlineNet
 from configloader import ConfigLoader
 import random
 
-     
-async def check_room_state(roomid):
-    json_rsp = await OnlineNet().req('req_room_init', roomid)
-    return json_rsp['data']['live_status']
-
+ 
 async def get_one(areaid):
     # 1 娱乐分区, 2 游戏分区, 3 手游分区, 4 绘画分区
     if areaid == 1:
         roomid = 23058
-        state = await check_room_state(roomid)
-        if state == 1:
+        if (await utils.check_room_for_danmu(roomid, areaid)):
             printer.info([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
             return roomid
             
@@ -25,10 +20,10 @@ async def get_one(areaid):
         data = json_rsp['data']
         if not data:
             await asyncio.sleep(3)
+            printer.warn(json_rsp)
             continue
         roomid = random.choice(data)['roomid']
-        state = await check_room_state(roomid)
-        if state == 1:
+        if (await utils.check_room_for_danmu(roomid, areaid)):
             printer.info([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
             return roomid
 
