@@ -37,7 +37,7 @@ class connect():
             cls.instance = super(connect, cls).__new__(cls, *args, **kw)
             cls.instance.danmuji = None
             cls.instance.room_id = 0
-            cls.instance.area_id = 0
+            cls.instance.area_id = -1
         return cls.instance
         
     async def run(self):
@@ -111,7 +111,7 @@ class YjConnection():
     def __init__(self):
         self.danmuji = None
         self.roomid = 0
-        self.areaid = -1
+        self.areaid = 0
         
     async def run(self):
         self.roomid = ConfigLoader().dic_user['other_control']['raffle_minitor_roomid']
