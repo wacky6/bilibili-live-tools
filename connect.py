@@ -34,17 +34,20 @@ async def get_one(areaid):
 
 
 class connect():
-    __slots__ = ('danmuji')
+    __slots__ = ('danmuji', 'room_id', 'area_id')
     instance = None
     
     def __new__(cls, *args, **kw):
         if not cls.instance:
             cls.instance = super(connect, cls).__new__(cls, *args, **kw)
             cls.instance.danmuji = None
+            cls.instance.room_id = 0
+            cls.instance.area_id = 0
         return cls.instance
         
     async def run(self):
-        self.danmuji = danmu.DanmuPrinter()
+        self.room_id = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
+        self.danmuji = danmu.DanmuPrinter(self.room_id, self.area_id)
         time_now = 0
         while True:
             if int(utils.CurrentTime()) - time_now <= 3:
@@ -71,7 +74,7 @@ class connect():
         ConfigLoader().dic_user['other_control']['default_monitor_roomid'] = roomid
         print('已经切换roomid')
         if connect.instance.danmuji is not None:
-            connect.instance.danmuji.roomid = roomid
+            connect.instance.danmuji.room_id = roomid
             await connect.instance.danmuji.terminate()
         
         
@@ -88,7 +91,7 @@ class RaffleConnect():
             if int(utils.CurrentTime()) - time_now <= 3:
                 printer.info(['当前网络不稳定，弹幕监控将自动延迟3秒后重启'], True)
                 await asyncio.sleep(3)
-            self.danmuji.roomid = await get_one(self.areaid)
+            self.danmuji.room_id = await get_one(self.areaid)
             printer.info(['正在启动抽奖监控弹幕姬'], True)
             time_now = int(utils.CurrentTime())
             connect_results = await self.danmuji.start()
