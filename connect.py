@@ -55,17 +55,17 @@ class connect():
                 await asyncio.sleep(3)
             printer.info(['正在启动直播监控弹幕姬'], True)
             time_now = int(utils.CurrentTime())
-            connect_results = await self.danmuji.start()
+            connect_results = await self.danmuji.open()
             if not connect_results:
                 continue
-            task_main = asyncio.ensure_future(self.danmuji.handle_msg())
+            task_main = asyncio.ensure_future(self.danmuji.read_datas())
             task_heartbeat = asyncio.ensure_future(self.danmuji.heart_beat())
             tasks = [task_main, task_heartbeat]
             finished, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             printer.info(['主弹幕姬异常或主动断开，正在处理剩余信息'], True)
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
-            await self.danmuji.terminate()
+            await self.danmuji.close()
             await asyncio.wait(pending)
             printer.info(['主弹幕姬退出，剩余任务处理完毕'], True)
     
@@ -75,7 +75,7 @@ class connect():
         print('已经切换roomid')
         if connect.instance.danmuji is not None:
             connect.instance.danmuji.room_id = roomid
-            await connect.instance.danmuji.terminate()
+            await connect.instance.danmuji.close()
         
         
 class RaffleConnect():
@@ -94,10 +94,10 @@ class RaffleConnect():
             self.danmuji.room_id = await get_one(self.areaid)
             printer.info(['正在启动抽奖监控弹幕姬'], True)
             time_now = int(utils.CurrentTime())
-            connect_results = await self.danmuji.start()
+            connect_results = await self.danmuji.open()
             if not connect_results:
                 continue
-            task_main = asyncio.ensure_future(self.danmuji.handle_msg())
+            task_main = asyncio.ensure_future(self.danmuji.read_datas())
             task_heartbeat = asyncio.ensure_future(self.danmuji.heart_beat())
             task_checkarea = asyncio.ensure_future(self.danmuji.check_area())
             tasks = [task_main, task_heartbeat, task_checkarea]
@@ -107,7 +107,7 @@ class RaffleConnect():
                 task_heartbeat.cancel()
             if not task_checkarea.done():
                 task_checkarea.cancel()
-            await self.danmuji.terminate()
+            await self.danmuji.close()
             await asyncio.wait(pending)
             printer.info([f'{self.areaid}号弹幕姬退出，剩余任务处理完毕'], True)
                 
@@ -130,17 +130,17 @@ class YjConnection():
                 await asyncio.sleep(3)
             printer.info(['正在启动Yj监控弹幕姬'], True)
             time_now = int(utils.CurrentTime())
-            connect_results = await self.danmuji.start()
+            connect_results = await self.danmuji.open()
             if not connect_results:
                 continue
-            task_main = asyncio.ensure_future(self.danmuji.handle_msg())
+            task_main = asyncio.ensure_future(self.danmuji.read_datas())
             task_heartbeat = asyncio.ensure_future(self.danmuji.heart_beat())
             tasks = [task_main, task_heartbeat]
             finished, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             printer.info(['Yj弹幕姬异常或主动断开，正在处理剩余信息'], True)
             if not task_heartbeat.done():
                 task_heartbeat.cancel()
-            await self.danmuji.terminate()
+            await self.danmuji.close()
             await asyncio.wait(pending)
             printer.info(['Yj弹幕姬退出，剩余任务处理完毕'], True)
             

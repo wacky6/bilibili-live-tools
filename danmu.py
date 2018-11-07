@@ -28,26 +28,6 @@ class BaseDanmu():
         self._room_id = room_id
         str_conn_room = f'{{"uid":0,"roomid":{room_id},"protover":1,"platform":"web","clientver":"1.3.3"}}'
         self._bytes_conn_room = self._wrap_str(opt=7, body=str_conn_room)
-
-    # 待确认
-    async def terminate(self):
-        try:
-            await self.ws.close()
-        except:
-            print('请联系开发者', sys.exc_info()[0], sys.exc_info()[1])
-        if not self.ws.closed:
-            printer.info([f'请联系开发者  {self._area_id}号弹幕收尾模块状态{self.ws.closed}'], True)
-        
-    async def start(self):
-        try:
-            url = 'wss://broadcastlv.chat.bilibili.com:443/sub'
-            self.ws = await asyncio.wait_for(self.client.ws_connect(url), timeout=3)
-        except:
-            print("# 连接无法建立，请检查本地网络状况")
-            print(sys.exc_info()[0], sys.exc_info()[1])
-            return False
-        printer.info([f'{self._area_id}号弹幕监控已连接b站服务器'], True)
-        return (await self._send_bytes(self._bytes_conn_room))
         
     def _wrap_str(self, opt, body, len_header=16, ver=1, seq=1):
         remain_data = body.encode('utf-8')
@@ -55,15 +35,6 @@ class BaseDanmu():
         header = self.structer.pack(len_data, len_header, ver, opt, seq)
         data = header + remain_data
         return data
-
-    async def heart_beat(self):
-        try:
-            while True:
-                if not (await self._send_bytes(self._bytes_heartbeat)):
-                    return
-                await asyncio.sleep(30)
-        except asyncio.CancelledError:
-            pass
 
     async def _send_bytes(self, bytes_data):
         try:
@@ -90,8 +61,28 @@ class BaseDanmu():
             return None
         
         return bytes_data
-    
-    async def handle_msg(self):
+        
+    async def open(self):
+        try:
+            url = 'wss://broadcastlv.chat.bilibili.com:443/sub'
+            self.ws = await asyncio.wait_for(self.client.ws_connect(url), timeout=3)
+        except:
+            print("# 连接无法建立，请检查本地网络状况")
+            print(sys.exc_info()[0], sys.exc_info()[1])
+            return False
+        printer.info([f'{self._area_id}号弹幕监控已连接b站服务器'], True)
+        return (await self._send_bytes(self._bytes_conn_room))
+        
+    async def heart_beat(self):
+        try:
+            while True:
+                if not (await self._send_bytes(self._bytes_heartbeat)):
+                    return
+                await asyncio.sleep(30)
+        except asyncio.CancelledError:
+            pass
+            
+    async def read_datas(self):
         while True:
             datas = await self._read_bytes()
             # 本函数对bytes进行相关操作，不特别声明，均为bytes
@@ -107,14 +98,14 @@ class BaseDanmu():
                 len_data, len_header, ver, opt, seq = tuple_header
                 body_l = data_l + len_header
                 next_data_l = data_l + len_data
-                remain_data = datas[body_l:next_data_l]
+                body = datas[body_l:next_data_l]
                 # 人气值(或者在线人数或者类似)以及心跳
                 if opt == 3:
                     # UserCount, = struct.unpack('!I', remain_data)
                     printer.debug(f'弹幕心跳检测{self._area_id}')
                 # cmd
                 elif opt == 5:
-                    if not self.handle_danmu(remain_data):
+                    if not self.handle_danmu(body):
                         return
                 # 握手确认
                 elif opt == 8:
@@ -123,14 +114,23 @@ class BaseDanmu():
                     printer.warn(datas[data_l:next_data_l])
 
                 data_l = next_data_l
+
+    # 待确认
+    async def close(self):
+        try:
+            await self.ws.close()
+        except:
+            print('请联系开发者', sys.exc_info()[0], sys.exc_info()[1])
+        if not self.ws.closed:
+            printer.info([f'请联系开发者  {self._area_id}号弹幕收尾模块状态{self.ws.closed}'], True)
                 
-    def handle_danmu(self, bytes_msg):
+    def handle_danmu(self, body):
         return True
                 
                 
 class DanmuPrinter(BaseDanmu):
-    def handle_danmu(self, bytes_msg):
-        dic = json.loads(bytes_msg.decode('utf-8'))
+    def handle_danmu(self, body):
+        dic = json.loads(body.decode('utf-8'))
         cmd = dic['cmd']
         # print(cmd)
         if cmd == 'DANMU_MSG':
@@ -151,8 +151,8 @@ class DanmuRaffleHandler(BaseDanmu):
         except asyncio.CancelledError:
             pass
         
-    def handle_danmu(self, bytes_msg):
-        dic = json.loads(bytes_msg.decode('utf-8'))
+    def handle_danmu(self, body):
+        dic = json.loads(body.decode('utf-8'))
         cmd = dic['cmd']
         
         if cmd == 'PREPARING':
@@ -200,11 +200,11 @@ class DanmuRaffleHandler(BaseDanmu):
             
         
 class YjMonitorHandler(BaseDanmu):
-    def __init__(self, roomid, area_id):
-        super().__init__(roomid, area_id)
+    def __init__(self, room_id, area_id):
+        super().__init__(room_id, area_id)
         self.read = {}
     
-    def varify(self, msg):
+    def __varify(self, msg):
         msg = msg.replace('?', '')
         first = ord(msg[0])
         last = ord(msg[-1])
@@ -213,7 +213,7 @@ class YjMonitorHandler(BaseDanmu):
             return msg[:-1]
         return None
             
-    def combine_piece(self, uid, msg):
+    def __combine_piece(self, uid, msg):
         # None/''
         if not msg:
             return None
@@ -234,8 +234,8 @@ class YjMonitorHandler(BaseDanmu):
             user_danmus[msg_id] = real_msg
             return None
         
-    def handle_danmu(self, bytes_msg):
-        dic = json.loads(bytes_msg.decode('utf-8'))
+    def handle_danmu(self, body):
+        dic = json.loads(body.decode('utf-8'))
         cmd = dic['cmd']
         # print(cmd)
         if cmd == 'DANMU_MSG':
@@ -244,9 +244,9 @@ class YjMonitorHandler(BaseDanmu):
             uid = info[2][0]
             ori = msg
             try:
-                msg = self.varify(msg)
+                msg = self.__varify(msg)
                 print(uid, ':', msg)
-                msg = self.combine_piece(uid, msg)
+                msg = self.__combine_piece(uid, msg)
                 if msg is None:
                     return True
                 if '+' in msg:
