@@ -184,17 +184,18 @@ class DanmuRaffleHandler(BaseDanmu):
                 printer.info([f'{self._area_id}号弹幕监控检测到{real_roomid:^9}的{raffle_name}'], True)
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_TV)
                 broadcast_type = 0 if broadcast == '全区' else 1
-                Statistics.add2pushed_raffle(raffle_name, 1, broadcast_type)
+                Statistics.add2pushed_raffle(raffle_name, broadcast_type)
             elif msg_type == 3:
                 raffle_name = msg_common.split('开通了')[-1][:2]
                 printer.info([f'{self._area_id}号弹幕监控检测到{real_roomid:^9}的{raffle_name}'], True)
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_guard)
                 broadcast_type = 0 if raffle_name == '总督' else 2
-                Statistics.add2pushed_raffle(raffle_name, 1, broadcast_type)
+                Statistics.add2pushed_raffle(raffle_name, broadcast_type)
             elif msg_type == 6:
-                printer.info(["20倍节奏风暴"], True)
+                raffle_name = '20倍节奏风暴'
+                printer.info([f'{self._area_id}号弹幕监控检测到{real_roomid:^9}的{raffle_name}'], True)
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_storm)
-                Statistics.add2pushed_raffle('20倍节奏风暴')
+                Statistics.add2pushed_raffle(raffle_name)
         
         return True
             
@@ -202,7 +203,7 @@ class DanmuRaffleHandler(BaseDanmu):
 class YjMonitorHandler(BaseDanmu):
     def __init__(self, room_id, area_id):
         super().__init__(room_id, area_id)
-        self.read = {}
+        self.__read = {}
     
     def __varify(self, msg):
         msg = msg.replace('?', '')
@@ -217,9 +218,9 @@ class YjMonitorHandler(BaseDanmu):
         # None/''
         if not msg:
             return None
-        if uid not in self.read:
-            self.read[uid] = {}
-        user_danmus = self.read[uid]
+        if uid not in self.__read:
+            self.__read[uid] = {}
+        user_danmus = self.__read[uid]
         pieces = msg.split('.')
         msg_id = int(pieces[0])
         real_msg = pieces[1]
@@ -250,9 +251,9 @@ class YjMonitorHandler(BaseDanmu):
                     return True
                 if '+' in msg:
                     roomid, raffleid = map(int, msg.split('+'))
-                    printer.info([f'弹幕监控检测到{roomid:^9}的提督/舰长{raffleid}'], True)
+                    printer.info([f'{self._area_id}号弹幕监控检测到{roomid:^9}的大航海(id: {raffleid})'], True)
                     rafflehandler.Rafflehandler.Put2Queue((roomid, raffleid), rafflehandler.handle_1_room_guard)
-                    Statistics.add2pushed_raffle('YJ推送提督/舰长', 1, 2)
+                    Statistics.add2pushed_raffle('YJ推送大航海', 1, 2)
             except Exception:
                 printer.warn(f'Yj监控房间内可能有恶意干扰{uid}: {ori}   {msg}')
         return True

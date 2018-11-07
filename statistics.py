@@ -67,8 +67,8 @@ class Statistics:
         inst = Statistics.instance
         inst.joined_raffle[type] = inst.joined_raffle.get(type, 0) + int(num)
      
-    @staticmethod   
-    def add2pushed_raffle(raffle_name, num=1, broadcast_type=0):
+    @staticmethod
+    def add2pushed_raffle(raffle_name, broadcast_type=0, num=1):
         # broadcast_type 0全区 1分区 2本房间
         inst = Statistics.instance
         if broadcast_type == 0:
