@@ -253,7 +253,7 @@ class YjMonitorHandler(BaseDanmu):
                     roomid, raffleid = map(int, msg.split('+'))
                     printer.info([f'{self._area_id}号弹幕监控检测到{roomid:^9}的大航海(id: {raffleid})'], True)
                     rafflehandler.Rafflehandler.Put2Queue((roomid, raffleid), rafflehandler.handle_1_room_guard)
-                    Statistics.add2pushed_raffle('协同大航海', 2)
+                    Statistics.add2pushed_raffle('Yj协同大航海', 2)
             except Exception:
                 printer.warn(f'Yj监控房间内可能有恶意干扰{uid}: {ori}   {msg}')
         return True

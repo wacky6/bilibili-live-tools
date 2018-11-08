@@ -27,19 +27,19 @@ class Statistics:
         inst = Statistics.instance
         print('本次推送抽奖统计：')
         for k, v in inst.pushed_raffle.items():
-            print(f'{v:^4} X {k}')
+            print(f'{v:^5} X {k}')
             
         print()
         print('本次参与抽奖统计：')
         for k, v in inst.joined_raffle.items():
-            print(f'{v:^4} X {k}')
+            print(f'{v:^5} X {k}')
 
     @staticmethod
     def getresult():
         inst = Statistics.instance
         print('本次抽奖结果统计：')
         for k, v in inst.result.items():
-            print(f'{v:^4} X {k}')
+            print(f'{v:^5} X {k}')
 
     @staticmethod
     def append_to_activitylist(raffleid, text1, time=''):
@@ -62,7 +62,7 @@ class Statistics:
     @staticmethod
     def append_to_guardlist():
         inst = Statistics.instance
-        inst.append2joined_raffle('总督(合计)')
+        inst.append2joined_raffle('大航海(合计)')
         
     @staticmethod
     def append2joined_raffle(type, num=1):
