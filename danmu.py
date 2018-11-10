@@ -203,17 +203,28 @@ class DanmuRaffleHandler(BaseDanmu):
 class YjMonitorHandler(BaseDanmu):
     def __init__(self, room_id, area_id):
         super().__init__(room_id, area_id)
+        keys = 'ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκ∧λΜμΝνΞξΟο∏πΡρ∑σΤτΥυΦφΧχΨψΩωабвгдеёжзийклмнопрстуфхцчъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧЪЫЬЭЮЯ'
+        self.__reverse_keys = {value: i for i, value in enumerate(keys)}
         self.__read = {}
     
-    def __varify(self, msg):
+    def __base2dec(self, str_num, base=110):
+        result = 0
+        for i in str_num:
+            result = result * base + self.__reverse_keys[i]
+        return result
+    
+    def __reverse(self, msg):
         msg = msg.replace('?', '')
-        first = ord(msg[0])
-        last = ord(msg[-1])
-        if 48 <= first <= 57 and 48 <= last <= 57 and not (first + last - 105):
-            # 验证后删掉校验位
-            return msg[:-1]
+        first = self.__reverse_keys.get(msg[0], -1)
+        last = self.__reverse_keys.get(msg[-1], -1)
+        
+        # 校验
+        if 0 <= first <= 109 and 0 <= last <= 109 and not (first + last - 109):
+            type = msg[-2]
+            msg_id, id = map(self.__base2dec, msg[:-2].split('.'))
+            return msg_id, type, id
         return None
-            
+        
     def __combine_piece(self, uid, msg):
         # None/''
         if not msg:
@@ -221,18 +232,16 @@ class YjMonitorHandler(BaseDanmu):
         if uid not in self.__read:
             self.__read[uid] = {}
         user_danmus = self.__read[uid]
-        pieces = msg.split('.')
-        msg_id = int(pieces[0])
-        real_msg = pieces[1]
-        id_need = (msg_id - 1) if (msg_id % 2) else (msg_id + 1)
-        pop_realmsg = user_danmus.pop(id_need, None)
-        if pop_realmsg is not None:
+        msg_id, type, id = msg
+        msg_id_wanted = (msg_id - 1) if (msg_id % 2) else (msg_id + 1)
+        id_wanted = user_danmus.pop(msg_id_wanted, None)
+        if id_wanted is not None:
             if msg_id % 2:
-                return pop_realmsg + real_msg
+                return type, id_wanted, id
             else:
-                return real_msg + pop_realmsg
+                return type, id, id_wanted
         else:
-            user_danmus[msg_id] = real_msg
+            user_danmus[msg_id] = id
             return None
         
     def handle_danmu(self, body):
@@ -245,14 +254,16 @@ class YjMonitorHandler(BaseDanmu):
             uid = info[2][0]
             ori = msg
             try:
-                msg = self.__varify(msg)
-                msg = self.__combine_piece(uid, msg)
-                if msg is None:
+                msg = self.__reverse(msg)
+                result = self.__combine_piece(uid, msg)
+                print('监控read dic', self.__read)
+                if result is None:
                     return True
-                if '+' in msg:
-                    roomid, raffleid = map(int, msg.split('+'))
-                    printer.info([f'{self._area_id}号弹幕监控检测到{roomid:^9}的大航海(id: {raffleid})'], True)
-                    rafflehandler.Rafflehandler.Put2Queue((roomid, raffleid), rafflehandler.handle_1_room_guard)
+                print(result)
+                type, raffle_id, room_id = result
+                if type == '+':
+                    printer.info([f'{self._area_id}号弹幕监控检测到{room_id:^9}的大航海(id: {raffle_id})'], True)
+                    rafflehandler.Rafflehandler.Put2Queue((room_id, raffle_id), rafflehandler.handle_1_room_guard)
                     Statistics.add2pushed_raffle('Yj协同大航海', 2)
             except Exception:
                 printer.warn(f'Yj监控房间内可能有恶意干扰{uid}: {ori}   {msg}')
