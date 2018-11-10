@@ -203,7 +203,7 @@ class DanmuRaffleHandler(BaseDanmu):
 class YjMonitorHandler(BaseDanmu):
     def __init__(self, room_id, area_id):
         super().__init__(room_id, area_id)
-        keys = 'ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκ∧λΜμΝνΞξΟο∏πΡρ∑σΤτΥυΦφΧχΨψΩωабвгдеёжзийклмнопрстуфхцчъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧЪЫЬЭЮЯ'
+        keys = '飠牜饣卩卪厸厶厽孓宀巛巜彳廴彡彐彳忄扌攵氵灬爫犭疒癶礻糹纟罒罓耂虍訁覀兦亼亽亖亗吂卝匸皕旡玊尐幵朩囘囙囜囝囟囡団囤囥囦囧囨囩囪囫囬囮囯困囱囲図囵囶囷囸囹固囻囼图囿圀圁圂圃圄圅圆圇圉圊圌圍圎圏圐圑園圓圔圕圖圗團圙圚圛圜圝圞'
         self.__reverse_keys = {value: i for i, value in enumerate(keys)}
         self.__read = {}
     
@@ -250,11 +250,11 @@ class YjMonitorHandler(BaseDanmu):
         # print(cmd)
         if cmd == 'DANMU_MSG':
             info = dic['info']
-            msg = info[1]
+            ori = info[1]
             uid = info[2][0]
-            ori = msg
+            print(ori)
             try:
-                msg = self.__reverse(msg)
+                msg = self.__reverse(ori)
                 result = self.__combine_piece(uid, msg)
                 print('监控read dic', self.__read)
                 if result is None:
