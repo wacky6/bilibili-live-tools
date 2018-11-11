@@ -255,6 +255,13 @@ class YjMonitorHandler(BaseDanmu):
             print(ori)
             try:
                 msg = self.__reverse(ori)
+                '''
+                if msg is not None:
+                    msg_id, type, id = msg
+                    if type == '~' and not msg_id % 2:
+                        storm_id = id
+                        print('节奏风暴', storm_id)
+                '''
                 result = self.__combine_piece(uid, msg)
                 print('监控read dic', self.__read)
                 if result is None:
@@ -266,7 +273,7 @@ class YjMonitorHandler(BaseDanmu):
                     rafflehandler.Rafflehandler.Put2Queue((room_id, raffle_id), rafflehandler.handle_1_room_guard)
                     Statistics.add2pushed_raffle('Yj协同大航海', 2)
             except Exception:
-                printer.warn(f'Yj监控房间内可能有恶意干扰{uid}: {ori}   {msg}')
+                printer.warn(f'Yj监控房间内可能有恶意干扰{uid}: {ori}')
         return True
                     
                     
