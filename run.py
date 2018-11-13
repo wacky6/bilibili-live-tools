@@ -18,19 +18,20 @@ from bilitimer import BiliTimer
 loop = asyncio.get_event_loop()
 fileDir = os.path.dirname(os.path.realpath('__file__'))
 
-ConfigLoader(fileDir)
+conf = ConfigLoader(fileDir)
+area_ids = conf.dic_user['other_control']['area_ids']
 
 # print('Hello world.')
 printer.init_config()
 bilibili()
 online_net.login()
 online_net.OnlineNet()
-Statistics()
+Statistics(len(area_ids))
 
 rafflehandler = Rafflehandler()
 var_console = bili_console.Biliconsole(loop)
 
-list_raffle_connection = [connect.RaffleConnect(i) for i in range(1, 5)]
+list_raffle_connection = [connect.RaffleConnect(i) for i in area_ids]
 list_raffle_connection_task = [i.run() for i in list_raffle_connection]
 yjconnection = connect.YjConnection()
 

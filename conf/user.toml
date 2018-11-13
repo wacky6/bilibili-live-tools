@@ -39,3 +39,6 @@ default_monitor_roomid = 23058
 
 # 额外自定义弹幕监控房间
 raffle_minitor_roomid = 0
+
+# raffle monitor(控制抽奖监控的，默认一个分区一个监控)
+area_ids = [1, 2, 3, 4, 5]

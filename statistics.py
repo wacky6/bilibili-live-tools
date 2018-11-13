@@ -1,10 +1,10 @@
 class Statistics:
-    __slots__ = ('activity_id_list', 'TV_id_list', 'result', 'pushed_raffle', 'joined_raffle')
     instance = None
 
-    def __new__(cls, *args, **kw):
+    def __new__(cls, area_num=0):
         if not cls.instance:
-            cls.instance = super(Statistics, cls).__new__(cls, *args, **kw)
+            cls.instance = super(Statistics, cls).__new__(cls)
+            cls.instance.area_num = area_num
             cls.instance.activity_id_list = []
             # cls.instance.activity_time_list = []
             cls.instance.TV_id_list = []
@@ -74,7 +74,7 @@ class Statistics:
         # broadcast_type 0全区 1分区 2本房间
         inst = Statistics.instance
         if broadcast_type == 0:
-            inst.pushed_raffle[raffle_name] = inst.pushed_raffle.get(raffle_name, 0) + int(num) / 4
+            inst.pushed_raffle[raffle_name] = inst.pushed_raffle.get(raffle_name, 0) + int(num) / inst.area_num
         else:
             inst.pushed_raffle[raffle_name] = inst.pushed_raffle.get(raffle_name, 0) + int(num)
                     
