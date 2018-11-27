@@ -22,19 +22,19 @@ class BasePrinter():
             self.debug_control = debug_control
             
     def timestamp(self):
-        str_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        str_time = time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime())
         return str_time
         
     def info(self, list_msg, tag_time=False):
         if tag_time:
-            print(f'[{self.timestamp()}]', end=' ')
+            print(self.timestamp(), end='')
         for msg in list_msg:
             print(msg)
             
     def warn(self, msg):
         print(msg, file=sys.stderr)
         with open('bili.log', 'a', encoding='utf-8') as f:
-            f.write(f'{self.timestamp()} {msg}\n')
+            f.write(f'{self.timestamp()}{msg}\n')
         
     def debug(self, msg):
         if ConfigLoader().dic_user['print_control']['debug']:
