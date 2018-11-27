@@ -261,12 +261,14 @@ class YjMonitorHandler(BaseDanmu):
                     if type == '~' and not msg_id % 2:
                         storm_id = id
                         print('节奏风暴', storm_id)
-                '''
+                        rafflehandler.Rafflehandler.Put2Queue((storm_id,), rafflehandler.handle_1_storm_raffle)
+                '''        
+                
                 result = self.__combine_piece(uid, msg)
-                print('监控read dic', self.__read)
+                # print('监控read dic', self.__read)
                 if result is None:
                     return True
-                print(result)
+                # print(result)
                 type, raffle_id, room_id = result
                 if type == '+':
                     printer.info([f'{self._area_id}号弹幕监控检测到{room_id:^9}的大航海(id: {raffle_id})'], True)
