@@ -252,7 +252,7 @@ class YjMonitorHandler(BaseDanmu):
             info = dic['info']
             ori = info[1]
             uid = info[2][0]
-            print(ori)
+            # print(ori)
             try:
                 msg = self.__reverse(ori)
                 '''
