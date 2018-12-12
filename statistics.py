@@ -27,7 +27,10 @@ class Statistics:
         inst = Statistics.instance
         print('本次推送抽奖统计：')
         for k, v in inst.pushed_raffle.items():
-            print(f'{v:^5} X {k}')
+            if isinstance(v, int):
+                print(f'{v:^5} X {k}')
+            else:
+                print(f'{v:^5.2f} X {k}')
             
         print()
         print('本次参与抽奖统计：')
