@@ -134,7 +134,7 @@ class OnlineNet():
             cls.instance.list_delay = []
         return cls.instance
      
-    @property   
+    @property
     def is_online(self):
         return self.var_is_online
         
@@ -147,26 +147,28 @@ class OnlineNet():
             del self.list_delay[:]
             
     async def req(self, str_func, *args):
-        rsp = await getattr(self.bili, str_func)(*args)
-        is_online = self.is_online
-        # print(rsp)
-        if not is_online:
-            future = asyncio.Future()
-            self.list_delay.append(future)
-            await future
-        # 未登陆且未处理
-        if rsp == 3 and is_online:
-            printer.info([f'判定出现了登陆失败，且未处理'], True)
-            self.is_online = False
-            # login
-            HandleExpire()
-            # await asyncio.sleep(10)
-            print(self.list_delay)
-            printer.info([f'已经登陆了'], True)
-            self.is_online = True
+        while True:
             rsp = await getattr(self.bili, str_func)(*args)
-        # 未登陆，但已处理
-        elif not is_online:
-            printer.info([f'判定出现了登陆失败，已经处理'], True)
-            rsp = await getattr(self.bili, str_func)(*args)
-        return rsp
+            is_online = self.is_online
+            # print(rsp)
+            if not is_online:
+                future = asyncio.Future()
+                self.list_delay.append(future)
+                await future
+            # 未登陆且未处理
+            if rsp == 3 and is_online:
+                printer.info([f'判定出现了登陆失败，且未处理'], True)
+                self.is_online = False
+                # login
+                HandleExpire()
+                # await asyncio.sleep(10)
+                print(self.list_delay)
+                printer.info([f'已经登陆了'], True)
+                self.is_online = True
+                # rsp = await getattr(self.bili, str_func)(*args)
+            # 未登陆，但已处理
+            elif not is_online:
+                printer.info([f'判定出现了登陆失败，已经处理'], True)
+                # rsp = await getattr(self.bili, str_func)(*args)
+            else:
+                return rsp
