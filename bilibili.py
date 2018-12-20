@@ -393,7 +393,8 @@ class bilibili():
             'msg': msg,
             'rnd': '0',
             'roomid': int(roomId),
-            'csrf_token': inst.dic_bilibili['csrf']
+            'csrf_token': inst.dic_bilibili['csrf'],
+            'csrf': inst.dic_bilibili['csrf']
         }
 
         json_rsp = await inst.bili_session_post(url, headers=inst.dic_bilibili['pcheaders'], data=data)
