@@ -37,9 +37,7 @@ class Statistics:
         for k, v in inst.joined_raffle.items():
             print(f'{v:^5} X {k}')
 
-    @staticmethod
-    def getresult():
-        inst = Statistics.instance
+        print()
         print('本次抽奖结果统计：')
         for k, v in inst.result.items():
             print(f'{v:^5} X {k}')

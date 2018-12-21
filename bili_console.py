@@ -53,7 +53,6 @@ class Biliconsole(Cmd):
         
     def do_1(self, line):
         Statistics.getlist()
-        Statistics.getresult()
         
     def do_2(self, line):
         self.append2list_console(utils.fetch_bag_list)
