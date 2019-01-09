@@ -166,11 +166,14 @@ class DanmuRaffleHandler(BaseDanmu):
             # 4 欢迎 <%总督 user_name%> 登船
             # 5 恭喜 <%user_name%> 获得大奖 <%23333x银瓜子%>, 感谢 <%user_name%> 的赠送
             # 6 <%user_name%> 在直播间 <%529%> 使用了 <%20%> 倍节奏风暴，大家快去跟风领取奖励吧！(只报20的)
+            # 8 全区广播：主播<%红莉栖魔王喵%>开启了“任意门”，点击前往TA的房间去抽奖吧！
             msg_type = dic['msg_type']
             msg_common = dic['msg_common']
             real_roomid = dic['real_roomid']
             msg_common = dic['msg_common'].replace(' ', '')
-            if msg_type == 2:
+            msg_common = msg_common.replace('”', '')
+            msg_common = msg_common.replace('“', '')
+            if msg_type == 2 or msg_type == 8:
                 str_gift = msg_common.split('%>')[-1].split('，')[0]
                 if '个' in str_gift:
                     raffle_num, raffle_name = str_gift.split('个')
