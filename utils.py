@@ -2,7 +2,6 @@ from online_net import OnlineNet
 import printer
 import time
 import datetime
-from PIL import Image
 from io import BytesIO
 import webbrowser
 import re
@@ -100,7 +99,7 @@ async def send_danmu_msg_web(msg, roomId):
 
 async def find_live_user_roomid(wanted_name):
     print(wanted_name)
-    
+
     def check_name_piece(json_rsp, wanted_name):
         results = json_rsp['result']
         if results is None:
@@ -113,7 +112,7 @@ async def find_live_user_roomid(wanted_name):
                 print('找到结果', i)
                 return i
         return None
-                
+
     for i in range(len(wanted_name), 0, -1):
         name_piece = wanted_name[:i]
         json_rsp = await OnlineNet().req('request_search_biliuser', name_piece)
@@ -210,13 +209,7 @@ async def fetch_user_info():
         bili_coins = userCoinIfo['bili_coins']
         print('# 用户名', uname)
         size = 100, 100
-        response_face = await OnlineNet().req('request_load_img', userInfo['face'])
-        img = Image.open(BytesIO(await response_face.read()))
-        img.thumbnail(size)
-        try:
-            img.show()
-        except:
-            pass
+
         print(f'# 手机认证状况 {mobile_verify} | 实名认证状况 {identification}')
         print('# 银瓜子', silver)
         print('# 通用金瓜子', gold)
@@ -366,13 +359,6 @@ async def fetch_liveuser_info(real_roomid):
             print('# 该主播暂时没有开通勋章')  # print(json_response_fan)
 
         size = 100, 100
-        response_face = await OnlineNet().req('request_load_img', data['info']['face'])
-        img = Image.open(BytesIO(await response_face.read()))
-        img.thumbnail(size)
-        try:
-            img.show()
-        except:
-            pass
 
 async def enter_room(roomid):
     json_response = await OnlineNet().req('request_check_room', roomid)
@@ -458,8 +444,8 @@ async def GetRewardInfo(show=True):
     if show:
         print(f'每日登陆：{login} 每日观看：{watch_av} 每日投币经验：{coins_av}/50 每日分享：{share_av}')
     return login, watch_av, coins_av, share_av
-    
-        
+
+
 async def FetchRoomArea(roomid):
     json_response = await OnlineNet().req('ReqRoomInfo', roomid)
 
@@ -467,8 +453,8 @@ async def FetchRoomArea(roomid):
         # print(json_response)
         # print(json_response['data']['parent_area_id'])
         return json_response['data']['parent_area_id']
-    
-    
+
+
 async def check_room_for_danmu(room_id, area_id):
     json_response = await OnlineNet().req('request_check_room', room_id)
     data = json_response['data']
@@ -479,7 +465,7 @@ async def check_room_for_danmu(room_id, area_id):
         is_normal = False
     else:
         is_normal = True
-            
+
     json_response = await OnlineNet().req('ReqRoomInfo', room_id)
     data = json_response['data']
     is_open = True if data['live_status'] == 1 else False
@@ -487,6 +473,6 @@ async def check_room_for_danmu(room_id, area_id):
     # print(is_hidden, is_locked, is_encrypted, is_open, current_area_id)
     is_ok = (area_id == current_area_id) and is_normal and is_open
     return is_ok
-            
-            
-            
+
+
+

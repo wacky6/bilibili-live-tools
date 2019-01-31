@@ -1,5 +1,4 @@
 requests
 rsa
 aiohttp
-Pillow
 toml
