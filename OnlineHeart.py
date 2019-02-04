@@ -31,9 +31,8 @@ async def guard_lottery():
             response = await bilibili().guard_list()
             json_response = response.json()
             break
-        except Exception as e:
-            print(e)
-            continue
+        except:
+            traceback.print_exc()
     else:
         printer.info(["连接舰长服务器失败"])
         return
@@ -112,9 +111,8 @@ async def run():
 
         try:
             await guard_lottery()
-        except Exception as e:
+        except:
             traceback.print_exc()
-            print("errored guard_lottery")
 
         await asyncio.sleep(300)
 
