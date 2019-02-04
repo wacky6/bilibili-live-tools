@@ -10,6 +10,7 @@ import random
 import json
 from io import BytesIO
 import os
+import traceback
 
 def get_env(name, default = ''):
     if name in os.environ:
@@ -99,6 +100,13 @@ class bilibili():
             cls.instance.var_login_session = None
             cls.instance.app_params = f'actionKey={dic_bilibili["actionKey"]}&appkey={dic_bilibili["appkey"]}&build={dic_bilibili["build"]}&device={dic_bilibili["device"]}&mobi_app={dic_bilibili["mobi_app"]}&platform={dic_bilibili["platform"]}'
         return cls.instance
+
+    @property
+    def bili_section(self):
+        if self.bili_session is None:
+            self.bili_session = aiohttp.ClientSession()
+            # print(0)
+        return self.bili_session
 
     @property
     def bili_session(self):
@@ -857,3 +865,44 @@ class bilibili():
         text_rsp = await self.session_text_get(url, headers=headers)
         # print(text_rsp)
         return text_rsp
+
+    async def guard_list(self):
+        url = "http://118.25.108.153:8080/guard"
+        headers = {
+            "User-Agent": "bilibili-live-tools/" + str(self.dic_bilibili['uid'])
+        }
+        response = requests.get(url, headers=headers)
+        return response
+
+    async def get_gift_of_captain(self, roomid, id):
+        join_url = "https://api.live.bilibili.com/lottery/v2/lottery/join"
+        payload = {"roomid": roomid, "id": id, "type": "guard", "csrf_token": self.dic_bilibili['csrf']}
+        response2 = await self.bili_section_post(join_url, data=payload, headers=self.dic_bilibili['pcheaders'])
+        return response2
+
+    async def replay_request(self, response):
+        json_response = await response.json(content_type=None)
+        if json_response['code'] == 1024:
+            Printer().printer(f'b站炸了,暂停所有请求5s后重试,请耐心等待',"Error","red")
+            await asyncio.sleep(5)
+            return True
+        else:
+            return False
+
+    async def bili_section_post(self, url, headers=None, data=None):
+        while True:
+            try:
+                response = await self.bili_section.post(url, headers=headers, data=data)
+                if response.status == 403:
+                    await asyncio.sleep(5)
+                    continue
+                tag = await self.replay_request(response)
+                if tag:
+                    continue
+                return response
+            except Exception as e:
+                traceback.print_exc()
+                # print('当前网络不好，正在重试，请反馈开发者!!!!')
+                # print(sys.exc_info()[0], sys.exc_info()[1])
+                await asyncio.sleep(1)
+                continue

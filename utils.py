@@ -7,6 +7,7 @@ import webbrowser
 import re
 from operator import itemgetter
 from configloader import ConfigLoader
+from bilibili import bilibili
 
 
 def adjust_for_chinese(str):
@@ -475,4 +476,15 @@ async def check_room_for_danmu(room_id, area_id):
     return is_ok
 
 
+async def check_room_true(roomid):
+    json_response = await bilibili().request_check_room(roomid)
 
+    if json_response['code'] == 0:
+        data = json_response['data']
+        param1 = data['is_hidden']
+        param2 = data['is_locked']
+        param3 = data['encrypted']
+        return param1, param2, param3
+    else:
+        Printer().printer(f"获取房间信息出错: {json_response}", "Error", "red")
+        return [None]
