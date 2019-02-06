@@ -30,16 +30,6 @@ def CurrentTime():
 def randomint():
     return ''.join(str(random.randint(0, 9)) for _ in range(17))
 
-
-def cnn_captcha(content):
-    img = base64.b64encode(content)
-    url = "http://47.95.255.188:5000/code"
-    data = {"image": img}
-    rsp = requests.post(url, data=data)
-    captcha = rsp.text
-    print(f'此次登录出现验证码,识别结果为{captcha}')
-    return captcha
-
 def telegram_captcha(content):
     if TELEGRAM_BOT_TOKEN == '' or TELEGRAM_CHAT_ID == '':
         return ''
@@ -171,6 +161,15 @@ class bilibili():
                 # print('当前网络不好，正在重试，请反馈开发者!!!!')
                 print(sys.exc_info()[0], sys.exc_info()[1], url)
                 continue
+
+    def cnn_captcha(self, img):
+        url = "http://zerozhushou.com:11003/captcha/v1"
+        img = str(img, encoding='utf-8')
+        json = {"image": img}
+        ressponse = requests.post(url, json=json)
+        captcha = ressponse.json()
+        Printer().printer(f"此次登录出现验证码,识别结果为{captcha['message']}","Info","green")
+        return captcha['message']
 
     async def get_json_rsp(self, rsp, url):
         if rsp.status == 200:
