@@ -509,9 +509,11 @@ class bilibili():
         # print(res.content)
         # print(res.content)
 
-        captcha = telegram_captcha(res.content)
-        # captcha = cnn_captcha(res.content)
-        return captcha
+        try:
+            return cnn_captcha(res.content)
+        except:
+            traceback.print_exc()
+            return telegram_captcha(res.content)
 
     @staticmethod
     def request_check_token():
