@@ -767,7 +767,7 @@ class bilibili():
 
     @staticmethod
     async def req_realroomid(areaid):
-        url = f'{base_url}/room/v1/area/getRoomList?platform=web&parent_area_id={areaid}&cate_id=0&area_id=0&sort_type=online&page=1&page_size=30'
+        url = f'{base_url}/room/v1/area/getRoomList?parent_area_id={areaid}&sort_type=online&page=1&page_size=50'
         json_rsp = await bilibili.instance.bili_session_get(url)
         return json_rsp
 

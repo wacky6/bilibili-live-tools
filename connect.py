@@ -5,16 +5,11 @@ import printer
 from online_net import OnlineNet
 from configloader import ConfigLoader
 import random
+import math
+import traceback
 
- 
 async def get_one(areaid):
     # 1 娱乐分区, 2 游戏分区, 3 手游分区, 4 绘画分区
-    if areaid == 1:
-        roomid = 23058
-        if (await utils.check_room_for_danmu(roomid, areaid)):
-            printer.info([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
-            return roomid
-            
     while True:
         json_rsp = await OnlineNet().req('req_realroomid', areaid)
         data = json_rsp['data']
@@ -22,16 +17,22 @@ async def get_one(areaid):
             await asyncio.sleep(3)
             printer.warn(json_rsp)
             continue
-        roomid = random.choice(data)['roomid']
-        if (await utils.check_room_for_danmu(roomid, areaid)):
-            printer.info([f'{areaid}号弹幕监控选择房间（{roomid}）'], True)
-            return roomid
+
+        # choose candidate rooms
+        n_candidates = max(1, math.floor(len(data) / 3))
+        candidate_rooms = sorted(data, key=lambda room: int(room['online']), reverse=True)[:n_candidates]
+        random.shuffle(candidate_rooms)
+
+        for room in candidate_rooms:
+            roomid = room['roomid']
+            if (await utils.check_room_for_danmu(roomid, areaid)):
+                return roomid
 
 
 class connect():
     __slots__ = ('danmuji', 'room_id', 'area_id')
     instance = None
-    
+
     def __new__(cls, *args, **kw):
         if not cls.instance:
             cls.instance = super(connect, cls).__new__(cls, *args, **kw)
@@ -39,7 +40,7 @@ class connect():
             cls.instance.room_id = 0
             cls.instance.area_id = -1
         return cls.instance
-        
+
     async def run(self):
         self.room_id = ConfigLoader().dic_user['other_control']['default_monitor_roomid']
         self.danmuji = danmu.DanmuPrinter(self.room_id, self.area_id)
@@ -48,7 +49,6 @@ class connect():
             if int(utils.CurrentTime()) - time_now <= 3:
                 printer.info(['当前网络不稳定，弹幕监控将自动延迟3秒后重启'], True)
                 await asyncio.sleep(3)
-            printer.info(['正在启动直播监控弹幕姬'], True)
             time_now = int(utils.CurrentTime())
             connect_results = await self.danmuji.open()
             if not connect_results:
@@ -63,7 +63,7 @@ class connect():
             await self.danmuji.close()
             await asyncio.wait(pending)
             printer.info(['主弹幕姬退出，剩余任务处理完毕'], True)
-    
+
     @staticmethod
     async def reconnect(roomid):
         ConfigLoader().dic_user['other_control']['default_monitor_roomid'] = roomid
@@ -71,14 +71,14 @@ class connect():
         if connect.instance.danmuji is not None:
             connect.instance.danmuji.room_id = roomid
             await connect.instance.danmuji.close()
-        
-        
+
+
 class RaffleConnect():
     def __init__(self, areaid):
         self.danmuji = None
         self.roomid = 0
         self.areaid = areaid
-        
+
     async def run(self):
         self.danmuji = danmu.DanmuRaffleHandler(self.roomid, self.areaid)
         time_now = 0
@@ -87,7 +87,6 @@ class RaffleConnect():
                 printer.info(['当前网络不稳定，弹幕监控将自动延迟3秒后重启'], True)
                 await asyncio.sleep(3)
             self.danmuji.room_id = await get_one(self.areaid)
-            printer.info(['正在启动抽奖监控弹幕姬'], True)
             time_now = int(utils.CurrentTime())
             connect_results = await self.danmuji.open()
             if not connect_results:
@@ -105,14 +104,14 @@ class RaffleConnect():
             await self.danmuji.close()
             await asyncio.wait(pending)
             printer.info([f'{self.areaid}号弹幕姬退出，剩余任务处理完毕'], True)
-                
-                
+
+
 class YjConnection():
     def __init__(self):
         self.danmuji = None
         self.roomid = 0
         self.areaid = 0
-        
+
     async def run(self):
         self.roomid = ConfigLoader().dic_user['other_control']['raffle_minitor_roomid']
         if not self.roomid:
@@ -138,8 +137,3 @@ class YjConnection():
             await self.danmuji.close()
             await asyncio.wait(pending)
             printer.info(['Yj弹幕姬退出，剩余任务处理完毕'], True)
-            
-            
-
-        
-                    

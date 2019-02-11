@@ -7,7 +7,7 @@ import struct
 import json
 import sys
 import aiohttp
-                                                          
+
 
 class BaseDanmu():
     structer = struct.Struct('!I2H2I')
@@ -17,18 +17,18 @@ class BaseDanmu():
         self._area_id = area_id
         self.room_id = room_id
         self._bytes_heartbeat = self._wrap_str(opt=2, body='')
-    
+
     @property
     def room_id(self):
         # 仅仅为了借用roomi_id.setter，故不设置
         pass
-        
+
     @room_id.setter
     def room_id(self, room_id):
         self._room_id = room_id
         str_conn_room = f'{{"uid":0,"roomid":{room_id},"protover":1,"platform":"web","clientver":"1.3.3"}}'
         self._bytes_conn_room = self._wrap_str(opt=7, body=str_conn_room)
-        
+
     def _wrap_str(self, opt, body, len_header=16, ver=1, seq=1):
         remain_data = body.encode('utf-8')
         len_data = len(remain_data) + len_header
@@ -59,9 +59,9 @@ class BaseDanmu():
             print(sys.exc_info()[0], sys.exc_info()[1])
             print('请联系开发者')
             return None
-        
+
         return bytes_data
-        
+
     async def open(self):
         try:
             url = 'wss://broadcastlv.chat.bilibili.com:443/sub'
@@ -70,9 +70,8 @@ class BaseDanmu():
             print("# 连接无法建立，请检查本地网络状况")
             print(sys.exc_info()[0], sys.exc_info()[1])
             return False
-        printer.info([f'{self._area_id}号弹幕监控已连接b站服务器'], True)
         return (await self._send_bytes(self._bytes_conn_room))
-        
+
     async def heart_beat(self):
         try:
             while True:
@@ -81,7 +80,7 @@ class BaseDanmu():
                 await asyncio.sleep(30)
         except asyncio.CancelledError:
             pass
-            
+
     async def read_datas(self):
         while True:
             datas = await self._read_bytes()
@@ -123,11 +122,11 @@ class BaseDanmu():
             print('请联系开发者', sys.exc_info()[0], sys.exc_info()[1])
         if not self.ws.closed:
             printer.info([f'请联系开发者  {self._area_id}号弹幕收尾模块状态{self.ws.closed}'], True)
-                
+
     def handle_danmu(self, body):
         return True
-                
-                
+
+
 class DanmuPrinter(BaseDanmu):
     def handle_danmu(self, body):
         dic = json.loads(body.decode('utf-8'))
@@ -138,7 +137,7 @@ class DanmuPrinter(BaseDanmu):
             printer.print_danmu(dic)
         return True
 
-        
+
 class DanmuRaffleHandler(BaseDanmu):
     async def check_area(self):
         try:
@@ -150,15 +149,15 @@ class DanmuRaffleHandler(BaseDanmu):
                 await asyncio.sleep(300)
         except asyncio.CancelledError:
             pass
-        
+
     def handle_danmu(self, body):
         dic = json.loads(body.decode('utf-8'))
         cmd = dic['cmd']
-        
+
         if cmd == 'PREPARING':
             printer.info([f'{self._area_id}号弹幕监控房间下播({self._room_id})'], True)
             return False
-    
+
         elif cmd == 'NOTICE_MSG':
             # 1 《第五人格》哔哩哔哩直播预选赛六强诞生！
             # 2 全区广播：<%user_name%>送给<%user_name%>1个嗨翻全城，快来抽奖吧
@@ -199,35 +198,35 @@ class DanmuRaffleHandler(BaseDanmu):
                 printer.info([f'{self._area_id}号弹幕监控检测到{real_roomid:^9}的{raffle_name}'], True)
                 rafflehandler.Rafflehandler.Put2Queue((real_roomid,), rafflehandler.handle_1_room_storm)
                 Statistics.add2pushed_raffle(raffle_name)
-        
+
         return True
-            
-        
+
+
 class YjMonitorHandler(BaseDanmu):
     def __init__(self, room_id, area_id):
         super().__init__(room_id, area_id)
         keys = '阝飠牜饣卩卪厸厶厽孓宀巛巜彳廴彡彐忄扌攵氵灬爫犭疒癶礻糹纟罒罓耂虍訁覀兦亼亽亖亗吂卝匸皕旡玊尐幵朩囘囙囜囝囟囡団囤囥囦囧囨囩囪囫囬囮囯困囱囲図囵囶囷囸囹固囻囼图囿圀圁圂圃圄圅圆圇圉圊圌圍圎圏圐圑園圓圔圕圖圗團圙圚圛圜圝圞'
         self.__reverse_keys = {value: i for i, value in enumerate(keys)}
         self.__read = {}
-    
+
     def __base2dec(self, str_num, base=110):
         result = 0
         for i in str_num:
             result = result * base + self.__reverse_keys[i]
         return result
-    
+
     def __reverse(self, msg):
         msg = msg.replace('?', '')
         first = self.__reverse_keys.get(msg[0], -1)
         last = self.__reverse_keys.get(msg[-1], -1)
-        
+
         # 校验
         if 0 <= first <= 109 and 0 <= last <= 109 and not (first + last - 109):
             type = msg[-2]
             msg_id, id = map(self.__base2dec, msg[:-2].split('.'))
             return msg_id, type, id
         return None
-        
+
     def __combine_piece(self, uid, msg):
         # None/''
         if not msg:
@@ -246,7 +245,7 @@ class YjMonitorHandler(BaseDanmu):
         else:
             user_danmus[msg_id] = id
             return None
-        
+
     def handle_danmu(self, body):
         dic = json.loads(body.decode('utf-8'))
         cmd = dic['cmd']
@@ -265,8 +264,8 @@ class YjMonitorHandler(BaseDanmu):
                         storm_id = id
                         print('节奏风暴', storm_id)
                         rafflehandler.Rafflehandler.Put2Queue((storm_id,), rafflehandler.handle_1_storm_raffle)
-                '''        
-                
+                '''
+
                 result = self.__combine_piece(uid, msg)
                 # print('监控read dic', self.__read)
                 if result is None:
@@ -280,7 +279,7 @@ class YjMonitorHandler(BaseDanmu):
             except Exception:
                 printer.warn(f'Yj监控房间内可能有恶意干扰{uid}: {ori}')
         return True
-                    
-                    
-               
-    
+
+
+
+
