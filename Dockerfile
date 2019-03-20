@@ -14,7 +14,7 @@ RUN apk add --no-cache git && \
     rm -r /var/cache/apk && \
     rm -r /usr/share/man
 
-ENTRYPOINT git pull && \
+ENTRYPOINT git pull -f && \
             pip install -r requirements.txt && \
             sed -i ''"$(cat conf/bilibili.toml -n | grep "username =" | awk '{print $1}')"'c '"$(echo "username = \"${USER_NAME}\"")"'' conf/bilibili.toml && \
             sed -i ''"$(cat conf/bilibili.toml -n | grep "password =" | awk '{print $1}')"'c '"$(echo "password = \"${USER_PASSWORD}\"")"'' conf/bilibili.toml && \
