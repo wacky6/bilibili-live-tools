@@ -566,11 +566,11 @@ class bilibili():
         return json_rsp
 
     @staticmethod
-    async def get_gift_of_events_web(text1, text2, raffleid):
+    async def get_gift_of_events_web(text1, referrer, raffleid):
         inst = bilibili.instance
         headers = {
             **(inst.dic_bilibili['pcheaders']),
-            'referer': text2
+            'referer': referrer
             }
 
         pc_url = f'{base_url}/activity/v1/Raffle/join?roomid={text1}&raffleId={raffleid}'
@@ -589,29 +589,17 @@ class bilibili():
         return json_rsp
 
     @staticmethod
-    async def get_gift_of_TV(real_roomid, TV_raffleid):
+    async def get_gift_of_TV(raffle_type, real_roomid, raffleid):
         inst = bilibili.instance
         url = f"{base_url}/gift/v3/smalltv/join"
         payload = {
             "roomid": real_roomid,
-            "raffleId": TV_raffleid,
-            "type": "Gift",
-            "csrf_token": ''
-            }
+            "raffleId": raffleid,
+            "type": raffle_type,
+            "csrf_token": inst.dic_bilibili['csrf']
+        }
 
         json_rsp = await inst.bili_session_post(url, data=payload, headers=inst.dic_bilibili['pcheaders'])
-        return json_rsp
-
-    @staticmethod
-    async def get_gift_of_TV_app(real_roomid, raffle_id, raffle_type):
-        inst = bilibili.instance
-        url = f"{base_url}/gift/v4/smalltv/getAward"
-        temp_params = f'access_key={inst.dic_bilibili["access_key"]}&{inst.app_params}&raffleId={raffle_id}&roomid={real_roomid}&ts={CurrentTime()}&type={raffle_type}'
-        sign = inst.calc_sign(temp_params)
-        payload = f'{temp_params}&sign={sign}'
-        # print(payload)
-        json_rsp = await inst.bili_session_post(url, params=payload, headers=inst.dic_bilibili['appheaders'])
-        # print(json_rsp)
         return json_rsp
 
     @staticmethod
