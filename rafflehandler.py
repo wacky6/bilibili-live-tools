@@ -82,7 +82,7 @@ class Rafflehandler:
 
 async def handle_1_TV_raffle(num, raffle_type, real_roomid, raffleid):
     while True:
-        printer.info([f'参与房间${real_roomid:^9}的 {raffle_type} 抽奖：${raffleid}'], True)
+        printer.info([f'参与房间{real_roomid:^9}的 {raffle_type} 抽奖：{raffleid}'], True)
         json_response2 = await OnlineNet().req('get_gift_of_TV', raffle_type, real_roomid, raffleid)
         code = json_response2['code']
         if not code:
