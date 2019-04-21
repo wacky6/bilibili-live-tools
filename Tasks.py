@@ -7,6 +7,8 @@ from bilitimer import BiliTimer
 import random
 import re
 import json
+import sys
+import time
 
 # 获取每日包裹奖励
 async def Daily_bag():
@@ -74,7 +76,7 @@ async def send_expiring_gift():
                 print('正在投递其他勋章')
                 list_medal = await utils.fetch_medal(show=False)
                 list_gift = await full_intimate(list_gift, list_medal)
-                
+
             print('正在清理过期礼物到指定房间')
             for i in list_gift:
                 giftID = i[0]
@@ -144,10 +146,10 @@ async def sliver2coin():
     if ConfigLoader().dic_user['task_control']['silver2coin']:
         # 403 done
         # json_response1 = await OnlineNet().req('silver2coin_app')
-        
+
         json_response = await OnlineNet().req('silver2coin_web')
         printer.info([f'#  {json_response["msg"]}'])
-        
+
         if json_response['code'] == 403 and '最多' in json_response['msg']:
             finish_web = True
         else:
@@ -222,13 +224,13 @@ async def check(id):
     voteRule = data['voteRule']
     voted = votebreak+voteDelete+voteRule
     percent = (voteRule / voted) if voted else 0
-    
+
     print(f'\"{data["originContent"]}\"')
     print('该案件目前已投票', voted)
     print('认为言论合理比例', percent)
     return voted, percent
-    
-    
+
+
 def judge_case(voted, percent):
     vote = None
     if voted >= 300:
@@ -250,9 +252,9 @@ def judge_case(voted, percent):
     # 抬一手
     if vote is None and voted >= 400:
         vote = 2
-        
+
     return vote
-               
+
 async def judge():
     num_case = 0
     num_voted = 0
@@ -264,7 +266,7 @@ async def judge():
         else:
             print('本次未获取到案件')
             break
-        
+
         wait_time = 0
         min_percent = 1
         max_percent = 0
@@ -275,7 +277,7 @@ async def judge():
                 min_percent = min(min_percent, percent)
                 max_percent = max(max_percent, percent)
                 print('统计投票波动情况', max_percent, min_percent)
-            
+
             if vote is not None:
                 break
             elif wait_time >= 1200:
@@ -293,7 +295,7 @@ async def judge():
                 printer.info([f'案件{id}暂时无法判定，在{sleep_time}后重新尝试'], True)
                 await asyncio.sleep(sleep_time)
                 wait_time += sleep_time
-        
+
         if vote is None:
             num_voted -= 1
             vote = 3
@@ -305,12 +307,55 @@ async def judge():
             num_voted += 1
         else:
             print('该案件的投票结果', id, '投票失败，请反馈作者')
-        
+
         print('______________________________________________')
-    
+
     printer.info([f'风纪委员会共获取{num_case}件案例，其中有效投票{num_voted}件'], True)
     BiliTimer.call_after(judge, 3600)
-        
+
+
+async def watch_av():
+    av = [
+        24158750,  # freely tomorrow
+        21317048,  # 皆大欢喜 お気に召すまま
+        26448377,  # B With U
+    ]
+
+    for aid in av:
+        try:
+            resp = await OnlineNet().req('AvView', aid)
+            json = resp['data']
+            cid = json['cid']
+            duration = json['duration']
+
+            printer.info([f'开始观看 av{aid}: {json["title"]}'])
+
+            startts = int(time.time())
+            playtime = 0
+
+            # start play
+            resp2 = await OnlineNet().req('AvHeartbeat', aid, cid, 1, playtime, playtime, startts)
+
+            # playing
+            while playtime < duration - 1:
+                wait_for = min(15, duration - 1 - playtime)
+                await asyncio.sleep(wait_for)
+                playtime += wait_for
+                resp2 = await OnlineNet().req('AvHeartbeat', aid, cid, 0, playtime, playtime, startts)
+                printer.info([f'正在观看 av{aid}, t={playtime}/{duration}'])
+
+            # finish play
+            resp2 = await OnlineNet().req('AvHeartbeat', aid, cid, 4, -1, duration-1, startts)
+            printer.info([f'完成观看 av{aid}'])
+
+            await asyncio.sleep(random.randint(10, 120))
+
+        except:
+            print(sys.exc_info()[0], sys.exc_info()[1], url)
+            continue
+
+    BiliTimer.call_after(watch_av, 28800 + random.randint(0, 14400))
+
 
 def init():
     BiliTimer.call_after(sliver2coin, 0)
@@ -322,4 +367,4 @@ def init():
     BiliTimer.call_after(send_gift, 0)
     BiliTimer.call_after(BiliMainTask, 0)
     BiliTimer.call_after(judge, 0)
-    
+    BiliTimer.call_after(watch_av, 0)

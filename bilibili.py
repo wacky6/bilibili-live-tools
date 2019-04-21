@@ -792,6 +792,36 @@ class bilibili():
         json_rsp = await self.other_session_post(url, headers=pcheaders, data=data)
         return json_rsp
 
+    async def AvView(self, aid):
+        url = f"https://api.bilibili.com/x/web-interface/view?aid={aid}"
+        pcheaders = {
+            **(self.dic_bilibili['pcheaders']),
+            'referer': f'https://www.bilibili.com/video/av{aid}'
+        }
+        json_rsp = await self.bili_session_get(url, headers=pcheaders)
+        return json_rsp
+
+    async def AvHeartbeat(self, aid, cid, playtype, playtime, realtime, startts):
+        url = 'https://api.bilibili.com/x/report/web/heartbeat'
+        pcheaders = {
+            **(self.dic_bilibili['pcheaders']),
+            'referer': f'https://www.bilibili.com/video/av{aid}'
+        }
+        data = {
+            'aid': aid,
+            'cid': cid,
+            'mid': self.dic_bilibili['uid'],
+            'csrf': self.dic_bilibili['csrf'],
+            'played_time': playtime,
+            'realtime': realtime,
+            'start_ts': startts,
+            'type': 3,
+            'dt': 2,
+            'play_type': playtype
+        }
+        json_rsp = await self.other_session_post(url, data=data, headers=pcheaders)
+        return json_rsp
+
     async def Heartbeat(self, aid, cid):
         url = 'https://api.bilibili.com/x/report/web/heartbeat'
         data = {'aid': aid, 'cid': cid, 'mid': self.dic_bilibili['uid'], 'csrf': self.dic_bilibili['csrf'],
