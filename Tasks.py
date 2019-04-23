@@ -354,7 +354,7 @@ async def watch_av():
             print(sys.exc_info()[0], sys.exc_info()[1], url)
             continue
 
-    BiliTimer.call_after(watch_av, 28800 + random.randint(0, 14400))
+    BiliTimer.call_after(watch_av, 54000 + random.randint(0, 14400))
 
 
 def init():
