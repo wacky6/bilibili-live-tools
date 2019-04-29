@@ -895,7 +895,7 @@ class bilibili():
         headers = {
             "User-Agent": "bilibili-live-tools/" + str(self.dic_bilibili['uid'])
         }
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=30.0)
         return response
 
     async def get_gift_of_captain(self, roomid, id):
