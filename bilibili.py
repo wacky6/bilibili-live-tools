@@ -657,7 +657,12 @@ class bilibili():
     async def pcpost_heartbeat():
         inst = bilibili.instance
         url = f'{base_url}/User/userOnlineHeart'
-        json_rsp = await inst.bili_session_post(url, headers=inst.dic_bilibili['pcheaders'])
+        data = {
+            "csrf_token": inst.dic_bilibili['csrf'],
+            "csrf": inst.dic_bilibili['csrf']
+        }
+        json_rsp = await inst.bili_session_post(url, data=data, headers=inst.dic_bilibili['pcheaders'])
+        print(json_rsp)
         return json_rsp
 
     # 发送app心跳包
