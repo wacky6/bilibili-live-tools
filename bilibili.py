@@ -459,7 +459,7 @@ class bilibili():
     async def request_fetchmedal():
         inst = bilibili.instance
         url = f'{base_url}/i/api/medal?page=1&pageSize=50'
-        json_rsp = await inst.bili_session_post(url, headers=inst.dic_bilibili['pcheaders'])
+        json_rsp = await inst.bili_session_get(url, headers=inst.dic_bilibili['pcheaders'])
         return json_rsp
 
     @staticmethod

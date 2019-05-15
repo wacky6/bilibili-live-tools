@@ -74,7 +74,7 @@ async def send_expiring_gift():
             print('发现即将过期的礼物', list_gift)
             if task_control['clean_expiring_gift2all_medal']:
                 print('正在投递其他勋章')
-                list_medal = await utils.fetch_medal(show=False)
+                list_medal = await utils.fetch_medal(False)
                 list_gift = await full_intimate(list_gift, list_medal)
 
             print('正在清理过期礼物到指定房间')
@@ -94,17 +94,24 @@ async def send_medal_gift():
         if not list_medal:
             print('暂未佩戴任何勋章')
     if task_control['send2medal']:
-        list_medal += await utils.fetch_medal(False, task_control['send2medal'])
-    # print(list_medal)
+        all_medals = await utils.fetch_medal(True)
+        wanted_medals = task_control['send2medal']
+        if wanted_medals != None:
+            for roomid in wanted_medals:
+                for m in all_medals:
+                    if m[0] == roomid:
+                        list_medal.append(m[:3])
+
     print('正在投递勋章')
     temp = await utils.fetch_bag_list(show=False)
-    # print(temp)
+
     list_gift = []
     for i in temp:
         gift_id = int(i[0])
         left_time = i[3]
         if (gift_id not in [4, 3, 9, 10]) and left_time is not None:
             list_gift.append(i[:3])
+
     await full_intimate(list_gift, list_medal)
 
 async def send_gift():
