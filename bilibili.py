@@ -468,7 +468,7 @@ class bilibili():
         url = f'{base_url}/live_user/v1/UserInfo/get_weared_medal'
         data = {
             'uid': inst.dic_bilibili['uid'],
-            'csrf_token': ''
+            'csrf_token': inst.dic_bilibili['csrf']
         }
         json_rsp = await inst.bili_session_post(url, data=data, headers=inst.dic_bilibili['pcheaders'])
         return json_rsp
