@@ -352,7 +352,7 @@ async def watch_av():
                 printer.info([f'正在观看 av{aid}, t={playtime}/{duration}'])
 
             # finish play
-            resp2 = await OnlineNet().req('AvHeartbeat', aid, cid, 4, -1, duration-1, startts)
+            resp2 = await OnlineNet().req('AvHeartbeat', aid, cid, 4, -1, duration, startts)
             printer.info([f'完成观看 av{aid}'])
 
             await asyncio.sleep(random.randint(10, 120))
