@@ -122,24 +122,29 @@ async def handle_1_storm_raffle(id):
 
 async def handle_1_room_TV(real_roomid):
     result = await utils.enter_room(real_roomid)
-    if result:
-        json_response = await OnlineNet().req('get_giftlist_of_TV', real_roomid)
-        current_time = CurrentTime()
-        checklen = json_response['data']['list']
-        list_available_raffleid = []
-        for j in checklen:
-            raffle_id = j['raffleId']
-            raffle_type = j['type']
-            time_wanted = j['time_wait'] + current_time
-            # 处理一些重复
-            if not Rafflehandler().check_duplicate(raffle_id):
-                list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
-                Rafflehandler().add2raffle_id(raffle_id)
+    if not result:
+        return None
 
-        num_available = len(list_available_raffleid)
-        # print(list_available_raffleid)
-        for raffle_id, raffle_type, time_wanted in list_available_raffleid:
-            BiliTimer.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, raffle_type, real_roomid, raffle_id))
+    json_response = await OnlineNet().req('get_giftlist_of_TV', real_roomid)
+    current_time = CurrentTime()
+    checklen = json_response['data']['list']
+    if not checklen:
+        return None
+
+    list_available_raffleid = []
+    for j in checklen:
+        raffle_id = j['raffleId']
+        raffle_type = j['type']
+        time_wanted = j['time_wait'] + current_time
+        # 处理一些重复
+        if not Rafflehandler().check_duplicate(raffle_id):
+            list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
+            Rafflehandler().add2raffle_id(raffle_id)
+
+    num_available = len(list_available_raffleid)
+    # print(list_available_raffleid)
+    for raffle_id, raffle_type, time_wanted in list_available_raffleid:
+        BiliTimer.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, raffle_type, real_roomid, raffle_id))
 
 async def handle_1_room_storm(roomid):
     result = await utils.enter_room(roomid)

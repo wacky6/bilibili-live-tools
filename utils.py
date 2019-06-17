@@ -351,6 +351,9 @@ async def fetch_liveuser_info(real_roomid):
         size = 100, 100
 
 async def enter_room(roomid):
+    if not roomid:
+        return True
+
     json_response = await OnlineNet().req('request_check_room', roomid)
 
     if not json_response['code']:
