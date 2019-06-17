@@ -909,6 +909,22 @@ class bilibili():
         response2 = await self.bili_section_post(join_url, data=payload, headers=self.dic_bilibili['pcheaders'])
         return response2
 
+    async def check_room_pk_gift(self, real_roomid):
+        url = f"https://api.live.bilibili.com/xlive/lottery-interface/v1/pk/check?roomid={real_roomid}"
+        resp = await self.other_session_get(url)
+        return resp
+
+    async def join_room_pk_gift(self, real_roomid, raffle_id):
+        url = f"https://api.live.bilibili.com/xlive/lottery-interface/v1/pk/join"
+        data = {
+            'roomid': real_roomid,
+            'id': raffle_id,
+            'csrf_token': self.dic_bilibili['csrf'],
+            'csrf': self.dic_bilibili['csrf'],
+        }
+        resp = await self.bili_session_post(url, data=data, headers=self.dic_bilibili['pcheaders'])
+        return resp
+
     async def replay_request(self, response):
         json_response = await response.json(content_type=None)
         if json_response['code'] == 1024:

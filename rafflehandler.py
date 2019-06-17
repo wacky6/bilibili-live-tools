@@ -6,6 +6,7 @@ import asyncio
 import time
 import random
 from bilitimer import BiliTimer
+from pk_gift import monitor_pk_result
 
 
 def CurrentTime():
@@ -145,6 +146,10 @@ async def handle_1_room_TV(real_roomid):
     # print(list_available_raffleid)
     for raffle_id, raffle_type, time_wanted in list_available_raffleid:
         BiliTimer.append2list_jobs(handle_1_TV_raffle, time_wanted, (num_available, raffle_type, real_roomid, raffle_id))
+
+        # PK 礼物检测
+        if raffle_type == 'GIFT_30207':
+            BiliTimer.call_with_args(monitor_pk_result, (real_roomid,))
 
 async def handle_1_room_storm(roomid):
     result = await utils.enter_room(roomid)
