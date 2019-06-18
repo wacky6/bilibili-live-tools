@@ -11,7 +11,7 @@ async def get_pk_winner_gift(real_roomid, raffle_id):
 
 async def monitor_pk_result(real_roomid):
     check_interval = 75
-    init_trials = 9    # ceil(max duration of pk / check_interval) + 1 + tolerance
+    init_trials = 11    # ceil(max duration of pk / check_interval) + 1 + tolerance
 
     if real_roomid in active_rooms:
         active_rooms[real_roomid] = init_trials
