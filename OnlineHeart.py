@@ -25,42 +25,36 @@ async def guard_lottery():
     global had_gotted_guard
     global last_guard_room
 
-    print("starting guard_lottery")
-    for k in range(3):
-        try:
-            response = await bilibili().guard_list()
-            json_response = response.json()
-            break
-        except:
-            traceback.print_exc()
-    else:
-        printer.info(["连接舰长服务器失败"])
-        return
+    guards = await bilibili().guard_list()
 
-    for i in range(0, len(json_response)):
-        if json_response[i]['Status']:
-            GuardId = json_response[i]['GuardId']
-            if GuardId not in had_gotted_guard and GuardId != 0:
-                had_gotted_guard.append(GuardId)
-                OriginRoomId = json_response[i]['OriginRoomId']
-                if not OriginRoomId == last_guard_room:
-                    result = await utils.check_room_true(OriginRoomId)
-                    if True in result:
-                        printer.info([f"检测到房间 {OriginRoomId} 的钓鱼操作"])
-                        continue
-                    await bilibili().post_watching_history(OriginRoomId)
-                    last_guard_room = OriginRoomId
-                response2 = await bilibili().get_gift_of_captain(OriginRoomId, GuardId)
-                json_response2 = await response2.json(content_type=None)
-                if json_response2['code'] == 0:
-                    printer.info([f"获取到房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度: {json_response2['data']['message']}"])
-                elif json_response2['code'] == 400 and json_response2['msg'] == "你已经领取过啦":
-                    printer.info([f"房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度已领过"])
-                elif json_response2['code'] == 400 and json_response2['msg'] == "访问被拒绝":
-                    printer.info([f"获取房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度: {json_response2['message']}"])
-                    print(json_response2)
-                else:
-                    printer.info([f"房间 {OriginRoomId} 编号 {GuardId}  的上船亲密度领取出错: {json_response2}"])
+    for guard in guards:
+        if not guard['Status']:
+            continue
+
+        GuardId = guard['GuardId']
+        if GuardId not in had_gotted_guard and GuardId != 0:
+            had_gotted_guard.append(GuardId)
+            OriginRoomId = guard['OriginRoomId']
+
+            if not OriginRoomId == last_guard_room:
+                result = await utils.check_room_true(OriginRoomId)
+                if True in result:
+                    printer.info([f"检测到房间 {OriginRoomId} 的钓鱼操作"])
+                    continue
+                await bilibili().post_watching_history(OriginRoomId)
+                last_guard_room = OriginRoomId
+
+            response2 = await bilibili().get_gift_of_captain(OriginRoomId, GuardId)
+            json_response2 = await response2.json(content_type=None)
+            if json_response2['code'] == 0:
+                printer.info([f"获取到房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度: {json_response2['data']['message']}"])
+            elif json_response2['code'] == 400 and json_response2['msg'] == "你已经领取过啦":
+                printer.info([f"房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度已领过"])
+            elif json_response2['code'] == 400 and json_response2['msg'] == "访问被拒绝":
+                printer.info([f"获取房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度: {json_response2['message']}"])
+                print(json_response2)
+            else:
+                printer.info([f"房间 {OriginRoomId} 编号 {GuardId}  的上船亲密度领取出错: {json_response2}"])
         else:
             pass
 

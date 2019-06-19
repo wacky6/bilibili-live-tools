@@ -11,6 +11,7 @@ import json
 from io import BytesIO
 import os
 import traceback
+import re
 
 def get_env(name, default = ''):
     if name in os.environ:
@@ -168,7 +169,7 @@ class bilibili():
         json = {"image": img}
         ressponse = requests.post(url, json=json)
         captcha = ressponse.json()
-        Printer().printer(f"此次登录出现验证码,识别结果为{captcha['message']}","Info","green")
+        print(f"此次登录出现验证码,识别结果为{captcha['message']}")
         return captcha['message']
 
     async def get_json_rsp(self, rsp, url):
@@ -896,12 +897,73 @@ class bilibili():
         return text_rsp
 
     async def guard_list(self):
-        url = "http://118.25.108.153:8080/guard"
-        headers = {
-            "User-Agent": "bilibili-live-tools/" + str(self.dic_bilibili['uid'])
-        }
-        response = requests.get(url, headers=headers, timeout=30.0)
-        return response
+        list1 = []
+        list2 = []
+
+        # Dawnnnnnn
+        for i in range(3):
+            try:
+                url = "http://118.25.108.153:8080/guard"
+                headers = {
+                    "User-Agent": "bilibili-live-tools/" + str(self.dic_bilibili['uid'])
+                }
+                list1 = requests.get(url, headers=headers, timeout=30.0).json()
+                break
+            except:
+                print('Fail to fetch Dawnnnnnn list')
+                traceback.print_exc()
+                pass
+
+        # Bilibili Wiki
+        for i in range(3):
+            try:
+                url = "https://list.bilibili.wiki/zongdu.php"
+                headers = {
+                    "User-Agent": self.dic_bilibili['pcheaders']["User-Agent"]
+                }
+                html = requests.get(url, headers=headers, timeout=30.0).content.decode('utf-8')
+                list2 = list(map(
+                    lambda t: {
+                        "GovernorName": "[Unknown]",
+                        "Guard": t[2],
+                        "GuardId": int(t[0]),
+                        "MasterId": -1,
+                        "MasterName": "[Unknown]",
+                        "OriginRoomId": int(t[1]),
+                        "SenderId": -1,
+                        "ShortRoomId": int(t[1]),
+                        "Status": True,
+                        "Time": t[3],
+                    },
+                    re.findall(r'<tr>\s*<td>\s*<b>\s*(\d+)\s*</b>\s*</td>\s*<td>\s*(\d+)\s*</td>\s*<td>\s*([^<+]+)(?:\+\d+)?\s*</td>\s*<td>\s*([^<]+)\s*</td>', html)
+                ))
+            except:
+                print('Fail to fetch Bilibili Wiki list')
+                traceback.print_exc()
+                pass
+
+
+        # merge response
+        merged = sorted(
+            list1 + list2,
+            key = lambda x: x['GuardId']
+        )
+
+        # union
+        ret = []
+        g_id = set()
+        for g in merged:
+            if g['GuardId'] not in g_id:
+                g_id.add(g['GuardId'])
+                ret.append(g)
+
+        # Report statistics
+        u = len(ret)
+        pct1 = len(list1) / max(u, 1)
+        pct2 = len(list2) / max(u, 1)
+        print(f'Guard Lottery, Union = {u}; Coverage: Dawnnnnnn = {round(pct1 * 100, 2)}%, Bili.Wiki = {round(pct2 * 100, 2)}%')
+
+        return ret
 
     async def get_gift_of_captain(self, roomid, id):
         join_url = "https://api.live.bilibili.com/lottery/v2/lottery/join"
@@ -928,7 +990,7 @@ class bilibili():
     async def replay_request(self, response):
         json_response = await response.json(content_type=None)
         if json_response['code'] == 1024:
-            Printer().printer(f'b站炸了,暂停所有请求5s后重试,请耐心等待',"Error","red")
+            print(f'b站炸了,暂停所有请求5s后重试,请耐心等待')
             await asyncio.sleep(5)
             return True
         else:
