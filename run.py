@@ -13,6 +13,7 @@ import os
 import online_net
 import bili_console
 from bilitimer import BiliTimer
+from pkLottery import PKLottery
 
 
 loop = asyncio.get_event_loop()
@@ -50,7 +51,8 @@ tasks = [
     Silver.run(),
     danmu_connection.run(),
     rafflehandler.run(),
-    yjconnection.run()
+    yjconnection.run(),
+    PKLottery().run()
 ]
 try:
     loop.run_until_complete(asyncio.wait(tasks + list_raffle_connection_task))
@@ -60,10 +62,10 @@ except KeyboardInterrupt:
         pass
     else:
         response = online_net.logout()
-    
+
 console_thread.join()
 
 loop.close()
-    
+
 
 
