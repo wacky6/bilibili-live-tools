@@ -28,9 +28,6 @@ async def guard_lottery():
     guards = await bilibili().guard_list()
 
     for guard in guards:
-        if not guard['Status']:
-            continue
-
         GuardId = guard['GuardId']
         if GuardId not in had_gotted_guard and GuardId != 0:
             had_gotted_guard.append(GuardId)

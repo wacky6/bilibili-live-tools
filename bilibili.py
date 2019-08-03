@@ -189,8 +189,13 @@ class bilibili():
                     await asyncio.sleep(1)
                     return 3
             return json_rsp
-        elif rsp.status == 403:
-            print('403:', url)
+        elif rsp.status == 412:
+            # IP风控
+            await asyncio.sleep(120)
+            return None
+        else:
+            print(f'{rsp.status}: {url}')
+            print(rsp.content)
         return None
 
     async def get_text_rsp(self, rsp, url):
