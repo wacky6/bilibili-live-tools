@@ -1,6 +1,8 @@
-# bilibili-live-tools
-
-    再次想起的话，春华秋实、夏炽冬霜，还会一直轮回下去
+<p align="center">
+    <img width="360" height="350" src="https://raw.githubusercontent.com/wacky6/bilibili-live-tools/master/logo.png"></img>
+    <h1 align="center">bilibili-live-tools</h1>
+    <blockquote align="center">再次想起的话，春华秋实、夏炽冬霜，还会一直轮回下去</blockquote>
+</p>
 
 ## Docker使用
 
