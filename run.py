@@ -42,7 +42,6 @@ danmu_connection = connect.connect()
 bili_timer = BiliTimer(loop)
 
 console_thread = threading.Thread(target=var_console.cmdloop)
-
 console_thread.start()
 
 Tasks.init()
@@ -54,18 +53,14 @@ tasks = [
     yjconnection.run(),
     PKLottery().run()
 ]
-try:
-    loop.run_until_complete(asyncio.wait(tasks + list_raffle_connection_task))
-except KeyboardInterrupt:
-    # print(sys.exc_info()[0], sys.exc_info()[1])
-    if ConfigLoader().dic_user['other_control']['keep-login']:
-        pass
-    else:
-        response = online_net.logout()
 
-console_thread.join()
+loop.run_until_complete(asyncio.wait(
+    tasks + list_raffle_connection_task,
+    return_when=asyncio.FIRST_EXCEPTION
+))
 
 loop.close()
+console_thread.join()
 
 
 
