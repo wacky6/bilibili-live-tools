@@ -16,7 +16,8 @@ RUN apk add --no-cache git tzdata && \
     git clone https://github.com/wacky6/bilibili-live-tools.git /app && \
     pip install -r requirements.txt && \
     rm -r /var/cache/apk && \
-    rm -r /usr/share/man
+    rm -r /usr/share/man && \
+    cp /app/READ_SAMPLE_CONF.toml /app/conf/user.toml
 
 ENTRYPOINT git pull -f && \
             pip install -r requirements.txt && \
