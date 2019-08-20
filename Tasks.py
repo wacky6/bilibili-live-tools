@@ -121,7 +121,7 @@ async def initiate_send_gift():
     # - 保险起见应该 1000 秒 （16分种） ->（NTP允许的最大正常情况下的时间偏移）
     # - 但是这段时间很可能会手动刷金瓜子礼物，为了避免浪费亲密度，选择更少的提前量
     time_to_end_of_day = max(0, utils.seconds_until_tomorrow() - random.randint(90, 180))
-    printer.info([f'{time_to_end_of_day} 秒后自动送礼物'])
+    printer.info([f'辣条机：{time_to_end_of_day} 秒后 - 倒辣条'])
     BiliTimer.call_after(send_gift, time_to_end_of_day)
 
 async def send_gift():
@@ -334,11 +334,14 @@ async def judge():
 
 
 async def watch_av():
-    av = [
-        24158750,  # freely tomorrow
-        21317048,  # 皆大欢喜 お気に召すまま
-        26448377,  # B With U
-    ]
+    task_control = ConfigLoader().dic_user['task_control']
+
+    must_watch = task_control['must_watch'] if 'must_watch' in task_control else []
+    random_watch = task_control['random_watch'] if 'random_watch' in task_control else []
+
+    # 每日必看 + 随机三个
+    av = must_watch + random.sample(random_watch, k=min(3, len(random_watch)))
+    random.shuffle(av)
 
     for aid in av:
         try:
@@ -367,10 +370,10 @@ async def watch_av():
             resp2 = await OnlineNet().req('AvHeartbeat', aid, cid, 4, -1, duration, startts)
             printer.info([f'完成观看 av{aid}'])
 
-            await asyncio.sleep(random.randint(10, 120))
+            await asyncio.sleep(random.randint(30, 180))
 
         except:
-            print(sys.exc_info()[0], sys.exc_info()[1], url)
+            print(sys.exc_info()[0], sys.exc_info()[1])
             continue
 
     BiliTimer.call_after(watch_av, 54000 + random.randint(0, 14400))
@@ -386,4 +389,9 @@ def init():
     BiliTimer.call_after(initiate_send_gift, 0)
     BiliTimer.call_after(BiliMainTask, 0)
     BiliTimer.call_after(judge, 0)
-    BiliTimer.call_after(watch_av, 0)
+
+    # 每天 20:30 - 22:30 之间开始 (黄金时段？）看视频
+    # 如果正在黄金时段，立刻开始看。 假设 HEADLESS 并且定时重启（crontab）
+    seconds_to_gold_time = max(0, utils.seconds_until_tomorrow() - random.randint(5400, 12600))
+    printer.info([f'黄金时段：{seconds_to_gold_time} 秒后 - 看视频'])
+    BiliTimer.call_after(watch_av, seconds_to_gold_time)
