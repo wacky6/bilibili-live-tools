@@ -114,10 +114,22 @@ async def send_medal_gift():
 
     await full_intimate(list_gift, list_medal)
 
+async def initiate_send_gift():
+    # 每天结束前两分钟左右刷礼物，如果调用时间在最后两分钟内，立刻送礼物
+    # - 随即范围：3分钟 - 1分30秒
+    # - 通常情况下，本机时间和破站服务器时间不会相差太大
+    # - 保险起见应该 1000 秒 （16分种） ->（NTP允许的最大正常情况下的时间偏移）
+    # - 但是这段时间很可能会手动刷金瓜子礼物，为了避免浪费亲密度，选择更少的提前量
+    time_to_end_of_day = max(0, utils.seconds_until_tomorrow() - random.randint(90, 180))
+    printer.info([f'{time_to_end_of_day} 秒后自动送礼物'])
+    BiliTimer.call_after(send_gift, time_to_end_of_day)
+
 async def send_gift():
     await send_medal_gift()
     await send_expiring_gift()
-    BiliTimer.call_after(send_gift, 21600)
+
+    # 8小时后检查下一次送礼物的时间
+    BiliTimer.call_after(initiate_send_gift, 28800)
 
 async def full_intimate(list_gift, list_medal):
     json_res = await OnlineNet().req('gift_list')
@@ -371,7 +383,7 @@ def init():
     BiliTimer.call_after(Daily_bag, 0)
     BiliTimer.call_after(Daily_Task, 0)
     BiliTimer.call_after(link_sign, 0)
-    BiliTimer.call_after(send_gift, 0)
+    BiliTimer.call_after(initiate_send_gift, 0)
     BiliTimer.call_after(BiliMainTask, 0)
     BiliTimer.call_after(judge, 0)
     BiliTimer.call_after(watch_av, 0)
