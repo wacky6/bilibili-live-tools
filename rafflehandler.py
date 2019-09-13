@@ -82,28 +82,27 @@ class Rafflehandler:
 
 
 async def handle_1_TV_raffle(num, raffle_type, real_roomid, raffleid):
-    while True:
-        printer.info([f'参与房间{real_roomid:^9}的 {raffle_type} 抽奖：{raffleid}'], True)
-        json_response2 = await OnlineNet().req('get_gift_of_TV', raffle_type, real_roomid, raffleid)
-        code = json_response2['code']
-        if not code:
-            break
-        elif code == -403:
-            return True
-        elif code == -405:
-            print('没抢到。。。。。')
-            printer.warn(f'{raffleid}  {raffle_type} {num}')
-            return False
-        elif code == -400:
-            print(json_response2)
-            return
-        elif code != -401 and code != -403:
-            print(json_response2)
-            return
+    retries = 0
+    while retries < 3:
+        try:
+            json_response2 = await OnlineNet().req('get_gift_of_TV', raffle_type, real_roomid, raffleid)
+            code = json_response2['code']
 
-    g = json_response2['data']
-    printer.info([f'房间{real_roomid:^9}的抽奖：{raffleid} = {g["award_name"]} x {g["award_num"]}'], True)
+            if code == 0:
+                g = json_response2['data']
+                printer.info([f'房间 {real_roomid:^11} 的 {raffle_type} 抽奖 {raffleid}：{g["award_name"]} x{g["award_num"]}'], True)
+                return True
+            else:
+                printer.info([f'房间 {real_roomid:^11} 的 {raffle_type} 抽奖 {raffleid}：出问题了 = {code} / {json_response2}'], True)
+                return True
+        except:
+            await asyncio.sleep(3)
+            retries += 1
+
+    printer.info([f'房间 {real_roomid:^11} 的 {raffle_type} 抽奖 {raffleid}：持续网络故障，放弃治疗'], True)
+
     return True
+
 
 
 async def handle_1_guard_raffle(num, roomid, raffleid):
