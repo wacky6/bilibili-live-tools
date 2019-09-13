@@ -136,7 +136,7 @@ async def handle_1_room_TV(real_roomid):
     for j in checklen:
         raffle_id = j['raffleId']
         raffle_type = j['type']
-        time_wanted = j['time_wait'] + current_time
+        time_wanted = j['time_wait'] + current_time + random.randint(1, 15)
         # 处理一些重复
         if not Rafflehandler().check_duplicate(raffle_id):
             list_available_raffleid.append((raffle_id, raffle_type, time_wanted))
