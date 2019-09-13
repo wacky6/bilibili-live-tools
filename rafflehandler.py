@@ -72,9 +72,9 @@ class Rafflehandler:
 
     def add2raffle_id(self, raffle_id):
         self.list_raffle_id.append(raffle_id)
-        if len(self.list_raffle_id) > 150:
+        if len(self.list_raffle_id) > 4000:
             # print(self.list_raffle_id)
-            del self.list_raffle_id[:75]
+            del self.list_raffle_id[:2000]
             # print(self.list_raffle_id)
 
     def check_duplicate(self, raffle_id):
@@ -101,7 +101,8 @@ async def handle_1_TV_raffle(num, raffle_type, real_roomid, raffleid):
             print(json_response2)
             return
 
-    printer.info([f'房间{real_roomid:^9}的抽奖：{raffleid} = {json_response2["msg"]}'], True)
+    g = json_response2['data']
+    printer.info([f'房间{real_roomid:^9}的抽奖：{raffleid} = {g["award_name"]} x {g["award_num"]}'], True)
     return True
 
 
@@ -128,7 +129,7 @@ async def handle_1_room_TV(real_roomid):
 
     json_response = await OnlineNet().req('get_giftlist_of_TV', real_roomid)
     current_time = CurrentTime()
-    checklen = json_response['data']['list']
+    checklen = json_response['data']['gift']
     if not checklen:
         return None
 
@@ -136,7 +137,9 @@ async def handle_1_room_TV(real_roomid):
     for j in checklen:
         raffle_id = j['raffleId']
         raffle_type = j['type']
-        time_wanted = j['time_wait'] + current_time + random.randint(1, 15)
+        total_time = j['time']
+        time_wait = j['time_wait']
+        time_wanted = current_time + time_wait + random.randint(3, 15)
         # 处理一些重复
         if not Rafflehandler().check_duplicate(raffle_id):
             list_available_raffleid.append((raffle_id, raffle_type, time_wanted))

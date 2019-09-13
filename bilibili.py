@@ -209,7 +209,7 @@ class bilibili():
         max_retries = 3
         while max_retries > 0:
             try:
-                async with self.bili_session.post(url, headers=headers, data=data, params=params) as rsp:
+                async with self.bili_session.post(url, headers=headers, data=data, params=params, timeout=5) as rsp:
                     json_rsp = await self.get_json_rsp(rsp, url)
                     if json_rsp is not None:
                         return json_rsp
@@ -597,12 +597,14 @@ class bilibili():
     @staticmethod
     async def get_gift_of_TV(raffle_type, real_roomid, raffleid):
         inst = bilibili.instance
-        url = f"{base_url}/gift/v3/smalltv/join"
+        url = f"{base_url}/xlive/lottery-interface/v5/smalltv/join"
         payload = {
+            "id": raffleid,
             "roomid": real_roomid,
-            "raffleId": raffleid,
             "type": raffle_type,
-            "csrf_token": inst.dic_bilibili['csrf']
+            "csrf_token": inst.dic_bilibili['csrf'],
+            "csrf": inst.dic_bilibili['csrf'],
+            "visit_id": ''
         }
 
         json_rsp = await inst.bili_session_post(url, data=payload, headers=inst.dic_bilibili['pcheaders'])
@@ -634,7 +636,7 @@ class bilibili():
     @staticmethod
     async def get_giftlist_of_TV(real_roomid):
         inst = bilibili.instance
-        url = f"{base_url}/gift/v3/smalltv/check?roomid={real_roomid}"
+        url = f"{base_url}/xlive/lottery-interface/v1/lottery/Check?roomid={real_roomid}"
         json_rsp = await inst.bili_session_get(url, headers=inst.dic_bilibili['pcheaders'])
         return json_rsp
 
