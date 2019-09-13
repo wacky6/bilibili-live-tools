@@ -31,7 +31,6 @@ class BiliTimer:
     @staticmethod
     def call_with_args(func, args):
         inst = BiliTimer.instance
-        print('执行', func, args)
         asyncio.ensure_future(func(*args))
 
     @staticmethod
