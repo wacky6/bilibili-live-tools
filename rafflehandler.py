@@ -93,7 +93,7 @@ async def handle_1_TV_raffle(num, raffle_type, real_roomid, raffleid):
                 printer.info([f'房间 {real_roomid:^11} 的 {raffle_type} 抽奖 {raffleid}：{g["award_name"]} x{g["award_num"]}'], True)
                 return True
             else:
-                printer.info([f'房间 {real_roomid:^11} 的 {raffle_type} 抽奖 {raffleid}：出问题了 = {code} / {json_response2}'], True)
+                printer.info([f'房间 {real_roomid:^11} 的 {raffle_type} 抽奖 {raffleid}：出问题了 = {code} / {json_response2["msg"]}'], True)
                 return True
         except:
             await asyncio.sleep(3)
