@@ -19,7 +19,6 @@ class BiliTimer:
         return cls.instance
 
     def excute_async(self, i):
-        print('执行', i)
         asyncio.ensure_future(i[0](*i[1]))
 
     @staticmethod
