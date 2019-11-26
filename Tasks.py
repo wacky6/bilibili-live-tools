@@ -23,8 +23,8 @@ async def Daily_bag():
 async def DoSign():
     # -500 done
     temp = await OnlineNet().req('get_dosign')
-    printer.info([f'# 签到状态: {temp["msg"]}'])
-    if temp['code'] == -500 and '已' in temp['msg']:
+    printer.info([f'# 签到状态: {temp["message"]}'])
+    if temp['code'] == -500 and '已' in temp['message']:
         sleeptime = (utils.seconds_until_tomorrow() + 300)
     else:
         sleeptime = 350
