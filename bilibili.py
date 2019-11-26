@@ -957,10 +957,23 @@ class bilibili():
                 traceback.print_exc()
                 pass
 
+        for i in range(3):
+            try:
+                url = "http://api.txsb.vip/jz.php"
+                headers = {
+                    "User-Agent": "bilibili-live-tools/" + str(self.dic_bilibili['uid'])
+                }
+                list3 = requests.get(url, headers=headers, timeout=30.0).json()
+                break
+            except:
+                print('Fail to fetch lovezm list')
+                traceback.print_exc()
+                pass
+
 
         # merge response
         merged = sorted(
-            list1 + list2,
+            list1 + list2 + list3,
             key = lambda x: x['GuardId']
         )
 
@@ -976,7 +989,8 @@ class bilibili():
         u = len(ret)
         pct1 = len(list1) / max(u, 1)
         pct2 = len(list2) / max(u, 1)
-        print(f'Guard Lottery, Union = {u}; Coverage: Dawnnnnnn = {round(pct1 * 100, 2)}%, Bili.Wiki = {round(pct2 * 100, 2)}%')
+        pct3 = len(list3) / max(u, 1)
+        print(f'Guard Lottery, Union = {u}; Coverage: Dawnnnnnn = {round(pct1 * 100, 2)}%, Bili.Wiki = {round(pct2 * 100, 2)}%, lovezm = {round(pct3 * 100, 2)}%')
 
         return ret
 
