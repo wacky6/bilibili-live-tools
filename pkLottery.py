@@ -22,10 +22,10 @@ class PKLottery:
             return
 
         for i in range(0, len(json_response)):
-            PKId = json_response[i]['PKId']
+            PKId = json_response[i]['Id']
             if PKId not in PKLottery.had_gotten_pk and PKId != 0:
                 PKLottery.had_gotten_pk.append(PKId)
-                OriginRoomId = json_response[i]['OriginRoomId']
+                OriginRoomId = json_response[i]['RoomId']
                 if not OriginRoomId == PKLottery.last_pk_room:
                     result = await utils.check_room_true(OriginRoomId)
                     if True in result:

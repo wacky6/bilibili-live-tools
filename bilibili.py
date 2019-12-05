@@ -923,6 +923,18 @@ class bilibili():
                     "User-Agent": "bilibili-live-tools/" + str(self.dic_bilibili['uid'])
                 }
                 list1 = requests.get(url, headers=headers, timeout=30.0).json()
+                list1 = list(map(
+                    lambda e: {
+                        "GuardId": e['Id'],
+                        "MasterId": e['MasterId'],
+                        "MasterName": e['MasterName'],
+                        "OriginRoomId": e['RoomId'],
+                        "SenderId": e['SenderId'],
+                        "Status": True,
+                        "Time": e['Time'],
+                    },
+                    list1
+                ))
                 break
             except:
                 print('Fail to fetch Dawnnnnnn list')
@@ -939,14 +951,11 @@ class bilibili():
                 html = requests.get(url, headers=headers, timeout=30.0).content.decode('utf-8')
                 list2 = list(map(
                     lambda t: {
-                        "GovernorName": "[Unknown]",
-                        "Guard": t[2],
                         "GuardId": int(t[0]),
                         "MasterId": -1,
                         "MasterName": "[Unknown]",
                         "OriginRoomId": int(t[1]),
                         "SenderId": -1,
-                        "ShortRoomId": int(t[1]),
                         "Status": True,
                         "Time": t[3],
                     },
