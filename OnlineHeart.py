@@ -44,11 +44,15 @@ async def guard_lottery():
             response2 = await bilibili().get_gift_of_captain(OriginRoomId, GuardId)
             json_response2 = await response2.json(content_type=None)
             if json_response2['code'] == 0:
-                printer.info([f"获取到房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度: {json_response2['data']['message']}"])
+                if json_response2['data']['award_text']:
+                    award_text = f"{json_response2['data']['award_text']}"
+                else:
+                    award_text = f"{json_response2['data']['award_name']}X{json_response2['data']['award_num']}"
+                printer.info([f"获取到房间 {OriginRoomId} 编号 {GuardId} 的舰队奖励: {award_text}"])
             elif json_response2['code'] == 400 and json_response2['msg'] == "你已经领取过啦":
                 printer.info([f"房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度已领过"])
-            elif json_response2['code'] == 400 and json_response2['msg'] == "访问被拒绝":
-                printer.info([f"获取房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度: {json_response2['message']}"])
+            elif json_response2['code'] == -403:
+                printer.info([f"获取房间 {OriginRoomId} 编号 {GuardId} 的上船亲密度:"])
                 print(json_response2)
             else:
                 printer.info([f"房间 {OriginRoomId} 编号 {GuardId}  的上船亲密度领取出错: {json_response2}"])
