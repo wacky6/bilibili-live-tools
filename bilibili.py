@@ -937,6 +937,7 @@ class bilibili():
                 ))
                 break
             except:
+                list1 = []
                 print('Fail to fetch Dawnnnnnn list')
                 traceback.print_exc()
                 pass
@@ -962,6 +963,7 @@ class bilibili():
                     re.findall(r'<tr>\s*<td>\s*<b>\s*(\d+)\s*</b>\s*</td>\s*<td>\s*(\d+)\s*</td>\s*<td>\s*([^<+]+)(?:\+\d+)?\s*</td>\s*<td>\s*([^<]+)\s*</td>', html)
                 ))
             except:
+                list2 = []
                 print('Fail to fetch Bilibili Wiki list')
                 traceback.print_exc()
                 pass
@@ -975,6 +977,7 @@ class bilibili():
                 list3 = requests.get(url, headers=headers, timeout=30.0).json()
                 break
             except:
+                list3 = []
                 print('Fail to fetch lovezm list')
                 traceback.print_exc()
                 pass
