@@ -164,7 +164,7 @@ class bilibili():
                 continue
 
     def cnn_captcha(self, img):
-        url = "http://zerozhushou.com:11003/captcha/v1"
+        url = "http://106.75.36.27:19951/captcha/v1"
         img = str(img, encoding='utf-8')
         json = {"image": img}
         ressponse = requests.post(url, json=json)
@@ -491,7 +491,7 @@ class bilibili():
     @staticmethod
     def request_getkey():
         inst = bilibili.instance
-        url = 'https://passport.bilibili.com/api/oauth2/getKey'
+        url = 'https://passport.snm0516.aisee.tv/api/oauth2/getKey'
         temp_params = f'appkey={inst.dic_bilibili["appkey"]}'
         sign = inst.calc_sign(temp_params)
         params = {'appkey': inst.dic_bilibili['appkey'], 'sign': sign}
@@ -499,15 +499,23 @@ class bilibili():
         return response
 
     @staticmethod
+    def access_token_2_cookies(access_token):
+        inst = bilibili.instance
+        params = f"access_key={access_token}&appkey={inst.dic_bilibili['appkey']}&gourl=https%3A%2F%2Faccount.bilibili.com%2Faccount%2Fhome"
+        url = f"https://passport.bilibili.com/api/login/sso?{params}&sign={inst.calc_sign(params)}"
+        response = requests.get(url, allow_redirects=False)
+        return response.cookies.get_dict(domain=".bilibili.com")
+
+    @staticmethod
     def normal_login(username, password, captcha=None):
         inst = bilibili.instance
         if captcha is None:
             captcha = ''
-        temp_params = f'actionKey={inst.dic_bilibili["actionKey"]}&appkey={inst.dic_bilibili["appkey"]}&build={inst.dic_bilibili["build"]}&captcha={captcha}&device={inst.dic_bilibili["device"]}&mobi_app={inst.dic_bilibili["mobi_app"]}&password={password}&platform={inst.dic_bilibili["platform"]}&username={username}'
-        sign = inst.calc_sign(temp_params)
-        payload = f'{temp_params}&sign={sign}'
-        url = "https://passport.bilibili.com/api/v2/oauth2/login"
-        response = inst.login_session_post(url, params=payload)
+        url = "https://passport.snm0516.aisee.tv/api/tv/login"
+        temp_params = f"appkey={inst.dic_bilibili['appkey']}&build={inst.dic_bilibili['build']}&captcha=&channel=master&guid=XYEBAA3E54D502E37BD606F0589A356902FCF&mobi_app={inst.dic_bilibili['mobi_app']}&password={password}&platform={inst.dic_bilibili['platform']}&token=5598158bcd8511e2&ts=0&username={username}"
+        data = f"{temp_params}&sign={bilibili().calc_sign(temp_params)}"
+        headers = {"Content-type": "application/x-www-form-urlencoded"}
+        response = requests.post(url, data=data, headers=headers)
         return response
 
     @staticmethod
@@ -515,7 +523,7 @@ class bilibili():
         inst = bilibili.instance
 
         # with requests.Session() as s:
-        url = "https://passport.bilibili.com/captcha"
+        url = "http://passport.snm0516.aisee.tv/api/captcha?token=5598158bcd8511e2"
         res = inst.login_session_get(url)
         # print(res.content)
         # print(res.content)
@@ -865,8 +873,8 @@ class bilibili():
         return json_rsp
 
     async def req_fetch_av(self):
-        text_tsp = await self.session_text_get('https://www.bilibili.com/ranking/all/0/0/1/')
-        return text_tsp
+        json_rsp = await self.other_session_get('https://api.bilibili.com/x/web-interface/ranking?rid=0&day=1&type=1&arc_type=0')
+        return json_rsp
 
     async def req_vote_case(self, id, vote):
         url = 'http://api.bilibili.com/x/credit/jury/vote'

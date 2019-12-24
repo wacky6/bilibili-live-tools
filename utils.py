@@ -387,10 +387,8 @@ async def GiveCoin2Av(video_id, num):
         return False
 
 async def GetTopVideoList():
-    text_rsp = await OnlineNet().req('req_fetch_av')
-    list_av = re.findall(r'(?<=www.bilibili.com/video/av)\d+(?=/)', text_rsp)
-    list_av = list(set(list_av))
-    return list_av
+    json_rsp = await OnlineNet().req('req_fetch_av')
+    return list(map(lambda x: x['aid'], json_rsp['data']['list']))
 
 async def fetch_uper_video(list_mid):
     list_av = []
