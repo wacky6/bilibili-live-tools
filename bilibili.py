@@ -798,6 +798,16 @@ class bilibili():
         res = await inst.bili_session_get(url)
         return res
 
+    @staticmethod
+    async def recv_vip_privilege(type):
+        inst = bilibili.instance
+        url = f'https://api.bilibili.com/x/vip/privilege/receive'
+        data = {
+            'type': type,
+            'csrf': inst.dic_bilibili['csrf'],
+        }
+        return await inst.bili_session_post(url, headers=inst.dic_bilibili['pcheaders'], data=data)
+
     async def ReqGiveCoin2Av(self, video_id, num):
         url = 'https://api.bilibili.com/x/web-interface/coin/add'
         pcheaders = {

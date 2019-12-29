@@ -378,6 +378,10 @@ async def watch_av():
 
     BiliTimer.call_after(watch_av, 54000 + random.randint(0, 14400))
 
+async def vip_priviledge_b_coin():
+    resp = await OnlineNet().req('recv_vip_privilege', 1)
+    BiliTimer.call_after(vip_priviledge_b_coin, utils.seconds_until_tomorrow())
+    printer.info([f'大会员返B币：{resp["message"]}'])
 
 def init():
     BiliTimer.call_after(sliver2coin, 0)
@@ -389,6 +393,7 @@ def init():
     BiliTimer.call_after(initiate_send_gift, 0)
     BiliTimer.call_after(BiliMainTask, 0)
     BiliTimer.call_after(judge, 0)
+    BiliTimer.call_after(vip_priviledge_b_coin, 0)
 
     # 每天 20:30 - 22:30 之间开始 (黄金时段？）看视频
     # 如果正在黄金时段，立刻开始看。 假设 HEADLESS 并且定时重启（crontab）
