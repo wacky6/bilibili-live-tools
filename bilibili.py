@@ -833,7 +833,7 @@ class bilibili():
         return json_rsp
 
     async def AvHeartbeat(self, aid, cid, playtype, playtime, realtime, startts):
-        url = 'https://api.bilibili.com/x/report/web/heartbeat'
+        url = 'https://api.bilibili.com/x/click-interface/web/heartbeat'
         pcheaders = {
             **(self.dic_bilibili['pcheaders']),
             'referer': f'https://www.bilibili.com/video/av{aid}'
@@ -854,7 +854,7 @@ class bilibili():
         return json_rsp
 
     async def Heartbeat(self, aid, cid):
-        url = 'https://api.bilibili.com/x/report/web/heartbeat'
+        url = 'https://api.bilibili.com/x/click-interface/web/heartbeat'
         data = {'aid': aid, 'cid': cid, 'mid': self.dic_bilibili['uid'], 'csrf': self.dic_bilibili['csrf'],
                 'played_time': 0, 'realtime': 0,
                 'start_ts': int(time.time()), 'type': 3, 'dt': 2, 'play_type': 1}
