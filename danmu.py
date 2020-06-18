@@ -7,6 +7,7 @@ import struct
 import json
 import sys
 import aiohttp
+import zlib
 
 
 class BaseDanmu():
@@ -97,7 +98,20 @@ class BaseDanmu():
                 len_data, len_header, ver, opt, seq = tuple_header
                 body_l = data_l + len_header
                 next_data_l = data_l + len_data
-                body = datas[body_l:next_data_l]
+
+                if ver == 2:
+                    # handle ver 2 zlib gibberish, insert decompressed data to datas
+                    decompressed = zlib.decompress(datas[body_l:next_data_l])
+                    datas = decompressed + datas[next_data_l:]
+                    data_l = 0
+                    len_datas = len(datas)
+                    continue
+                else:
+                    # ver 0 and ver 1 doesn't need decompression
+                    body_l = data_l + len_header
+                    next_data_l = data_l + len_data
+                    body = datas[body_l:next_data_l]
+
                 # 人气值(或者在线人数或者类似)以及心跳
                 if opt == 3:
                     # UserCount, = struct.unpack('!I', remain_data)

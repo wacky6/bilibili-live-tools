@@ -960,32 +960,6 @@ class bilibili():
                 traceback.print_exc()
                 pass
 
-        # Bilibili Wiki
-        for i in range(3):
-            try:
-                url = "https://list.bilibili.wiki/zongdu.php"
-                headers = {
-                    "User-Agent": self.dic_bilibili['pcheaders']["User-Agent"]
-                }
-                html = requests.get(url, headers=headers, timeout=30.0).content.decode('utf-8')
-                list2 = list(map(
-                    lambda t: {
-                        "GuardId": int(t[0]),
-                        "MasterId": -1,
-                        "MasterName": "[Unknown]",
-                        "OriginRoomId": int(t[1]),
-                        "SenderId": -1,
-                        "Status": True,
-                        "Time": t[3],
-                    },
-                    re.findall(r'<tr>\s*<td>\s*<b>\s*(\d+)\s*</b>\s*</td>\s*<td>\s*(\d+)\s*</td>\s*<td>\s*([^<+]+)(?:\+\d+)?\s*</td>\s*<td>\s*([^<]+)\s*</td>', html)
-                ))
-                break
-            except:
-                print('Fail to fetch Bilibili Wiki list')
-                traceback.print_exc()
-                pass
-
         for i in range(3):
             try:
                 url = "http://api.txsb.vip/jz.php"
@@ -1002,7 +976,7 @@ class bilibili():
 
         # merge response
         merged = sorted(
-            list1 + list2 + list3,
+            list1 + list3,
             key = lambda x: x['GuardId']
         )
 
@@ -1017,9 +991,8 @@ class bilibili():
         # Report statistics
         u = len(ret)
         pct1 = len(list1) / max(u, 1)
-        pct2 = len(list2) / max(u, 1)
         pct3 = len(list3) / max(u, 1)
-        print(f'Guard Lottery, Union = {u}; Coverage: Dawnnnnnn = {round(pct1 * 100, 2)}%, Bili.Wiki = {round(pct2 * 100, 2)}%, lovezm = {round(pct3 * 100, 2)}%')
+        print(f'Guard Lottery, Union = {u}; Coverage: Dawnnnnnn = {round(pct1 * 100, 2)}%, lovezm = {round(pct3 * 100, 2)}%')
 
         return ret
 
